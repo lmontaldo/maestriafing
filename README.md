@@ -1,28 +1,30 @@
 
 #  MLOps project
-thesis_lmontaldo/
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   ├── models/
-│   ├── logs/
+
+**Option 2: Visual representation**
+
+If you prefer a more visual representation, you can use ASCII art or a tree diagram to display the directory structure. Here's an example using ASCII art:
+
+```plaintext
+.
+├── data
+│   ├── raw
+│   ├── processed
+│   ├── models
+│   ├── logs
 │   └── ...
-│
-├── tasks/
+├── tasks
 │   ├── data_processing.py
 │   ├── model_training.py
 │   ├── model_evaluation.py
 │   ├── deployment.py
 │   └── ...
-│
-├── utils/
+├── utils
 │   ├── data_loader.py
 │   ├── data_preprocessing.py
 │   ├── model_architecture.py
 │   ├── evaluation_metrics.py
 │   └── ...
-│
 ├── main.py
 ├── config.py
 └── requirements.txt
