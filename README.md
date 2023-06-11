@@ -43,7 +43,7 @@ Discuss the strengths and weaknesses of each model.
 │   ├── models
 │   ├── logs
 │   └── ...
-├── tasks
+├── tasks_scripts
 │   ├── data_processing.py
 │   ├── model_training.py
 │   ├── model_evaluation.py
