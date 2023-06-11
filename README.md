@@ -24,7 +24,7 @@
 ├── main.py
 ├── config.py
 └── requirements.txt
-
+```
 ## Breakdown of the folders and files:
 
 data/: This folder contains subfolders for different stages of data processing and storage. For example, raw/ may contain raw data files, processed/ stores cleaned and preprocessed data, models/ saves trained models, logs/ stores logs generated during the process, and so on. You can customize these folders based on your project's requirements.
