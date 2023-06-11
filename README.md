@@ -1,11 +1,7 @@
 
 #  MLOps project
 
-**Option 2: Visual representation**
-
-If you prefer a more visual representation, you can use ASCII art or a tree diagram to display the directory structure. Here's an example using ASCII art:
-
-```plaintext
+```Structture
 .
 ├── data
 │   ├── raw
