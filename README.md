@@ -1,5 +1,5 @@
 
-# Thesis:  MLOps project
+# Thesis MLOps project
 
 ```Structture
 .
