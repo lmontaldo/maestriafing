@@ -1,5 +1,39 @@
 
-# THESIS MLOPS PROJECT
+# THESIS STRUCTURE
+## Chapter 1: Introduction
+
+Introduce the topic of the thesis and the goal of the MLOps project.
+Provide background information on preprocessing, FAVAR model, deep learning, and time series analysis.
+
+## Chapter 2: Literature Review
+
+Review existing literature on preprocessing techniques for time series data.
+Explore relevant research papers and articles on FAVAR models and their application in time series analysis.
+Investigate deep learning models for time series forecasting.
+
+## Chapter 3: Data Collection and Preprocessing
+
+Explain the data collection process, including the sources of your monthly time series data.
+Describe the steps taken to preprocess the time series data, such as handling missing values, handling outliers, and scaling the data.
+
+## Chapter 4: FAVAR Model
+
+Present the concept and theory behind the FAVAR model.
+Describe the implementation of the FAVAR model on your monthly time series data.
+Explain how the model is trained, validated, and evaluated.
+
+## Chapter 5: Deep Learning Model
+
+Discuss the theory and architecture of the deep learning model you chose for time series analysis.
+Detail the implementation of the deep learning model on your monthly time series data.
+Explain the training process, hyperparameter tuning, and evaluation metrics used.
+Chapter 6: Model Comparison and Evaluation
+
+Compare the performance of the FAVAR model and the deep learning model.
+Evaluate the models based on appropriate metrics such as accuracy, RMSE, MAE, etc.
+Discuss the strengths and weaknesses of each model.
+
+## Chapter 7: Deployment and MLOps
 
 ```Structture
 .
@@ -38,43 +72,6 @@
 * config.py: This file contains configuration variables for your project. You can define constants such as file paths, hyperparameters, API keys, or any other project-specific configurations here.
 
 * requirements.txt: This file lists the required Python packages and their versions for your project. It helps ensure that anyone running your project can install the necessary dependencies easily.
-
-
-# THESIS STRUCTURE
-## Chapter 1: Introduction
-
-Introduce the topic of the thesis and the goal of the MLOps project.
-Provide background information on preprocessing, FAVAR model, deep learning, and time series analysis.
-
-## Chapter 2: Literature Review
-
-Review existing literature on preprocessing techniques for time series data.
-Explore relevant research papers and articles on FAVAR models and their application in time series analysis.
-Investigate deep learning models for time series forecasting.
-
-## Chapter 3: Data Collection and Preprocessing
-
-Explain the data collection process, including the sources of your monthly time series data.
-Describe the steps taken to preprocess the time series data, such as handling missing values, handling outliers, and scaling the data.
-
-## Chapter 4: FAVAR Model
-
-Present the concept and theory behind the FAVAR model.
-Describe the implementation of the FAVAR model on your monthly time series data.
-Explain how the model is trained, validated, and evaluated.
-
-## Chapter 5: Deep Learning Model
-
-Discuss the theory and architecture of the deep learning model you chose for time series analysis.
-Detail the implementation of the deep learning model on your monthly time series data.
-Explain the training process, hyperparameter tuning, and evaluation metrics used.
-Chapter 6: Model Comparison and Evaluation
-
-Compare the performance of the FAVAR model and the deep learning model.
-Evaluate the models based on appropriate metrics such as accuracy, RMSE, MAE, etc.
-Discuss the strengths and weaknesses of each model.
-
-### Chapter 7: Deployment and MLOps
 
 Discuss the deployment process of the chosen models in a production environment.
 Describe the MLOps practices and tools used for model deployment, monitoring, and versioning.
