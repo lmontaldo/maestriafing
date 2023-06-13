@@ -1,0 +1,10 @@
+2023-06-12 00:17:45.397 | DEBUG    | __main__:<module>:7 - This is a debug message
+2023-06-12 00:17:45.452 | INFO     | __main__:<module>:8 - This is an info message
+2023-06-12 00:17:45.455 | WARNING  | __main__:<module>:9 - This is a warning message
+2023-06-12 00:17:45.460 | ERROR    | __main__:<module>:10 - This is an error message
+2023-06-12 00:17:45.463 | CRITICAL | __main__:<module>:11 - This is a critical message
+2023-06-12 00:18:18.436 | DEBUG    | __main__:<module>:7 - This is a debug message
+2023-06-12 00:18:18.440 | INFO     | __main__:<module>:8 - This is an info message
+2023-06-12 00:18:18.445 | WARNING  | __main__:<module>:9 - This is a warning message
+2023-06-12 00:18:18.448 | ERROR    | __main__:<module>:10 - This is an error message
+2023-06-12 00:18:18.453 | CRITICAL | __main__:<module>:11 - This is a critical message
