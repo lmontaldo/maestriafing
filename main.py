@@ -1,5 +1,5 @@
 # Import necessary modules
-from tasks.data_processing import process_data
+from tasks_scripts.data_processing import process_data
 #from tasks.model_training import train_model
 #from tasks.model_evaluation import evaluate_model
 #from tasks.deployment import deploy_model
