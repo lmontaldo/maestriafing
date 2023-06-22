@@ -3,6 +3,9 @@ from tasks_scripts.data_processing import process_data
 #from tasks.model_training import train_model
 #from tasks.model_evaluation import evaluate_model
 #from tasks.deployment import deploy_model
+from tasks_scripts.data_loader import load_data
+from utils.model_architecture import create_model
+
 
 def main():
     # Step 1: Data Processing
