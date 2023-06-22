@@ -31,7 +31,7 @@ results = cursor.fetchall()
 df = pd.DataFrame(results, columns=col_names)
 
 # Process and display the DataFrame
-print(df.columns)
+print(df.head())
 
 # Close the cursor and the database connection
 cursor.close()
