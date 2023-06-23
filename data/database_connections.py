@@ -58,8 +58,8 @@ def main():
     
     # Query 1: Get column names
     table_clases = 'Datosipc'
-    df_clases = query_column_names(conn, table_clases)
-    print("Column names for table 'Datosipc':")
+    df_clases = query_table_data(conn, table_clases)
+    print("Table data for table 'Datosipc':")
     print(df_clases.head())
     
     # Query 2: Get table data
