@@ -7,3 +7,5 @@ data/
 *.csv
 # Ignore files with a specific extension
 *.log
+# Ignore __pycache__/
+__pycache__/
