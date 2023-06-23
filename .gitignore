@@ -1,3 +1,9 @@
  
 *.csv
 
+# Ignore a specific directory
+data/
+# Ignore CSV files
+*.csv
+# Ignore files with a specific extension
+*.log
