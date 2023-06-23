@@ -48,34 +48,24 @@ def query_table_data(conn, table_name):
     
     return df
 
-# Main function to execute the queries
-def main():
-    # Specify the database path
-    path = 'C:/Users/Transitorio/Desktop/tesis2023/tesis2023-1/data/mydatabase.db'
-    
+def get_data(database_path):
     # Connect to the database
-    conn = connect_to_database(path)
+    conn = connect_to_database(database_path)
     
-    # Query 1: Get column names
+    # Query 1: Get table data for 'Datosipc'
     table_clases = 'Datosipc'
     df_clases = query_table_data(conn, table_clases)
-    print("Table data for table 'Datosipc':")
-    print(df_clases.head())
     
-    # Query 2: Get table data
+    # Query 2: Get table data for 'ipc_univariado'
     table_univa = 'ipc_univariado'
     df_univariado = query_table_data(conn, table_univa)
-    print("Table data for table 'ipc_univariado':")
-    print(df_univariado.head())
     
-    # Query 3: Get table data for the third query
+    # Query 3: Get table data for 'Datos_fmi_2022_external'
     table_fmi = 'Datos_fmi_2022_external'
     df_fmi = query_table_data(conn, table_fmi)
-    print("Table data for table 'Datos_fmi_2022_external':")
-    print(df_fmi.head())
     
     # Close the database connection
     conn.close()
+    
+    return df_clases, df_univariado, df_fmi
 
-# Call the main function
-main()
