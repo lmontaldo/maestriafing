@@ -14,7 +14,13 @@ from sklearn.preprocessing import StandardScaler
 # Specify the database path
 path = 'C:/Users/Transitorio/Desktop/tesis2023/tesis2023-1/data/mydatabase.db'
 # Retrieve the DataFrames from data_loader
-df_clases, df_univariado, df_fmi, df_clases_filter = data_loader.get_data(path)
+#df_clases, df_univariado, df_fmi, df_clases_filter = data_loader.get_data(path)
+tables_list= ['Datosipc', 'ipc_general_ine','Datos_fmi_2022_external', 'clases_ipc_filtradas']
+df_dict = data_loader.get_data(path, tables_list)
+df_univariado = df_dict['ipc_general_ine']
+df_clases_filter=df_dict['clases_ipc_filtradas']
+df_clases = df_dict['Datosipc']
+df_fmi = df_dict['Datos_fmi_2022_external']
 ###########################################
 # Preprocessing functions
 ###########################################
