@@ -1,18 +1,10 @@
 import sys
 import os
-
-# Get the current file directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Get the parent directory
 parent_dir = os.path.dirname(current_dir)
-
-# Add the parent directory to the module search path
 sys.path.append(parent_dir)
-
-
-import data_loader
 from config import DATA_BASE_PATH
+from utils import data_loader
 import sqlite3
 import sys
 import numbers
