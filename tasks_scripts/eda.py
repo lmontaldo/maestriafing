@@ -14,6 +14,8 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import matplotlib.pyplot as plt
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
@@ -31,7 +33,17 @@ df_gral = df_dict['IPC_gral']
 # IPC GENERAL EDA
 ############################################
 print('\n IPC general información de los datos: \n ------------------------------ \n')
-print(df_gral.info())
 # transform ymd column to datetime
-
-
+df_gral['ymd'] = pd.to_datetime(df_gral['ymd']).dt.strftime('%Y-%m-%d')
+# Create the plot
+plt.figure(figsize=(10, 10))  # Adjust figure size to provide more space for labels
+sns.lineplot(x='ymd', y='indice', data=df_gral)
+plt.xlabel('fecha')
+plt.ylabel('valor IPC')
+plt.title('Evolución del IPC general mensual')
+# Rotate x-axis labels
+plt.xticks(rotation=45, ha='right')
+# Format x-axis tick labels for readability
+plt.gca().xaxis.set_major_locator(plt.MaxNLocator(8))
+# Save the plot to an image file
+plt.savefig('docs/images/time_series_plot_1.png')
