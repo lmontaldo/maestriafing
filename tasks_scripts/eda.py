@@ -4,7 +4,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from config import DATA_BASE_PATH
-from utils import data_loader
+from utils import data_loader 
+from utils.ADF_KPSS_tests import adf_test 
 import sqlite3
 import sys
 import numbers
@@ -47,3 +48,18 @@ plt.xticks(rotation=45, ha='right')
 plt.gca().xaxis.set_major_locator(plt.MaxNLocator(8))
 # Save the plot to an image file
 plt.savefig('docs/images/time_series_plot_1.png')
+
+print(df_clases.head())
+
+results = adf_test(df_clases)
+for column, result in results.items():
+    print(f"Variable: {column}")
+    print(result)
+    print()
+
+
+
+
+
+
+
