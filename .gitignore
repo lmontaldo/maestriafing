@@ -9,3 +9,5 @@ data/
 *.log
 # Ignore __pycache__/
 __pycache__/
+# ignore docs
+/doc/

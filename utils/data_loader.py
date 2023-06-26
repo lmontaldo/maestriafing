@@ -59,6 +59,7 @@ def get_data(database_path, table_names):
         df_dict[table] = query_table_data(conn, table)
 
     # Close the database connection
+    
     conn.close()
     
     return df_dict    
