@@ -10,4 +10,4 @@ data/
 # Ignore __pycache__/
 __pycache__/
 # ignore docs
-/doc/
+/docs/images/
