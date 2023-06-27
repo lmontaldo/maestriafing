@@ -1,21 +1,31 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from statsmodels.tsa.seasonal import seasonal_decompose, STL
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from config import image_path
 
-def line_plot_dataframe(df, title=None, xlabel=None, ylabel=None):
+
+def to_datetime_str(df, column):
+    df[column] = pd.to_datetime(df[column]).dt.strftime('%Y-%m-%d')
+    return df
+
+def save_line_plot_df(df, save_path=image_path, title=None, xlabel=None, ylabel=None):
     """
-    Plot the DataFrame.
+    Plot the DataFrame and save it to a specified path.
 
     Args:
         df (pd.DataFrame): The DataFrame to plot.
+        save_path (str): The path where the plot should be saved.
         title (str): The title for the plot. Default is None.
         xlabel (str): The label for the x-axis. Default is None.
         ylabel (str): The label for the y-axis. Default is None.
+    Returns:
+        ax: An Axes object with the plot.
     """
     plt.figure(figsize=(10, 10))  # Set the figure size
-    df.plot()
+    ax = df.plot()
     plt.xticks(rotation=45, ha='right')  # Rotate and align x-axis tick labels
     plt.gca().xaxis.set_major_locator(plt.MaxNLocator(8))  # Set maximum number of x-axis tick labels
     if title:
@@ -24,7 +34,23 @@ def line_plot_dataframe(df, title=None, xlabel=None, ylabel=None):
         plt.xlabel(xlabel)  # Set the x-axis label if provided
     if ylabel:
         plt.ylabel(ylabel)  # Set the y-axis label if provided
-    plt.show()
+
+    # Save the plot
+    plt.savefig(os.path.join(save_path, input("Enter the plot name: ") + ".png"))
+    plt.close()  # Close the figure to free up memory
+
+    return ax
+
+    
+    
+def save_plot(plot_func, data, save_folder, filename):
+    plt.figure(figsize=(10, 10))  # Set the figure size
+    plot_func(data)
+    save_path = os.path.join(save_folder, filename)
+    plt.savefig(save_path)
+    plt.close()
+    print(f"Plot saved at {save_path}")    
+    
     
 def decompose_dataframe(df, model='additive', freq=None):
     """
