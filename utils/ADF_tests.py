@@ -1,31 +1,44 @@
-import rpy2.robjects as robjects
-from rpy2.robjects import pandas2ri
+import numpy as np
+from arch.unitroot import ADF
 
-# Activate automatic conversion between pandas and R objects
-pandas2ri.activate()
+class ADFModelComparison:
+    def __init__(self, data):
+        self.data = data
+        self.T = data.shape[0]
+    
+    def compare_model_c_with_a(self, r, k, significance_level=0.05):
+        model_c = ADF(self.data, trend='ct')
+        model_a = ADF(self.data, trend='nc')
+        results_c = model_c.fit()
+        results_a = model_a.fit()
+        
+        # Calculate the test statistic
+        test_stat = (results_a.stat - results_c.stat) * (self.T - r - k) / r
+        
+        # Calculate the p-value
+        p_value = 1 - np.abs(test_stat)
+        
+        # Compare with the significance level
+        is_significant = p_value < significance_level
+        
+        return test_stat, p_value, is_significant
+    
+    def compare_model_b_with_a(self, r, k, significance_level=0.05):
+        model_b = ADF(self.data, trend='c')
+        model_a = ADF(self.data, trend='nc')
+        results_b = model_b.fit()
+        results_a = model_a.fit()
+        
+        # Calculate the test statistic
+        test_stat = (results_a.stat - results_b.stat) * (self.T - r - k) / r
+        
+        # Calculate the p-value
+        p_value = 1 - np.abs(test_stat)
+        
+        # Compare with the significance level
+        is_significant = p_value < significance_level
+        
+        return test_stat, p_value, is_significant
 
-def adf_test(dataframe):
-    # Convert the dataframe to an R dataframe
-    r_dataframe = pandas2ri.conversion.py2rpy(dataframe)
-    
-    # Load the required R package for ADF test
-    robjects.r('library(tseries)')
-    
-    adf_results = {}
-    
-    # Apply ADF test to each variable in the R dataframe
-    for column in dataframe.columns:
-        variable = f'df${column}'
-        r_code = f"result <- adf.test({variable})"
-        
-        robjects.r(r_code)
-        
-        # Retrieve the ADF test results as an R object
-        adf_result = robjects.r['result']
-        
-        # Convert the ADF test results to a pandas dataframe
-        adf_result_df = pandas2ri.ri2py(adf_result)
-        
-        adf_results[column] = adf_result_df
-    
-    return adf_results
+
+
