@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from utils.eda_decomposition import *
 from utils.plot_saver import PlotSaver
 from arch.unitroot import ADF
+from utils.unitroot import UnitRootTests
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
@@ -48,54 +49,34 @@ df_gral_idx_diff = df_gral_idx.diff().dropna()
 # Deseasonalize IPC general
 df_gral_idx_diff_des = perform_seasonal_adjustment(df_gral_idx_diff)
 #save_line_plot_df(df_gral_idx_diff_des, image_path, title='Evolución IPC general en primeras diferencias con ajuste estacional', xlabel='Fecha', ylabel='Valores')
-T=len(df_gral_idx_diff_des)
-# model c 
-def gamma_test(df, critical_value=-3.45):
-    results = {}
-    gamma_not_zero = pd.DataFrame()
-    gamma_zero = pd.DataFrame()
-    
-    for col in df.columns:
-        adf_c = ADF(df[col], trend='ct')
-        reg_res_c = adf_c.regression
-        tau_tau = reg_res_c.tvalues[0]
-        reject_c = tau_tau < critical_value
-        
-        if reject_c:
-            gamma_zero[col] = df[col]
-        else:
-            gamma_not_zero[col] = df[col]
-    
-    return gamma_not_zero, gamma_zero
-
-gamma_zero, gamma_not_zero = gamma_test(df_gral_idx_diff_des)
-
-# If gamma=0 then test a_2 given gamma=0: phi_3  
-def a_2_test(gamma_zero, critical_value=7.44,r=2,T=T):
-    results = {}
-    a2_not_zero = pd.DataFrame()
-    a2_zero = pd.DataFrame()
-    for col in gamma_zero.columns:
-    # model c: unrestricted 
-        adf_c = ADF(gamma_zero[col], trend='ct')
-        reg_res_c = adf_c.regression
-        SSR_u = reg_res_c.resid.dot(reg_res_c.resid)
-        k=len(reg_res_c.params)
-        # model b: restricted
-        adf_b = ADF(gamma_zero[col], trend='c')
-        reg_res_b = adf_b.regression
-        SSR_r = reg_res_b.resid.dot(reg_res_b.resid)
-        phi_3=((SSR_r-SSR_u)/r)/(SSR_u/(T-k))
-        reject_a2_0 = phi_3 < critical_value
-        if reject_a2_0:
-            a2_not_zero[col] = gamma_zero[col]
-        else:
-            a2_zero[col] = gamma_zero[col]
-        return a2_not_zero, a2_zero
-       
-a2_not_zero, a2_zero = a_2_test(df_gral_idx_diff_des)                
-            
-    
-    
-    
-    
+#######################################
+# Unit root ADF test on IPC general
+#######################################
+print('the IPC general has been differenciated and deseasonalized so it is expected to be stationary:')
+unit_root = UnitRootTests(df_gral_idx_diff_des)
+# Call the desired method
+rh0, no_rh0 = unit_root.phi_2_adf()
+# Use the results as needed
+print("Columns rejecting the null hypothesis:")
+print(rh0.columns.tolist())
+print("Columns not rejecting the null hypothesis:")
+print(no_rh0.columns.tolist())
+# Conclusions
+# ------------------------------
+# Write your conclusions here
+conclusion_1 = "It is possible to reject the null hypothesis of a random walk against the alternative that the data contain an intercept and/or a unit root and/or a deterministic trend."
+conclusion_2 = "Rejecting a_0=a_2=\gamma=0 means that one or more of these parameters does not equal to zero"
+# End of Conclusions
+# ------------------------------
+rh0, no_rh0 = unit_root.phi_3_adf()
+print("Columns rejecting the null hypothesis:")
+print(rh0.columns.tolist())
+print("Columns not rejecting the null hypothesis:")
+print(no_rh0.columns.tolist())
+# Conclusions
+# ------------------------------
+# Write your conclusions here
+conclusion_3 = "H0) a_2=\gamma=0 was also tested and rejected. Model b is now the restricted and model c the unrestricted."
+conclusion_4 = "Rejecting a_0=a_2=\gamma=0 means that one or more of these parameters does not equal to zero"
+# End of Conclusions
+# ------------------------------
