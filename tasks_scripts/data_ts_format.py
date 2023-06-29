@@ -48,7 +48,7 @@ ipc_gral_idx=ipc_gral.set_index('ymd')
 # log transform
 log_gral_idx = np.log1p(ipc_gral_idx)
 log_IPC_gral = log_gral_idx.reset_index()
-
+log_IPC_gral['ymd'] = log_IPC_gral['ymd'].astype(str)
 #########################################
 # Clases IPC preprocessing
 #########################################
@@ -87,6 +87,7 @@ normalized_log_clases_idx = scaler.fit_transform(log_clases_idx)
 # Update the DataFrame with the normalized values
 log_clases_idx[:] = normalized_log_clases_idx
 log_clases=log_clases_idx.reset_index()
+log_clases['ymd'] = log_clases['ymd'].astype(str)
 #########################################
 # IMF data preprocessing- df_fmi
 #########################################
@@ -146,7 +147,7 @@ lst_external=['PBEEF','POILAPSP','PSOYB']
 ext_prices=log_externos_usd_idx.filter(lst_external)
 df_external_idx=pd.concat([ext_prices, avg_fb], axis=1)
 df_external=df_external_idx.reset_index()
-
+df_external['ymd'] = df_external['ymd'].astype(str)
 #########################################
 # DB storage
 #########################################
