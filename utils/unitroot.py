@@ -4,7 +4,7 @@ import statsmodels.api as sm
 from scipy import stats
 from scipy.stats import norm
 import numpy as np
-from statsmodels.tsa.stattools import adfuller
+
 
 class UnitRootTests:
     def __init__(self, df):
@@ -360,21 +360,4 @@ class UnitRootTests:
 
             return rh_a2_0, no_rh_a2_0
         
-def adf_test_statsmodels(dataframe):
-    print("Results of Dickey-Fuller Test:")
-    for column in dataframe.columns:
-        print("Column:", column)
-        dftest = adfuller(dataframe[column], autolag="AIC")
-        dfoutput = pd.Series(
-            dftest[0:4],
-            index=[
-                "Test Statistic",
-                "p-value",
-                "#Lags Used",
-                "Number of Observations Used",
-            ],
-        )
-        for key, value in dftest[4].items():
-            dfoutput["Critical Value (%s)" % key] = value
-        print(dfoutput)
-        print("------------------")        
+      

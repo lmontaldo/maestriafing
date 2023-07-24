@@ -48,6 +48,8 @@ df_gral_idx_diff = df_gral_idx.diff().dropna()
 # Deseasonalize IPC general
 df_gral_idx_diff_des = perform_seasonal_adjustment(df_gral_idx_diff)
 #save_line_plot_df(df_gral_idx_diff_des, image_path, title='Evolución IPC general en primeras diferencias con ajuste estacional', xlabel='Fecha', ylabel='Valores')
+
+
 #######################################
 # Unit root ADF test on IPC general
 #######################################
