@@ -26,8 +26,6 @@ from utils.eda_decomposition import *
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
-# Specify the database path
-DATA_BASE_PATH
 # Retrieve the DataFrames from data_loader
 #df_clases, df_univariado, df_fmi, df_clases_filter = data_loader.get_data(path)
 tables_list= ['EXTERNAL', 'CLASES_IPC','IPC_gral']

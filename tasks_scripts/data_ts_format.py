@@ -37,6 +37,7 @@ scaler = StandardScaler()
 # IPC general preprocessing
 #####################################
 df_gral=df_univariado
+# ymd column to create monthly datetime index
 df_gral[['month','year']]=df_gral.fecha.str.split('-',expand=True)
 df_gral['year']=str('20')+df_gral['year']
 months = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic']
@@ -45,10 +46,18 @@ df_gral['month']=df_gral['month'].replace(d, regex=True)
 df_gral['ymd'] = pd.to_datetime(df_gral[['year', 'month']].assign(day=1), format='%d/%b/%Y')
 ipc_gral=df_gral.loc[:,["ymd","indice"]]
 ipc_gral_idx=ipc_gral.set_index('ymd')
-# log transform
+# log transform (add 1 to avoid log(0)
 log_gral_idx = np.log1p(ipc_gral_idx)
 log_IPC_gral = log_gral_idx.reset_index()
 log_IPC_gral['ymd'] = log_IPC_gral['ymd'].astype(str)
+# z-score rescaling
+# Apply z-score normalization to the DataFrame
+log_IPC_gral_idx = log_IPC_gral.set_index('ymd')
+normalized_log_clases_idx = scaler.fit_transform(log_IPC_gral_idx)
+# Update the DataFrame with the normalized values
+log_IPC_gral_idx[:] = normalized_log_clases_idx
+IPC_gral_log_norm=log_IPC_gral_idx.reset_index()
+IPC_gral_log_norm['ymd'] = IPC_gral_log_norm['ymd'].astype(str)
 #########################################
 # Clases IPC preprocessing
 #########################################
@@ -86,8 +95,8 @@ log_clases_idx = np.log1p(wide_clases_idx)
 normalized_log_clases_idx = scaler.fit_transform(log_clases_idx)
 # Update the DataFrame with the normalized values
 log_clases_idx[:] = normalized_log_clases_idx
-log_clases=log_clases_idx.reset_index()
-log_clases['ymd'] = log_clases['ymd'].astype(str)
+log_norm_clases=log_clases_idx.reset_index()
+log_norm_clases['ymd'] = log_norm_clases['ymd'].astype(str)
 #########################################
 # IMF data preprocessing- df_fmi
 #########################################
@@ -146,16 +155,18 @@ avg_fb=df_fb.mean(axis = 1).to_frame('avg_fb')
 lst_external=['PBEEF','POILAPSP','PSOYB']
 ext_prices=log_externos_usd_idx.filter(lst_external)
 df_external_idx=pd.concat([ext_prices, avg_fb], axis=1)
-df_external=df_external_idx.reset_index()
-df_external['ymd'] = df_external['ymd'].astype(str)
+log_norm_external=df_external_idx.reset_index()
+log_norm_external['ymd'] = log_norm_external['ymd'].astype(str)
 #########################################
 # DB storage
 #########################################
 # Store the DataFrames in a dictionary
+# IPC_gral_log_norm: IPC general log transformed and z-score rescaled
+# log_norm_clases: IPC clases log transformed and z-score rescaled
 dataframes = {
-    'IPC_gral': log_IPC_gral, 
-    'CLASES_IPC': log_clases,
-    'EXTERNAL': df_external
+    'IPC_gral': IPC_gral_log_norm, 
+    'CLASES_IPC': log_norm_clases,
+    'EXTERNAL': log_norm_external
 }
 
 # Create tables in the database
