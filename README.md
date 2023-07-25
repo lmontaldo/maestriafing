@@ -82,7 +82,12 @@ Summarize the findings and conclusions from the project.
 Discuss potential areas of improvement or future work for expanding the project or enhancing the models.
 Remember that this is a general outline, and you should adapt it based on your specific project requirements and guidelines provided by your academic institution.
 
-
+# Project Diagram
+---
+title: Node
+---
+flowchart LR
+    id
 
 
 
