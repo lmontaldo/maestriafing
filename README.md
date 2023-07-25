@@ -84,7 +84,7 @@ Remember that this is a general outline, and you should adapt it based on your s
 
 --------
 
-![image](docs\markdowndraw\tesis.drawio.svg)
+![Diagram](C:\Users\Transitorio\Desktop\tesis2023\tesis2023-1\docs\markdowndraw\tesis.drawio.svg)
 
 
 
