@@ -1,0 +1,5 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Trabajando con \LaTeX }{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Introducción}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Editando texto}{1}{subsection.1.2}%
+\contentsline {section}{Referencias}{2}{section*.2}%
