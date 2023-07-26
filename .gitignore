@@ -12,4 +12,3 @@ __pycache__/
 # ignore docs
 /docs/images/
 /docs/latex/
-diagrams/
