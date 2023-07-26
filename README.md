@@ -84,7 +84,7 @@ Remember that this is a general outline, and you should adapt it based on your s
 
 --------
 
-![Diagram](./diagrams/tesis.drawio.svg)
+![Diagram](./diagrams/tesis_preproc.drawio.svg)
 
 
 
