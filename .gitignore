@@ -1,0 +1,14 @@
+ 
+*.csv
+
+# Ignore a specific directory
+data/
+# Ignore CSV files
+*.csv
+# Ignore files with a specific extension
+*.log
+# Ignore __pycache__/
+__pycache__/
+# ignore docs
+/docs/images/
+/docs/latex/
