@@ -41,20 +41,50 @@ def save_plot(plot_func, data, save_folder, filename):
     print(f"Plot saved at {save_path}")    
     
     
-def decompose_dataframe(df, model='additive', freq=None):
+def decompose_dataframe(df, model='additive', period=12):
     """
-    Perform seasonal decomposition on the DataFrame.
+    Perform seasonal decomposition on each column of the DataFrame.
 
     Args:
         df (pd.DataFrame): The DataFrame to decompose.
         model (str): The type of seasonal decomposition model to use. Default is 'additive'.
-        freq (int): The frequency of the time series. Required for 'multiplicative' model.
+        period (int): The frequency of the time series. Required for 'multiplicative' model.
 
     Returns:
-        statsmodels.tsa.seasonal.DecomposeResult: The result of the seasonal decomposition.
+        dict: A dictionary of statsmodels.tsa.seasonal.DecomposeResult objects for each column.
     """
-    decomposition = seasonal_decompose(df, model=model, freq=freq)
-    return decomposition
+    decompositions = {}
+    for column_name in df.columns:
+        decompositions[column_name] = seasonal_decompose(df[column_name], model=model, period=period)
+    return decompositions
+
+def perform_seasonal_adjustment(df):
+    """
+    Perform seasonal adjustment on all columns of a DataFrame using seasonal decomposition.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the time series.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the seasonal adjustment applied to all columns.
+    """
+    adjusted_df = pd.DataFrame(index=df.index)
+
+    for column in df.columns:
+        # Perform seasonal decomposition
+        decomposition = seasonal_decompose(df[column], model='additive')
+
+        # Retrieve the trend and residual components
+        trend = decomposition.trend
+        residual = decomposition.resid
+
+        # Apply seasonal adjustment by subtracting the seasonal component
+        adjusted_series = df[column] - decomposition.seasonal
+
+        # Add the adjusted series to the adjusted DataFrame
+        adjusted_df[column] = adjusted_series
+
+    return adjusted_df 
 
 def differentiate_dataframe(df, periods=1):
     """
