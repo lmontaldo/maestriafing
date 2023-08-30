@@ -18,12 +18,21 @@ import datetime as dt
 from sklearn.preprocessing import StandardScaler
 from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
 from utils.unitroot import *
+from utils.pruebas_KPSS import *
 import plotly.graph_objects as go
 import dash
-import dash_core_components as dcc
+from dash import dcc
 from dash import html
 from statsmodels.tsa.seasonal import seasonal_decompose
 from plotly.subplots import make_subplots
+from statsmodels.tsa.stattools import acf, pacf
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+from arch.unitroot import ADF
+import warnings
+from statsmodels.tools.sm_exceptions import InterpolationWarning
+
+warnings.simplefilter('ignore', InterpolationWarning)
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
@@ -76,9 +85,9 @@ fig.show()
 ############
 df_gral_idx = df_gral.set_index('ymd')
 df_gral_idx_diff = df_gral_idx.diff().dropna()
-######################33
-
+###############################
 # Decompose the time series
+##############################
 result = seasonal_decompose(df_gral_idx_diff['indice'], model='additive', period=12)
 
 # Create subplots
@@ -97,23 +106,124 @@ fig.update_yaxes(title_standoff=0)
 
 fig.show()
 
-##########################
-
+###############################
+# Deseasonalize the time series
+##############################
 ipc_gral_desea=perform_seasonal_adjustment(df_gral_idx_diff)
 
-print(ipc_gral_desea)
+# Create a trace
+trace = go.Scatter(x=ipc_gral_desea.index, y=ipc_gral_desea['indice'], mode='lines', name='IPC generl en primeras diferencias y desestacionalizado')
+
+# Create a layout
+layout = go.Layout(
+    title=dict(text='IPC general en primeras diferencias y desestacionalizado', font=dict(size=24)),
+    xaxis=dict(
+        title=dict(text='fecha', font=dict(size=18)),
+        tickfont=dict(size=20),
+    ),
+    yaxis=dict(
+        title=dict(text='valores', font=dict(size=20)),
+        tickfont=dict(size=20)
+    )
+)
+
+# Create a figure
+fig = go.Figure(data=[trace], layout=layout)
+
+# Show the figure
+fig.show()
+#################
+mean_value = ipc_gral_desea['indice'].mean()
+
+#########################################
+# Compute the ACF and PACF
+#######################################
+lag_acf = acf(ipc_gral_desea['indice'], nlags=20)
+lag_pacf = pacf(ipc_gral_desea['indice'], nlags=20, method='ols')
+
+# Compute the 95% confidence interval
+conf_interval = 1.96/np.sqrt(len(ipc_gral_desea['indice']))
+
+# Create subplots
+fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=('ACF', 'PACF'))
+
+# Create traces
+trace_acf = go.Bar(
+    x = np.arange(21),
+    y = lag_acf,
+    name = 'ACF'
+)
+
+trace_pacf = go.Bar(
+    x = np.arange(21),
+    y = lag_pacf,
+    name = 'PACF'
+)
+
+trace_conf_upper = go.Scatter(
+    x = np.arange(21),
+    y = [conf_interval]*21,
+    mode = 'lines',
+    name = '95% Confidence Interval',
+    line = dict(dash='dash')
+)
+
+trace_conf_lower = go.Scatter(
+    x = np.arange(21),
+    y = [-conf_interval]*21,
+    mode = 'lines',
+    name = '95% Confidence Interval',
+    line = dict(dash='dash'),
+    showlegend=False
+)
+
+# Add traces to the figure
+fig.add_trace(trace_acf, row=1, col=1)
+fig.add_trace(trace_conf_upper, row=1, col=1)
+fig.add_trace(trace_conf_lower, row=1, col=1)
+fig.add_trace(trace_pacf, row=2, col=1)
+fig.add_trace(trace_conf_upper, row=2, col=1)
+fig.add_trace(trace_conf_lower, row=2, col=1)
+
+# Set the layout of the figure
+fig.update_layout(
+    title='ACF y PACF del IPC general en primeras diferencias y desestacionalizado', height=1000,
+    template="ggplot2", showlegend=False
+)
+
+fig.update_yaxes(title_text="Correlation", row=1, col=1)
+fig.update_yaxes(title_text="Correlation", row=2, col=1)
+fig.update_xaxes(title_text="Lag", row=2, col=1)
+
+# Show the figure
+fig.show()
 
 
-##################################################
-# modelo (b): con constante y con tendencia
+################################
+# ADF with constant
+################################
+adf_ipc_gral = ADF(ipc_gral_desea)
+reg_res = adf_ipc_gral.regression
 
-#urt = UnitRootTests(df)
+latex_summary = adf_ipc_gral.summary().as_latex()
+#print(latex_summary)
+
+latex_reg_res=reg_res.summary().as_latex()
+#print(latex_reg_res)
 
 
+# instantiate the UnitRootTests class
+unit_root_tests = UnitRootTests(ipc_gral_desea)
+# call the methods you need
+tau_mu_values= unit_root_tests.tau_mu(return_values='tau_mu')
+phi_1_values = unit_root_tests.phi_1(return_values='phi_1')
+print(f' tau_mu: {tau_mu_values}')
+print(f' phi_1: {phi_1_values}')
 
-
-
-
-
-
-
+####################3
+# KPSS
+####################
+analyzer = KPSSAnalyzer(ipc_gral_desea)
+analyzer.run_tests()
+print(analyzer.results['c_auto'])
+print(analyzer.results['c_legacy'])
