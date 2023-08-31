@@ -227,3 +227,8 @@ analyzer = KPSSAnalyzer(ipc_gral_desea)
 analyzer.run_tests()
 print(analyzer.results['c_auto'])
 print(analyzer.results['c_legacy'])
+
+
+############################################
+# COMPONENTES DEL IPC
+############################################
