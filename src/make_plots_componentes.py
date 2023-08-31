@@ -67,7 +67,8 @@ def create_dfs(df, prefixes):
     return {prefix: df[df.columns[df.columns.str.startswith(prefix) | df.columns.str.startswith('ymd')]] for prefix in prefixes}
 
 dfs = create_dfs(df, prefixes)
-#
+  
+
 # Create a line plot for each group
 for prefix, df in dfs.items():
     plt.figure(figsize=(10, 6))
@@ -77,21 +78,3 @@ for prefix, df in dfs.items():
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
-    
-    
-# Create subplots for each series in each group
-for prefix, df in dfs.items():
-    n = df.shape[1] - 1  # number of series (excluding 'ymd')
-    fig, axs = plt.subplots(n, 1, figsize=(10, 6*n))
-    
-    for i, col in enumerate(df.columns):
-        if col != 'ymd':
-            sns.lineplot(x='ymd', y=col, data=df, ax=axs[i])
-            axs[i].set_title(f'Series: {col}')
-            axs[i].set_xlabel('ymd')
-            axs[i].set_xticks(rotation=45)
-    
-    plt.tight_layout()
-    plt.suptitle(f'Group: {prefix}', y=1.02, fontsize=16)
-    plt.show()    
-
