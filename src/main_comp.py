@@ -20,6 +20,7 @@ from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjust
 from utils.unitroot import *
 from utils.pruebas_KPSS import *
 from utils.validators import *
+from utils.eda_decomposition import STL_extract_trend
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -34,6 +35,7 @@ import warnings
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import warnings
 warnings.simplefilter('ignore', InterpolationWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
@@ -52,10 +54,7 @@ df_raw=df_dict['Datosipc']
 # COMPONENTES IPC
 ############################################
 df['ymd'] = pd.to_datetime(df['ymd']).dt.normalize()
-# melt the dataframe
-long_df = pd.melt(df, id_vars='ymd', var_name='code', value_name='value')
-# grouping by code
-long_df['groups_codes'] =long_df['code'].str[:3]
+
 
 # plot
 '''
@@ -73,6 +72,7 @@ plt.show()
 '''
 
 #
+'''
 dfs = {group: data for group, data in long_df.groupby('groups_codes')}
 for group, sub_df in dfs.items():
     g = sns.relplot(data=sub_df, x="ymd", y="value",
@@ -84,7 +84,45 @@ for group, sub_df in dfs.items():
 
     # Place the title at the bottom and make it very small
     g.fig.subplots_adjust(bottom=0.15) # Adjust this value if needed
-    g.fig.text(0.5, 0.1, 'Clases del IPC: ' + group, ha="center", va="center", fontsize=6)
+    g.fig.text(0.5, 0.1, 'Clases del IPC: ' + group, ha="center", va="center", fontsize=10)
 
+    # Show the plot
+    plt.show()
+    
+'''     
+    # underlying trends in ts df
+# Use the function to extract the trend
+trend_df = STL_extract_trend(df)
+
+# melt the dataframe
+long_df_trend = pd.melt(trend_df, id_vars='ymd', var_name='code', value_name='value')
+# grouping by code
+long_df_trend['groups_codes'] =long_df_trend['code'].str[:3]
+# plot trends
+dfs = {group: data for group, data in long_df_trend.groupby('groups_codes')}
+for group, sub_df in dfs.items():
+    
+    # Convert the 'ymd' column to pandas datetime format
+    sub_df["ymd"] = pd.to_datetime(sub_df["ymd"])
+    
+    g = sns.relplot(data=sub_df, x="ymd", y="value",
+                    col="code", hue="code",
+                    kind="line", palette="deep",
+                    linewidth=4, zorder=5,
+                    col_wrap=3, height=3.5, aspect=1.5, legend=False
+                   )
+
+    # Adjusting space at the bottom if needed
+    g.fig.subplots_adjust(bottom=0.2) 
+
+    # Ensure there's enough spacing between subplots to avoid overlap
+    g.fig.tight_layout()
+
+    # Format the x-axis to handle dates
+    for ax in g.axes.flat:
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+        
     # Show the plot
     plt.show()
