@@ -193,18 +193,19 @@ def perform_seasonal_adjustment(df):
 
 def STL_seasonal_adjusted(df, seasonal=12):
     """
-    1- Uses a STL method: Seasonal-Trend Decomposition Procedure Based on Loess
-    * It handles any type of seasonality
-    * The user can control the rate of change of the seasonal component
-    * It is robust to outliers
-    The seasonal argument is set to 12 by default. The larger the integer, the more 'smooth'
+    Uses the STL method: Seasonal-Trend Decomposition Procedure Based on Loess to:
+    * Handle any type of seasonality
+    * Allow the user to control the rate of change of the seasonal component
+    * Ensure robustness to outliers
+
+    The seasonal argument is set to 12 by default. The larger the integer, the more 'smooth' 
     the seasonal component becomes. This causes less of the variation in the data to be attributed to its seasonal component.
-    2- Keeps only the seasonal component (sc) and creates a DataFrame with the seasonal component of each IPC component
-    3- Removes the seasonal component from the original series
+
+    This function subtracts the seasonal component from the original series and returns the adjusted series.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the time series data.
-        seasonal (int): The parameter controlling the rate of change of the seasonal component. Default is 7.
+        seasonal (int): The parameter controlling the rate of change of the seasonal component. Default is 12.
 
     Returns:
         pd.DataFrame: The DataFrame with the seasonal component removed from the original series.
@@ -213,7 +214,7 @@ def STL_seasonal_adjusted(df, seasonal=12):
 
     for column in df.columns:
         # Perform STL decomposition
-        x = STL(df[column], robust=False).fit()
+        x = STL(df[column], seasonal=seasonal, robust=False).fit()
 
         # Subtract seasonal component from the original series
         adjusted_series = df[column] - x.seasonal
@@ -238,5 +239,36 @@ def convert_to_long_format(df, id_vars='ymd', var_name='c_codigo', value_name='v
     """
     df_long = pd.melt(df, id_vars=id_vars, var_name=var_name, value_name=value_name)
     return df_long
+
+
+def STL_extract_trend(df, period=12):
+    """
+    Uses the STL method: Seasonal-Trend Decomposition Procedure Based on Loess to:
+    * Handle any type of seasonality
+    * Allow the user to control the rate of change of the seasonal component
+    * Ensure robustness to outliers
+
+    The seasonal argument is set to 12 by default. The larger the integer, the more 'smooth' 
+    the seasonal component becomes. This causes less of the variation in the data to be attributed to its seasonal component.
+
+    This function extracts the trend component from the original series.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the time series data.
+        seasonal (int): The parameter controlling the rate of change of the seasonal component. Default is 12.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the trend component of each original series.
+    """
+    output = pd.DataFrame(index=df.index)
+
+    for column in df.columns:
+        # Perform STL decomposition
+        x = STL(df[column], period=period, robust=False).fit()
+
+        # Add the trend series to the output DataFrame
+        output[column] = x.trend
+
+    return output
          
        
