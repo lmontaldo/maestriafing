@@ -54,46 +54,63 @@ df_raw=df_dict['Datosipc']
 # COMPONENTES IPC
 ############################################
 df['ymd'] = pd.to_datetime(df['ymd']).dt.normalize()
-
-
-# plot
-'''
-g = sns.relplot(data=long_df, x="ymd", y="value",
-                col="code", hue="code",
-                kind="line", palette="deep",
-                linewidth=4, zorder=5,
-                col_wrap=5, height=3, aspect=1.5, legend=False
-               )
-g.fig.subplots_adjust(top=0.96)
-g.fig.suptitle('Clases del IPC', fontsize=16)
-
-# Show the plot
-plt.show()
-'''
-
-#
+long_df= pd.melt(df, id_vars='ymd', var_name='code', value_name='value')
+long_df['groups_codes'] =long_df['code'].str[:3]
+# plot components
 '''
 dfs = {group: data for group, data in long_df.groupby('groups_codes')}
 for group, sub_df in dfs.items():
+    
+    # Convert the 'ymd' column to pandas datetime format
+    sub_df["ymd"] = pd.to_datetime(sub_df["ymd"])
+    
     g = sns.relplot(data=sub_df, x="ymd", y="value",
                     col="code", hue="code",
                     kind="line", palette="deep",
                     linewidth=4, zorder=5,
-                    col_wrap=5, height=3, aspect=1.5, legend=False
+                    col_wrap=3, height=3.5, aspect=1.5, legend=False
                    )
 
-    # Place the title at the bottom and make it very small
-    g.fig.subplots_adjust(bottom=0.15) # Adjust this value if needed
-    g.fig.text(0.5, 0.1, 'Clases del IPC: ' + group, ha="center", va="center", fontsize=10)
+    # Adjusting space at the bottom if needed
+    g.fig.subplots_adjust(bottom=0.2) 
 
+    # Ensure there's enough spacing between subplots to avoid overlap
+    g.fig.tight_layout()
+
+    # Format the x-axis to handle dates
+    for ax in g.axes.flat:
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+        
     # Show the plot
     plt.show()
-    
-'''     
-    # underlying trends in ts df
+'''
+print(df.head())
+df_wide=df.set_index('ymd')
+print(df_wide.head())
+c0121 = df_wide['c0121']
+print(c0121.head())
+
+c0121['trend1'] = df['ymd']
+c0121['trend2'] = df['trend1'].cumsum()
+c0121['trend3'] = df['trend2'] * 0.5
+plt.figure(figsize=(10, 6))
+plt.plot(df['trend1'], label='Trend 1', color='blue')
+plt.plot(df['trend2'], label='Trend 2', color='green')
+plt.plot(df['trend3'], label='Trend 3', color='red')
+plt.legend(loc='upper left')
+plt.title('Three Trends Over Time')
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.tight_layout()
+plt.show()
+
+'''
+# plot
+# underlying trends in ts df
 # Use the function to extract the trend
 trend_df = STL_extract_trend(df)
-
 # melt the dataframe
 long_df_trend = pd.melt(trend_df, id_vars='ymd', var_name='code', value_name='value')
 # grouping by code
@@ -126,3 +143,5 @@ for group, sub_df in dfs.items():
         
     # Show the plot
     plt.show()
+'''    
+    
