@@ -57,7 +57,23 @@ is_valid, message = validate_df(df)
 print(is_valid, message)
 #
 filtered_df = df_raw[df_raw['c_codigo'].astype(str).str.len() == 3]
-div_df=filtered_df.iloc[:, :3]
+#print(filtered_df)
+div_df=filtered_df.iloc[:, 1:3]
+div_df['DivisionesGruposClasesFamiliasyProductos'] = div_df['DivisionesGruposClasesFamiliasyProductos'].str.lower()
+# Convert dataframe to LaTeX table
+latex_table = div_df.to_latex(index=False)
+#print(latex_table)
+filtered_df_5 = df_raw[df_raw['c_codigo'].astype(str).str.len() == 5]
+filtered_df_3_5 = df_raw[df_raw['c_codigo'].str.len().isin([3, 5])]
+filtered_df_3_5 = filtered_df_3_5.drop(columns=['codigo'])
+div_comp=filtered_df_3_5.iloc[:, :2]
+div_comp_latex=div_comp.to_latex(index=False)
+print(div_comp_latex)
+
+
+
+'''
+
 prefixes = div_df['c_codigo'].tolist()
 # Create a dictionary of DataFrames
 dfs = {prefix: df[df.columns[df.columns.str.startswith(prefix) | df.columns.str.startswith('ymd')]] for prefix in prefixes}
@@ -78,3 +94,4 @@ for prefix, df in dfs.items():
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
+'''
