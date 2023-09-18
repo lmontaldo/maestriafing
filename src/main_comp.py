@@ -92,19 +92,7 @@ print(df_wide.head())
 c0121 = df_wide['c0121']
 print(c0121.head())
 
-c0121['trend1'] = df['ymd']
-c0121['trend2'] = df['trend1'].cumsum()
-c0121['trend3'] = df['trend2'] * 0.5
-plt.figure(figsize=(10, 6))
-plt.plot(df['trend1'], label='Trend 1', color='blue')
-plt.plot(df['trend2'], label='Trend 2', color='green')
-plt.plot(df['trend3'], label='Trend 3', color='red')
-plt.legend(loc='upper left')
-plt.title('Three Trends Over Time')
-plt.xlabel('Date')
-plt.ylabel('Value')
-plt.tight_layout()
-plt.show()
+
 
 '''
 # plot
