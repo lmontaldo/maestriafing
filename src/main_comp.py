@@ -7,9 +7,7 @@ from config import DATA_BASE_PATH
 from config import image_path
 from utils import data_loader 
 #from utils.ADF_tests import adf_test 
-import sys
 sys.path.append('../utils')
-from utils.unitroot import UnitRootTests
 import sqlite3
 import sys
 import numbers
@@ -20,11 +18,12 @@ import numpy as np
 import datetime as dt
 from sklearn.preprocessing import StandardScaler
 from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
-from utils.unitroot import *
+#from utils.unitroot import *
 from utils.pruebas_KPSS import *
 from utils.validators import *
-from utils.ADF_tests import *
+#from utils.ADF_tests import *
 from utils.eda_decomposition import *
+from utils.test_statistics_adf import TestStatistics
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -40,6 +39,7 @@ from statsmodels.tools.sm_exceptions import InterpolationWarning
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from tabulate import tabulate
 import warnings
 warnings.simplefilter('ignore', InterpolationWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
@@ -150,6 +150,6 @@ df_idx_sa=STL_seasonal_adjusted(df_idx)
 ######################################################
 
 # ADF test ct
-adf_instance = UnitRootTests(df_idx_diff_sa)
-ct_notdif=adf_instance.adf_arch_ct(df_idx_diff_sa)
-print(ct_notdif)
+# Using the tau_tau method and retrieving only the lists
+results_adf_ct   = UnitRootTests.adf_arch_ct1(df_idx_sa)
+print(results_adf_ct)

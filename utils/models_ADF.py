@@ -7,7 +7,7 @@ import numpy as np
 from scipy import stats
 
 
-class UnitRootTests:
+class TestStatistics:
     """
     A collection of unit root tests for time series analysis from arch package.
 
@@ -49,6 +49,8 @@ class UnitRootTests:
 
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rho_list = []  # List of columns that reject the null hypothesis
+        no_rho_list = [] # List of columns that not reject the null hypothesis
 
         for col in df.columns:
             adf_c = ADF(df[col], trend='ct')
@@ -57,10 +59,12 @@ class UnitRootTests:
             reject_c = tau_tau_val < critical_value
             if reject_c:
                 rh0[col] = df[col]
+                rho_list.append(col)
             else:
                 no_rh0[col] = df[col]
+                no_rho_list.append(col)
 
-        return rh0, no_rh0
+        return rh0, no_rh0, rho_list, no_rho_list
     
     @staticmethod
     def phi_2(df, critical_value=6.50, r=3, alpha=0.05, cols_norho=None):
@@ -98,6 +102,8 @@ class UnitRootTests:
         """
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rho_list = []
+        no_rho_list = []
     
         if cols_norho is None:
             df_sliced = df
@@ -122,10 +128,12 @@ class UnitRootTests:
             reject_H0 = phi_2_val > critical_value
             if reject_H0:
                rh0[col] = df_sliced[col]
+               rho_list.append(col)
             else:
                no_rh0[col] = df_sliced[col]
+               no_rho_list.append(col)
 
-            return rh0, no_rh0
+            return rh0, no_rh0, rho_list, no_rho_list
 
     @staticmethod
     def phi_3(df, critical_value=7.44, r=2, alpha=0.05, cols_norho=None):
@@ -162,6 +170,8 @@ class UnitRootTests:
         results = {}
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rh0_list=[]
+        no_rh0_list=[]
         if cols_norho is None:
             df_sliced =df
         else:
@@ -183,10 +193,12 @@ class UnitRootTests:
             reject_H0 = phi_3 > critical_value
             if reject_H0:
                 rh0[col] = df_sliced[col]
+                rh0_list.append(col)
             else:
                 no_rh0[col] = df_sliced[col]
+                no_rh0_list.append(col)
 
-        return rh0, no_rh0
+        return rh0, no_rh0, rh0_list, no_rh0_list
     @staticmethod
     def tau_mu(df, critical_value=-2.90, return_values='all'):
         """
@@ -215,6 +227,8 @@ class UnitRootTests:
         results = {}
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rh0_list=[]
+        no_rh0_list=[]
         tau_mu_values = {}
 
         for col in df.columns:
@@ -225,8 +239,10 @@ class UnitRootTests:
             reject_c = tau_mu < critical_value
             if reject_c:
                 rh0[col] = df[col]
+                rh0_list.append(col)
             else:
                 no_rh0[col] = df[col]
+                no_rh0_list.append(col)
         if return_values == 'rh0':
             return rh0
         elif return_values == 'no_rh0':
@@ -234,9 +250,9 @@ class UnitRootTests:
         elif return_values == 'tau_mu':
             return tau_mu_values
         else:
-            return rh0, no_rh0, tau_mu_values        
+            return rh0, no_rh0, tau_mu_values, rh0_list, no_rh0_list        
 
-        return rh0, no_rh0, tau_mu_values
+        return rh0, no_rh0, tau_mu_values, rh0_list, no_rh0_list
     @staticmethod
     def phi_1(df, critical_value=5.57, r=2, alpha=0.05, cols_norho=None, return_values='all'):
         """
@@ -261,6 +277,8 @@ class UnitRootTests:
         results = {}
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rh0_list=[]
+        no_rh0_list=[]
         phi_1_values = {}
         if cols_norho is None:
             df_sliced = df
@@ -284,8 +302,10 @@ class UnitRootTests:
             reject_H0 = phi_1 < critical_value
             if reject_H0:
                 rh0[col] = df_sliced[col]
+                rh0_list.append(col)
             else:
                 no_rh0[col] = df_sliced[col]
+                no_rh0_list.append(col)
         if return_values == 'rh0':
             return rh0
         elif return_values == 'no_rh0':
@@ -293,7 +313,7 @@ class UnitRootTests:
         elif return_values == 'phi_1':
             return phi_1_values
         else:
-            return rh0, no_rh0, phi_1_values
+            return rh0, no_rh0, phi_1_values, rh0_list, no_rh0_list
 
     @staticmethod
     def tau(df, critical_value=-1.95):
@@ -314,6 +334,8 @@ class UnitRootTests:
         results = {}
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
+        rh0_list=[]
+        no_rh0_list=[]
 
         for col in df.columns:
             adf = ADF(df[col], trend='n')
@@ -322,176 +344,10 @@ class UnitRootTests:
             reject_c = tau < critical_value
             if reject_c:
                 rh0[col] = df[col]
+                rh0_list.append(col)
             else:
                 no_rh0[col] = df[col]
+                no_rh0_list.append(col)
 
-        return rh0, no_rh0
-    @staticmethod    
-    def test_a2(df, cols_norho=None):
-            """
-            Step 2 in Enders procedure for UR testing.
-            Perform hypothesis testing for a2 = 0 on each column in the DataFrame.
-
-            Returns:
-            - rh_a2_0: Pandas DataFrame
-                The columns that reject the null hypothesis a2 = 0.
-            - no_rh_a2_0: Pandas DataFrame
-                The columns that do not reject the null hypothesis a2 = 0.
-            """
-            rh_a2_0 = pd.DataFrame()
-            no_rh_a2_0 = pd.DataFrame()
-            if cols_norho is None:
-                df_sliced = df.columns
-            else:
-                df_sliced =  df[cols_norho]
-            for column in df_sliced:
-                # Calculate the suggested upper bound for the number of lags, k
-                n = T
-                k = int(np.trunc((n - 1) ** (1 / 3)))
-
-                # Create lagged variables
-                for i in range(1, k + 1):
-                    df_sliced[f'{column}_lag{i}'] = df_sliced[column].diff(i)
-
-                # Remove missing values from the DataFrame
-                df_cleaned = df_sliced.dropna()
-
-                # Define the dependent variable (Delta_y) and the independent variables (trend and lagged variables)
-                y = df_cleaned[column]
-                X = df_cleaned[['trend'] + [f'{column}_lag{i}' for i in range(1, k + 1)]]
-
-                # Add a constant term to the independent variables
-                X = sm.add_constant(X)
-
-                # Fit the model using ordinary least squares (OLS)
-                model = sm.OLS(y, X)
-                results = model.fit()
-
-                # Test the hypothesis a2 = 0 using t-distribution
-                a2_coef = results.params['trend']
-                a2_std_err = results.bse['trend']
-                t_statistic = a2_coef / a2_std_err
-                degrees_of_freedom = len(results.resid) - len(results.params)
-                p_value = 2 * (1 - stats.t.cdf(abs(t_statistic), df=degrees_of_freedom))
-
-                # Store the column in the respective DataFrame based on the test result
-                if p_value < 0.05:
-                    rh_a2_0[column] = df_sliced[column]
-                else:
-                    no_rh_a2_0[column] = df_sliced[column]
-
-            return rh_a2_0, no_rh_a2_0
-    @staticmethod        
-    def adf_arch_ct(df, alpha=0.05):
-        """
-        Perform Augmented Dickey-Fuller test on all columns in the data  for model c.
-        
-        Parameters:
-        - alpha: float, optional
-            Significance level for the test (default is 0.05).
-        
-        Returns:
-        - result_df: DataFrame
-            DataFrame with columns: 'Statistic', 'P-Value', 'Lags', and 'Result'
-        """
-        statistics = []
-        p_values = []
-        lags = []
-        results = []
-        
-        for col in df.columns:
-            adf_c = ADF(self.df[col], trend='ct',method='AIC')
-            statistics.append(adf_c.stat)
-            p_values.append(adf_c.pvalue)
-            lags.append(adf_c.lags)
-            
-            # Making decision based on p-value
-            if adf_c.pvalue <= alpha:
-                results.append("Reject H0: Time Series has no UR")
-            else:
-                results.append("Fail to Reject H0: Time Series has UR")
-        
-        results_adf_ct = pd.DataFrame({
-            'Statistic': statistics,
-            'P-Value': p_values,
-            'Lags': lags,
-            'Result': results
-        }, index=df.columns)
-        
-        return results_adf_ct
-    @staticmethod    
-    def adf_arch_c(df, alpha=0.05):
-        """
-        Perform Augmented Dickey-Fuller test on all columns in the data for model b.
-        
-        Parameters:
-        - alpha: float, optional
-            Significance level for the test (default is 0.05).
-        
-        Returns:
-        - result_df: DataFrame
-            DataFrame with columns: 'Statistic', 'P-Value', 'Lags', and 'Result'
-        """
-        statistics = []
-        p_values = []
-        lags = []
-        results = []
-        
-        for col in df.columns:
-            adf_c = ADF(df[col], trend='c',method='AIC')
-            statistics.append(adf_c.stat)
-            p_values.append(adf_c.pvalue)
-            lags.append(adf_c.lags)
-            
-            # Making decision based on p-value
-            if adf_c.pvalue <= alpha:
-                results.append("Reject H0: Time Series has no UR")
-            else:
-                results.append("Fail to Reject H0: Time Series has UR")
-        
-        results_adf_c = pd.DataFrame({
-            'Statistic': statistics,
-            'P-Value': p_values,
-            'Lags': lags,
-            'Result': results
-        }, index=df.columns)
-        
-        return results_adf_c 
-    @staticmethod    
-    def adf_arch_n(df, alpha=0.05):
-        """
-        Perform Augmented Dickey-Fuller test on all columns in the data for model b.
-        
-        Parameters:
-        - alpha: float, optional
-            Significance level for the test (default is 0.05).
-        
-        Returns:
-        - result_df: DataFrame
-            DataFrame with columns: 'Statistic', 'P-Value', 'Lags', and 'Result'
-        """
-        statistics = []
-        p_values = []
-        lags = []
-        results = []
-        
-        for col in df.columns:
-            adf_c = ADF(df[col], trend='n', method='AIC')
-            statistics.append(adf_c.stat)
-            p_values.append(adf_c.pvalue)
-            lags.append(adf_c.lags)
-            
-            # Making decision based on p-value
-            if adf_c.pvalue <= alpha:
-                results.append("Reject H0: Time Series has no UR")
-            else:
-                results.append("Fail to Reject H0: Time Series has UR")
-        
-        results_adf_n = pd.DataFrame({
-            'Statistic': statistics,
-            'P-Value': p_values,
-            'Lags': lags,
-            'Result': results
-        }, index=df.columns)
-        
-        return results_adf_n
+        return rh0, no_rh0, rh0_list, no_rh0_list       
+    
