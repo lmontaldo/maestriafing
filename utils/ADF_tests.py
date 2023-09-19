@@ -1,120 +1,112 @@
 import numpy as np
 from statsmodels.tsa.stattools import adfuller
+import pandas as pd
+# model c
+def adf_test_ct(df, regression='ct', autolag='AIC'):
+    # Create an empty DataFrame to store the results
+    columns = ['Column', 'ADF Statistic', 'p-value', '#Lags Used', 'Result']
+    results = pd.DataFrame(columns=columns)
 
-def dshift(x, lags=1):
-    if lags == 0:
-        return x
-    out = np.append(np.nan, np.diff(x))
-    for i in range(lags-1):
-        out = np.append(np.nan, np.diff(out))
-    return out
+    for column in df.columns:
+        # Apply ADF test
+        adf_result = adfuller(df[column], regression=regression, autolag=autolag)
 
-def adf_enders(x, maxlags=6, pval=0.1):
-    x = x[~np.isnan(x)]
-    res = {'trend': 0, 'ur': 0, 'n': len(x), 'p': pval}
+        # Determine the result based on p-value
+        if adf_result[1] < 0.05:
+            result_str = "not RU"
+        else:
+            result_str = "RU"
+        
+        # Add results to the dataframe using loc
+        results.loc[len(results)] = [column, 
+                                     adf_result[0], 
+                                     adf_result[1], 
+                                     adf_result[2], 
+                                     result_str]
 
-    if pval == 0.1:
-        signcol = 3
-    elif pval == 0.05:
-        signcol = 2
-    elif pval == 0.01:
-        signcol = 1
-    else:
-        raise ValueError("Invalid p value specified; choose 0.1, 0.05, or 0.01")
+    # Splitting the dataframe into two based on the 'Result' column
+    RU = results[results['Result'] == "RU"]
+    not_RU = results[results['Result'] == "not RU"]
 
-    critical_z = norm.ppf((1 - pval / 2))
+    # Getting the count of series that are RU and not RU
+    RU_count = len(RU)
+    not_RU_count = len(not_RU)
 
-    _, _, _, _, teststat, _, _ = adfuller(x, maxlag=maxlags, regression='ct', autolag='bic')
+    # Getting the lists of series names that are RU and not RU
+    RU_columns = RU['Column'].tolist()
+    not_RU_columns = not_RU['Column'].tolist()
 
-    # is gamma = 0?
-    gamma_is_zero = teststat[0] > teststat[2][f'{signcol}%', 'ct']
+    return RU, not_RU, RU_count, not_RU_count, RU_columns, not_RU_columns
+# model b
+def adf_test_c(df, regression='c', autolag='AIC'):
+    # Create an empty DataFrame to store the results
+    columns = ['Column', 'ADF Statistic', 'p-value', '#Lags Used', 'Result']
+    results = pd.DataFrame(columns=columns)
 
-    if not gamma_is_zero:
-        res['ur'] = 0
-        res['trend'] = int(abs(teststat[1][3]) > critical_z)
-        return res
+    for column in df.columns:
+        # Apply ADF test
+        adf_result = adfuller(df[column], regression=regression, autolag=autolag)
 
-    phi3_is_zero = teststat[2][f'{signcol}%', 'ctt'] > teststat[0]
+        # Determine the result based on p-value
+        if adf_result[1] < 0.05:
+            result_str = "not RU"
+        else:
+            result_str = "RU"
+        
+        # Add results to the dataframe using loc
+        results.loc[len(results)] = [column, 
+                                     adf_result[0], 
+                                     adf_result[1], 
+                                     adf_result[2], 
+                                     result_str]
 
-    if not phi3_is_zero:
-        gamma_is_zero_normdist = teststat[0] < -critical_z
+    # Splitting the dataframe into two based on the 'Result' column
+    RU = results[results['Result'] == "RU"]
+    not_RU = results[results['Result'] == "not RU"]
 
-        if not gamma_is_zero_normdist:
-            res['ur'] = 0
-            res['trend'] = int(abs(teststat[1][3]) > critical_z)
-            return res
+    # Getting the count of series that are RU and not RU
+    RU_count = len(RU)
+    not_RU_count = len(not_RU)
 
-        if gamma_is_zero_normdist:
-            res['ur'] = 1
-            res['trend'] = int(abs(teststat[1][3]) > critical_z)
-            return res
+    # Getting the lists of series names that are RU and not RU
+    RU_columns = RU['Column'].tolist()
+    not_RU_columns = not_RU['Column'].tolist()
 
-    _, _, _, _, teststat, _, _ = adfuller(x, maxlag=maxlags, regression='c', autolag='bic')
+    return RU, not_RU, RU_count, not_RU_count, RU_columns, not_RU_columns
 
-    # is gamma = 0?
-    gamma_is_zero = teststat[0] > teststat[2][f'{signcol}%', 'c']
+# model n
+def adf_test_c(df, regression='n', autolag='AIC'):
+    # Create an empty DataFrame to store the results
+    columns = ['Column', 'ADF Statistic', 'p-value', '#Lags Used', 'Result']
+    results = pd.DataFrame(columns=columns)
 
-    if not gamma_is_zero:
-        res['ur'] = 0
-        res['trend'] = 0
-        return res
+    for column in df.columns:
+        # Apply ADF test
+        adf_result = adfuller(df[column], regression=regression, autolag=autolag)
 
-    phi1_is_zero = teststat[2][f'{signcol}%', 'ct'] > teststat[1]
+        # Determine the result based on p-value
+        if adf_result[1] < 0.05:
+            result_str = "not RU"
+        else:
+            result_str = "RU"
+        
+        # Add results to the dataframe using loc
+        results.loc[len(results)] = [column, 
+                                     adf_result[0], 
+                                     adf_result[1], 
+                                     adf_result[2], 
+                                     result_str]
 
-    if not phi1_is_zero:
-        gamma_is_zero_normdist = teststat[0] < -critical_z
+    # Splitting the dataframe into two based on the 'Result' column
+    RU = results[results['Result'] == "RU"]
+    not_RU = results[results['Result'] == "not RU"]
 
-        if not gamma_is_zero_normdist:
-            res['ur'] = 0
-            res['trend'] = 0
-            return res
+    # Getting the count of series that are RU and not RU
+    RU_count = len(RU)
+    not_RU_count = len(not_RU)
 
-        if gamma_is_zero_normdist:
-            res['ur'] = 1
-            res['trend'] = 0
-            return res
+    # Getting the lists of series names that are RU and not RU
+    RU_columns = RU['Column'].tolist()
+    not_RU_columns = not_RU['Column'].tolist()
 
-    _, _, _, _, teststat, _, _ = adfuller(x, maxlag=maxlags, regression='nc', autolag='bic')
-
-    gamma_is_zero = teststat[0] > teststat[2][f'{signcol}%', 'nc']
-
-    if not gamma_is_zero:
-        res['ur'] = 0
-        res['trend'] = 0
-        return res
-    else:
-        res['ur'] = 1
-        res['trend'] = 0
-        return res
-
-def adf_enders_wrapper(x):
-    if len(np.unique(x)) < 2 or np.all(np.isnan(x)):
-        return None
-
-    difforder = range(3)
-    res = []
-    for lag in difforder:
-        res.append(adf_enders(dshift(x, lag)))
-
-    out = res[0]
-    out['order'] = 0 + out['ur']
-    if res[0]['ur'] == 1 and res[1]['ur'] == 1:
-        out = res[1]
-        out['order'] = 2
-    if res[0]['ur'] == 1 and res[1]['ur'] == 1 and res[2]['ur'] == 1:
-        out = res[2]
-        out['order'] = 3
-
-    return out
-
-# Running instructions
-np.random.seed(1234)
-x = np.random.rand(100)
-print(adf_enders_wrapper(x))  # No unit root
-
-y = np.arange(1, 101) + np.random.randn(100)
-print(adf_enders_wrapper(y))  # Trend-stationary
-
-
-
-
+    return RU, not_RU, RU_count, not_RU_count, RU_columns, not_RU_columns
