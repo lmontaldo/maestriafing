@@ -24,6 +24,7 @@ from utils.validators import *
 #from utils.ADF_tests import *
 from utils.eda_decomposition import *
 from utils.test_statistics_adf import TestStatistics
+from utils.models_ADF import ModelsADF
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -151,5 +152,15 @@ df_idx_sa=STL_seasonal_adjusted(df_idx)
 
 # ADF test ct
 # Using the tau_tau method and retrieving only the lists
-results_adf_ct   = UnitRootTests.adf_arch_ct1(df_idx_sa)
-print(results_adf_ct)
+df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_ct(df_idx_sa)
+print(f'lista de series que son no estacionarias en modelo c: {RU_series}')
+print(f'lista de series que son estacionarias en modelo c: {not_RU_series}')
+
+df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_c(df_idx_sa)
+print(f'lista de series que son no estacionarias en modelo b: {RU_series}')
+print(f'lista de series que son estacionarias en modelo b: {not_RU_series}')
+
+
+df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_n(df_idx_sa)
+print(f'lista de series que son no estacionarias en modelo a: {RU_series}')
+print(f'lista de series que son estacionarias en modelo a: {not_RU_series}')
