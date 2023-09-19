@@ -177,7 +177,7 @@ def perform_seasonal_adjustment(df, period=12):
 
     for column in df.columns:
         # Perform seasonal decomposition
-        decomposition = seasonal_decompose(df[column], model='additive')
+        decomposition = seasonal_decompose(df[column], model='additive', period=period)
 
         # Retrieve the trend and residual components
         trend = decomposition.trend
