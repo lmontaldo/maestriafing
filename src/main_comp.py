@@ -7,6 +7,9 @@ from config import DATA_BASE_PATH
 from config import image_path
 from utils import data_loader 
 #from utils.ADF_tests import adf_test 
+import sys
+sys.path.append('../utils')
+from utils.unitroot import UnitRootTests
 import sqlite3
 import sys
 import numbers
@@ -20,7 +23,8 @@ from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjust
 from utils.unitroot import *
 from utils.pruebas_KPSS import *
 from utils.validators import *
-from utils.eda_decomposition import STL_extract_trend
+from utils.ADF_tests import *
+from utils.eda_decomposition import *
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -51,9 +55,11 @@ df=df_dict['CLASES_IPC']
 df_raw=df_dict['Datosipc']
 
 ############################################
-# COMPONENTES IPC
+# GRÁFICOS DE LOS COMPONENTES IPC
 ############################################
 df['ymd'] = pd.to_datetime(df['ymd']).dt.normalize()
+
+# from wide to long to make plots
 long_df= pd.melt(df, id_vars='ymd', var_name='code', value_name='value')
 long_df['groups_codes'] =long_df['code'].str[:3]
 # plot components
@@ -86,14 +92,12 @@ for group, sub_df in dfs.items():
     # Show the plot
     plt.show()
 '''
-print(df.head())
-df_wide=df.set_index('ymd')
-print(df_wide.head())
-c0121 = df_wide['c0121']
-print(c0121.head())
+# size of each group
+unique_codes_per_group = long_df.groupby('groups_codes')['code'].nunique()
+latex_table_c = unique_codes_per_group.reset_index().to_latex(index=False, header=["Groups Codes", "Unique Codes Count"])
+print(latex_table_c)
 
-
-
+# plot
 '''
 # plot
 # underlying trends in ts df
@@ -131,5 +135,21 @@ for group, sub_df in dfs.items():
         
     # Show the plot
     plt.show()
-'''    
-    
+'''  
+
+#############################################################################
+# REMOCIÓN DE LA TENDENCIA Y  ESTACIONALIDAD DE LOS COMPONENTES DEL IPC
+############################################################################  
+df_idx=df.set_index('ymd')
+df_idx_diff = df_idx.diff().dropna()
+df_idx_diff_sa = STL_seasonal_adjusted(df_idx_diff)
+df_idx_sa=STL_seasonal_adjusted(df_idx)
+
+######################################################
+# ADF TEST SOBRE LAS SERIES
+######################################################
+
+# ADF test ct
+adf_instance = UnitRootTests(df_idx_diff_sa)
+ct_notdif=adf_instance.adf_arch_ct(df_idx_diff_sa)
+print(ct_notdif)
