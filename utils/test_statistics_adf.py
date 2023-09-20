@@ -358,6 +358,38 @@ class TestStatistics:
         return tuple(output)
     
     @staticmethod
+    def gamma_t_distribution(df, cols_rho=None, alpha=0.05, return_values=None):
+        results = {}
+        rh0 = pd.DataFrame()
+        no_rh0 = pd.DataFrame()
+        rh0_list = []
+        no_rh0_list = []
+        if cols_rho is None:
+            df_sliced = df.copy()
+        else:
+            df_sliced = df[cols_rho].copy()
+        for col in df_sliced:
+            adf_b = ADF(df_sliced[col], trend='c')
+            reg_res_b = adf_b.regression
+            p_value = reg_res_b.pvalues[0]  
+            if p_value < alpha:  
+                rh0_list.append(col)
+                rh0 = pd.concat([rh0, df_sliced[col]], axis=1)
+            else:
+                no_rh0_list.append(col)
+                no_rh0 = pd.concat([no_rh0, df_sliced[col]], axis=1)
+        results['RH0 (Stationary)'] = rh0_list
+        results['No RH0 (Non-stationary)'] = no_rh0_list
+        if return_values:
+            return results, rh0, no_rh0
+        else:
+            return results    
+            
+    
+    
+    
+    
+    @staticmethod
     def a_0_t(df, cols_rho=None, alpha=0.05, return_values=None):
         results = {}
         rh0 = pd.DataFrame()
