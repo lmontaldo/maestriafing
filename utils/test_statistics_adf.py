@@ -378,19 +378,15 @@ class TestStatistics:
             else:
                 no_rh0_list.append(col)
                 no_rh0 = pd.concat([no_rh0, df_sliced[col]], axis=1)
-        results['RH0 (Stationary)'] = rh0_list
-        results['No RH0 (Non-stationary)'] = no_rh0_list
+        results['RH0) ====> gamma neq 0 =====> NO RU y a_0 neq 0'] = rh0_list
+        results['No RH0 ====> gamma=0 =====> RU y a_0 neq 0'] = no_rh0_list
         if return_values:
             return results, rh0, no_rh0
         else:
             return results    
             
-    
-    
-    
-    
     @staticmethod
-    def a_0_t(df, cols_rho=None, alpha=0.05, return_values=None):
+    def a_0_t_standard(df, cols_rho=None, alpha=0.05, return_values=None):
         results = {}
         rh0 = pd.DataFrame()
         no_rh0 = pd.DataFrame()
@@ -413,10 +409,6 @@ class TestStatistics:
             print('ADF Statistic:', adf_test.stat)
             print('p-value:', adf_test.pvalue)
             print('Used lag:', adf_test.lags)
-            
-            
-
-            # Check if a0 = 0 using the t-distribution
             if adf_test.pvalue <= alpha:
                 rh0[col] = df_sliced[col]
                 rh0_list.append(col)
@@ -467,3 +459,40 @@ class TestStatistics:
 
         return {'rh0': rh0,'no_rh0': no_rh0,'rho_list': rh0_list, 'no_rho_list': no_rh0_list}      
     
+    
+    @staticmethod
+    def a_0_t_standard(df, cols_rho=None, alpha=0.05):
+        results = {}
+        rh0 = pd.DataFrame()
+        no_rh0 = pd.DataFrame()
+        rh0_list = []
+        no_rh0_list = []
+        
+        if cols_rho is None:
+            df_sliced = df.copy()
+        else:
+            df_sliced = df[cols_rho].copy()
+
+        for col in df_sliced.columns:
+            # Compute the differenced series for the column
+            df_sliced['delta_y'] = df_sliced[col].diff().dropna()
+
+            # Perform ADF test
+            adf_test = ADF(df_sliced['delta_y'].dropna(), trend='c')
+
+            print(f"Results for column {col}:")
+            print('ADF Statistic:', adf_test.stat)
+            print('p-value:', adf_test.pvalue)
+            print('Used lag:', adf_test.lags)
+
+            if adf_test.pvalue <= alpha:
+                print(f"Conclusion for column {col}: a_0 != 0. Go to step 1.")
+                rh0[col] = df_sliced[col]
+                rh0_list.append(col)
+            else:
+                print(f"Conclusion for column {col}: a_0 = 0. Go to step 3.")
+                no_rh0[col] = df_sliced[col]
+                no_rh0_list.append(col)
+        return {'rho_list': rh0_list, 'no_rho_list': no_rh0_list}
+
+
