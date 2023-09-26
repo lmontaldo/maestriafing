@@ -17,10 +17,11 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 from sklearn.preprocessing import StandardScaler
-from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
+#from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
 #from utils.unitroot import *
 from utils.pruebas_KPSS import *
 from utils.validators import *
+from utils.stl_decomposition import STL_procedure
 #from utils.ADF_tests import *
 from utils.eda_decomposition import *
 from utils.test_statistics_adf import TestStatistics
@@ -143,9 +144,12 @@ for group, sub_df in dfs.items():
 ############################################################################  
 df_idx=df.set_index('ymd')
 df_idx_diff = df_idx.diff().dropna()
-df_idx_diff_sa = perform_seasonal_adjustment(df_idx_diff)
+#df_idx_diff_sa = perform_seasonal_adjustment(df_idx_diff)
 
-
+stl = STL_procedure(df_idx_diff, seasonal=13, period=12)
+trend, seasonal, residual = stl.decompose_dataframe_stl()
+df_idx_diff_sa = stl.STL_seasonal_adjusted()
+detrended = stl.STL_detrend()
 ######################################################
 # ADF TEST SOBRE LAS SERIES
 ######################################################
@@ -254,3 +258,5 @@ results_tau=TestStatistics.tau(df_idx_diff_sa, cols_no_rho=results_phi1[6])
 print(f'Secuencias que no contienen RU:{results_tau["rho_list"]} ====> estacionarias en modelo (a)')
 print(f'Secuencias que contienen RU:{results_tau["no_rho_list"]} ====> no estacionarias en modelo (a)')
 # return {'rh0': rh0,'no_rh0': no_rh0,'rho_list': rh0_list, 'no_rho_list': no_rh0_list}  
+
+
