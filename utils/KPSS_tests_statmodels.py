@@ -16,7 +16,7 @@ class KPSSAnalyzer:
         print(title)
         results = []
         if nlags == 'legacy':
-            nlags = int(4*(len(self.data)/100)**0.25)
+            nlags = int(12*(len(self.data)/100)**(1/4))
         if isinstance(self.data, pd.DataFrame):
             for column in self.data.columns:
                 print("Column:", column)

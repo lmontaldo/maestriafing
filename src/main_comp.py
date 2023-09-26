@@ -19,13 +19,13 @@ import datetime as dt
 from sklearn.preprocessing import StandardScaler
 #from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
 #from utils.unitroot import *
-from utils.pruebas_KPSS import *
 from utils.validators import *
 from utils.stl_decomposition import STL_procedure
 #from utils.ADF_tests import *
 from utils.eda_decomposition import *
 from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF import ModelsADF
+from utils.KPSS_tests_arch import KPSSAnalyzer
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -258,5 +258,22 @@ results_tau=TestStatistics.tau(df_idx_diff_sa, cols_no_rho=results_phi1[6])
 print(f'Secuencias que no contienen RU:{results_tau["rho_list"]} ====> estacionarias en modelo (a)')
 print(f'Secuencias que contienen RU:{results_tau["no_rho_list"]} ====> no estacionarias en modelo (a)')
 # return {'rh0': rh0,'no_rh0': no_rh0,'rho_list': rh0_list, 'no_rho_list': no_rh0_list}  
+print(f'\n')
+# ADF test over df_idx
+print("##################################################################################")
+print("################################ TESTS KPSS  #####################################")
+print("##################################################################################")
+print(f'\n')
+# Usage:
+analyzer = KPSSAnalyzer(df_idx_diff_sa)
+analyzer.run_tests()
+# Print results
+for key, value in analyzer.results.items():
+    print(f"Results for {key}:\n")
+    for col, is_significant in value.items():
+        status = "Significant" if is_significant else "Not Significant"
+        print(f"Column: {col} - {status}")
+    print("------------------------------------------------------")
+
 
 
