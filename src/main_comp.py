@@ -25,7 +25,7 @@ from utils.stl_decomposition import STL_procedure
 from utils.eda_decomposition import *
 from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF import ModelsADF
-from utils.KPSS_tests_arch import KPSSAnalyzer
+from utils.KPSS_tests_arch import KPSSAnalysis
 import plotly.graph_objects as go
 import dash
 from dash import dcc
@@ -265,15 +265,15 @@ print("################################ TESTS KPSS  ############################
 print("##################################################################################")
 print(f'\n')
 # Usage:
-analyzer = KPSSAnalyzer(df_idx_diff_sa)
-analyzer.run_tests()
-# Print results
-for key, value in analyzer.results.items():
-    print(f"Results for {key}:\n")
-    for col, is_significant in value.items():
-        status = "Significant" if is_significant else "Not Significant"
-        print(f"Column: {col} - {status}")
-    print("------------------------------------------------------")
+analysis = KPSSAnalysis(df_idx_diff_sa)
+analysis.perform_test()
+result_none = analysis._test_for_params('c', None)
+result_lshort = analysis._test_for_params('c', 'lshort')
+print("Results:\n", result_none)
+# Retrieve and print columns where RH0 is false
+false_columns = analysis.get_RH0_false_columns('c', None)
+print("\nColumns where RH0 is false:", false_columns)
+
 
 
 
