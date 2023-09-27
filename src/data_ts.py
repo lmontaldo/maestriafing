@@ -5,6 +5,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from config import DATA_BASE_PATH
 from utils import data_loader
+from utils.standarization import StandardScaler
 import sqlite3
 import sys
 import numbers
