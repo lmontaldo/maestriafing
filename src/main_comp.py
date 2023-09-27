@@ -1,50 +1,51 @@
-import sys
+# -------------------------------
+# IMPORTS
+# -------------------------------
+
+# Standard libraries
 import os
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
-from config import DATA_BASE_PATH
-from config import image_path
-from utils import data_loader 
-#from utils.ADF_tests import adf_test 
-sys.path.append('../utils')
-import sqlite3
 import sys
 import numbers
 import time
 import math
+import datetime as dt
+import warnings
+
+# Third-party libraries
 import pandas as pd
 import numpy as np
-import datetime as dt
-from sklearn.preprocessing import StandardScaler
-#from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
-#from utils.unitroot import *
-from utils.validators import *
-from utils.stl_decomposition import STL_procedure
-#from utils.ADF_tests import *
-from utils.eda_decomposition import *
-from utils.test_statistics_adf import TestStatistics
-from utils.models_ADF import ModelsADF
-from utils.KPSS_tests_arch import KPSSAnalysis
 import plotly.graph_objects as go
 import dash
-from dash import dcc
-from dash import html
+from dash import dcc, html
 from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tools.sm_exceptions import InterpolationWarning
 from plotly.subplots import make_subplots
 from statsmodels.tsa.stattools import acf, pacf
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-from arch.unitroot import ADF
-import warnings
-from statsmodels.tools.sm_exceptions import InterpolationWarning
 import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from tabulate import tabulate
-import warnings
+
+# Local modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import DATA_BASE_PATH, image_path
+from utils import data_loader
+from utils.validators import *
+from utils.stl_decomposition import STL_procedure
+from utils.eda_decomposition import *
+from utils.test_statistics_adf import TestStatistics
+from utils.models_ADF_arch import ModelsADF
+from utils.KPSS_tests_arch import KPSSAnalysis
+from utils.standarization import Standardization
+
+# -------------------------------
+# CONFIGURATIONS
+# -------------------------------
+
 warnings.simplefilter('ignore', InterpolationWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
+
+
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
@@ -149,7 +150,7 @@ df_idx_diff = df_idx.diff().dropna()
 stl = STL_procedure(df_idx_diff, seasonal=13, period=12)
 trend, seasonal, residual = stl.decompose_dataframe_stl()
 df_idx_diff_sa = stl.STL_seasonal_adjusted()
-detrended = stl.STL_detrend()
+#detrended = stl.STL_detrend()
 ######################################################
 # ADF TEST SOBRE LAS SERIES
 ######################################################
@@ -159,45 +160,70 @@ print("#########################################################################
 print("################################ TESTS ADF  ######################################")
 print("##################################################################################")
 print(f'\n')
-print('########## Tests ADF sobre las series en log y normalizadas ######################')
-print(f'\n')
-#df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_ct(df_idx)
-results_1=ModelsADF.adf_ct(df_idx)
-print(f'Cantidad de series que son no estacionarias en modelo (c): {results_1[3]}')
-print(f'Cantidad de series que son estacionarias en modelo (c): {results_1[4]}')
-print(f'Lista de series que son estacionarias en modelo (c): {results_1[6]}')
-#df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_c(df_idx)
-print(f'\n')
-results_2=ModelsADF.adf_c(df_idx)
-print(f'Cantidad de series que son no estacionarias en modelo (b): {results_2[3]}')
-print(f'Cantidad de series que son estacionarias en modelo (b): {results_2[4]}')
-print(f'Lista de series que son estacionarias en modelo (b): {results_2[6]}')
-print(f'\n')
-#df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_n(df_idx)
-results_3=ModelsADF.adf_n(df_idx)
-print(f'Cantidad de series que son no estacionarias en modelo (a): {results_3[3]}')
-print(f'Cantidad de series que son estacionarias en modelo (a): {results_3[4]}')
-print(f'Lista de series que son estacionarias en modelo (a): {results_3[6]}')
+print("################################ Series normalizadas y estanzarizdadas ##########")
+adf_model = ModelsADF(df_idx)
+results = adf_model.perform_adf_test(trends=['ct', 'c', 'n'])
+for trend, results in results.items():
+    print(f"Results for trend {trend}:")
+    
+    # Display the entire DataFrame results
+    print(results['df_results'])
+    print("--------------------------")
+    
+    # Display RU results
+    print(f"RU Results for trend {trend}:")
+    print(results['RU'])
+    print("--------------------------")
+    
+    # Display not_RU results
+    print(f"Not RU Results for trend {trend}:")
+    print(results['not_RU'])
+    print("--------------------------")
+    
+    # Display counts
+    print(f"RU Count for trend {trend}: {results['RU_count']}")
+    print(f"Not RU Count for trend {trend}: {results['not_RU_count']}")
+    print("--------------------------")
+    
+    # Display series names
+    print(f"RU Series for trend {trend}: {results['RU_series']}")
+    print(f"Not RU Series for trend {trend}: {results['not_RU_series']}")
+    print("\n======================================\n")
+
+
 
 print(f'\n')
-print("######################################################################################################")
 print('############## Test ADF sobre las series en primeras diferencias y desestacionalizadas ##############') 
-print("######################################################################################################")
 print(f'\n')
 #df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_c(df_idx_diff_sa)
-results_4=ModelsADF.adf_ct(df_idx)
-print(f'Cantidad de series con RU en modelo (b): {results_4[3]}')
-print(f'Lista de series con RU en modelo (b): {results_4[5]}')
-print(f'\n')
-print(f'# de series con NO RU en modelo (b): {results_4[4]}')
-print(f'Lista de series con NO RU en modelo (b): {results_4[6]}')
-print(f'\n')
-#df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_n(df_idx_diff_sa)
-results_5= ModelsADF.adf_n(df_idx_diff_sa)
-print(f'Cantidad de series que son no estacionarias en modelo (a): {results_5[3]}')
-print(f'Lista de series que son no estacionarias en modelo (a): {results_5[5]}')
-print(f'Cantidad de series que son estacionarias en modelo (a): {results_5[4]}')
-print(f'Lista de series que son estacionarias en modelo (a): {results_5[6]}\n')
+adf_model = ModelsADF(df_idx_diff_sa)
+results = adf_model.perform_adf_test(trends=['c', 'n'])
+for trend, results in results.items():
+    print(f"Results for trend {trend}:")
+    
+    # Display the entire DataFrame results
+    print(results['df_results'])
+    print("--------------------------")
+    
+    # Display RU results
+    print(f"RU Results for trend {trend}:")
+    print(results['RU'])
+    print("--------------------------")
+    
+    # Display not_RU results
+    print(f"Not RU Results for trend {trend}:")
+    print(results['not_RU'])
+    print("--------------------------")
+    
+    # Display counts
+    print(f"RU Count for trend {trend}: {results['RU_count']}")
+    print(f"Not RU Count for trend {trend}: {results['not_RU_count']}")
+    print("--------------------------")
+    
+    # Display series names
+    print(f"RU Series for trend {trend}: {results['RU_series']}")
+    print(f"Not RU Series for trend {trend}: {results['not_RU_series']}")
+    print("\n======================================\n")
 print(f'\n')
 print("#################################################################################")
 print('######### Primer paso: se usa tau_mu para testear la $H0) \gamma=0$ #############')
@@ -246,7 +272,7 @@ print("#########################################################################
 print('Se vuelve al paso 1, para las series con a_0 neq 0 y se testea H0) gamma=0 con distribucion t')
 print("################################################################################################")
 print(f'\n')
-results_gamma=TestStatistics.gamma_t_distribution(df, cols_rho=results_a0["rho_list"], alpha=0.05, return_values=None)
+results_gamma=TestStatistics.gamma_t_distribution(df_idx_diff_sa, cols_rho=results_a0["rho_list"], alpha=0.05, return_values=None)
 print(results_gamma)
 print(f'\n')
 print("#############################################################################################")
@@ -264,19 +290,30 @@ print("#########################################################################
 print("################################ TESTS KPSS  #####################################")
 print("##################################################################################")
 print(f'\n')
-# Usage:
-analysis = KPSSAnalysis(df_idx_diff_sa)
-analysis.perform_test()
-    # Perform the test
-analysis.perform_test()
+# Create an instance of KPSSAnalysis with your data
+kpss_analysis = KPSSAnalysis(df_idx_diff_sa)
+# Performing the test
+kpss_analysis.perform_test()
 
-results_df = analysis.get_result()
-print(results_df)
+# Restricting the loop to only 'c' trend
+trend = 'c'
+for nlags in kpss_analysis.nlags_list:
+    print(f"Results for trend={trend} and nlags method={nlags}:")
+    
+    # Retrieve and print results
+    df_results = kpss_analysis.get_results_for_trend_nlags(trend, nlags)
+    stationary_df = kpss_analysis.get_stationary_for_trend_nlags(trend, nlags)
+    non_stationary_df = kpss_analysis.get_non_stationary_for_trend_nlags(trend, nlags)
 
-true_columns = analysis.get_RH0_true_columns()
-print(true_columns)
-
-
-
+    print(f"\nDataFrame named {trend}_{nlags}:")
+    print(df_results)
+    
+    print(f"\nList of Stationary series for trend={trend} and nlags method={nlags}:")
+    print(list(stationary_df.index))  # Get the index (column names) of the stationary DataFrame
+    
+    print(f"\nList of Non-Stationary series for trend={trend} and nlags method={nlags}:")
+    print(list(non_stationary_df.index))  # Get the index (column names) of the non-stationary DataFrame
+    
+    print("-------------------------------------------------------------")
 
 
