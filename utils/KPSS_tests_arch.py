@@ -1,6 +1,7 @@
 import pandas as pd
 import math
 from arch.unitroot import KPSS
+
 class KPSSAnalysis:
     
     def __init__(self, data, alpha=0.05, nlags_list=['legacy', 'lshort', None], trends=['c','ct']):
@@ -9,19 +10,13 @@ class KPSSAnalysis:
         self.nlags_list = nlags_list
         self.trends = trends
         self.n = len(data)
-        self.results = {}
-        self.RH0_true = {}
-        self.RH0_false = {}
+        self.results_df = pd.DataFrame(index=data.columns)
     
     def perform_test(self):
         for trend in self.trends:
             for nlags in self.nlags_list:
                 key = f"{trend}_{nlags}"
-                self.results[key] = self._test_for_params(trend, nlags)
-                true_columns = self.results[key][self.results[key]].index.tolist()
-                false_columns = self.results[key][~self.results[key]].index.tolist()
-                self.RH0_true[key] = true_columns
-                self.RH0_false[key] = false_columns
+                self.results_df[key] = self._test_for_params(trend, nlags)
     
     def _test_for_params(self, trend, nlags):
         result_data = {}
@@ -39,14 +34,11 @@ class KPSSAnalysis:
 
         return pd.Series(result_data)
 
-    def get_result(self, trend, nlags):
-        key = f"{trend}_{nlags}"
-        return self.results.get(key)
+    def get_result(self):
+        return self.results_df
 
-    def get_RH0_true_columns(self, trend, nlags):
-        key = f"{trend}_{nlags}"
-        return self.RH0_true.get(key)
+    def get_RH0_true_columns(self):
+        return {col: self.results_df.index[self.results_df[col]].tolist() for col in self.results_df.columns}
 
-    def get_RH0_false_columns(self, trend, nlags):
-        key = f"{trend}_{nlags}"
-        return self.RH0_false.get(key)
+    def get_RH0_false_columns(self):
+        return {col: self.results_df.index[~self.results_df[col]].tolist() for col in self.results_df.columns}
