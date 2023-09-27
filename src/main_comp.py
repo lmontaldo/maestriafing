@@ -267,12 +267,15 @@ print(f'\n')
 # Usage:
 analysis = KPSSAnalysis(df_idx_diff_sa)
 analysis.perform_test()
-result_none = analysis._test_for_params('c', None)
-result_lshort = analysis._test_for_params('c', 'lshort')
-print("Results:\n", result_none)
-# Retrieve and print columns where RH0 is false
-false_columns = analysis.get_RH0_false_columns('c', None)
-print("\nColumns where RH0 is false:", false_columns)
+    # Perform the test
+analysis.perform_test()
+
+results_df = analysis.get_result()
+print(results_df)
+
+true_columns = analysis.get_RH0_true_columns()
+print(true_columns)
+
 
 
 
