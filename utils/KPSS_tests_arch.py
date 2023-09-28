@@ -4,7 +4,7 @@ from arch.unitroot import KPSS
 
 class KPSSAnalysis:
     
-    def __init__(self, data, alpha=0.05, nlags_list=['old_method', 'Hobijn_et_al'], trends=['c','ct']):
+    def __init__(self, data, alpha=0.05, nlags_list=['legacy', 'auto', 'Newey_West', 'Schwert'], trends=['c','ct']):
         self.data = data
         self.alpha = alpha
         self.nlags_list = nlags_list
@@ -36,18 +36,24 @@ class KPSSAnalysis:
         stats, p_values, lags_used, results = [], [], [], []
 
         for column in self.data.columns:
-            if nlags == 'old_method':
+            if nlags == 'legacy':
                 actual_nlags = math.trunc(12 * (self.n/100) ** (1/4))
+            elif nlags == 'auto': 
+                actual_nlags = math.trunc(4 * (self.n/100) ** (1/4)) 
+            elif nlags == 'Newey_West':
+                actual_nlags = math.trunc(4 * (self.n/100)**(2/9)) 
+            elif nlags == 'Schwert': 
+                actual_nlags = math.trunc(self.n**(1/3))       
             else:  
-                actual_nlags = math.trunc(4 * (self.n/100)**0.25)
+                raise ValueError(f"Unknown nlags method: {nlags}")
 
             kpsstest = KPSS(self.data[column], trend=trend, lags=actual_nlags)
-            is_stationary = kpsstest.pvalue <= self.alpha
+            estacionarity_ccl = kpsstest.pvalue <= self.alpha
 
             stats.append(kpsstest.stat)
             p_values.append(kpsstest.pvalue)
             lags_used.append(actual_nlags)
-            results.append('Stationary' if is_stationary else 'Non-Stationary')
+            results.append('Non-Stationary' if estacionarity_ccl else 'Stationary')
 
         df_results = pd.DataFrame({
             'stat': stats,
@@ -61,10 +67,12 @@ class KPSSAnalysis:
     # Methods to fetch results
     def get_results_for_trend_nlags(self, trend, nlags):
         return self.results.get(trend, {}).get(nlags, {}).get('df_results', None)
-
     def get_stationary_for_trend_nlags(self, trend, nlags):
         return self.results.get(trend, {}).get(nlags, {}).get('Stationary', None)
-
     def get_non_stationary_for_trend_nlags(self, trend, nlags):
         return self.results.get(trend, {}).get(nlags, {}).get('Non-Stationary', None)
+    def get_stationary_count_for_trend_nlags(self, trend, nlags):
+        return self.results.get(trend, {}).get(nlags, {}).get('Stationary_count', None)
+    def get_non_stationary_count_for_trend_nlags(self, trend, nlags):
+        return self.results.get(trend, {}).get(nlags, {}).get('Non-Stationary_count', None)
 

@@ -145,12 +145,10 @@ for group, sub_df in dfs.items():
 ############################################################################  
 df_idx=df.set_index('ymd')
 df_idx_diff = df_idx.diff().dropna()
-#df_idx_diff_sa = perform_seasonal_adjustment(df_idx_diff)
-
 stl = STL_procedure(df_idx_diff, seasonal=13, period=12)
 trend, seasonal, residual = stl.decompose_dataframe_stl()
 df_idx_diff_sa = stl.STL_seasonal_adjusted()
-#detrended = stl.STL_detrend()
+
 ######################################################
 # ADF TEST SOBRE LAS SERIES
 ######################################################
@@ -196,7 +194,7 @@ print(f'\n')
 print('############## Test ADF sobre las series en primeras diferencias y desestacionalizadas ##############') 
 print(f'\n')
 #df_results, RU, not_RU, RU_count, not_RU_count, RU_series, not_RU_series   = ModelsADF.adf_c(df_idx_diff_sa)
-adf_model = ModelsADF(df_idx_diff_sa)
+adf_model = ModelsADF(residual)
 results = adf_model.perform_adf_test(trends=['c', 'n'])
 for trend, results in results.items():
     print(f"Results for trend {trend}:")
@@ -230,7 +228,7 @@ print('######### Primer paso: se usa tau_mu para testear la $H0) \gamma=0$ #####
 print("#################################################################################")
 print(f'\n')
 # rh0, no_rh0, tau_mu, rho_count, no_rho_count, rh0_list, no_rh0_list =TestStatistics.tau_mu(df_idx_diff_sa)
-results_tau_mu=TestStatistics.tau_mu(df_idx_diff_sa)
+results_tau_mu=TestStatistics.tau_mu(residual)
 print(f'Cantidad de secuencias que $RH0)\gamma=0$ entonces no contienen RU:   {results_tau_mu[3]}') 
 print(f'Secuencias que no contienen RU: {results_tau_mu[5]}')
 print(f'Cantidad de secuencias que $RH0)\gamma=0$ entonces no contienen RU:   {results_tau_mu[3]}') 
@@ -247,7 +245,7 @@ print('######### Segundo paso: se usa phi_1 para testear la $H0) a_0=gamma=0$ ##
 print("#################################################################################")
 print(f'\n')
 # rh0, no_rh0, phi_1, rho_count, no_rho_count, rh0_list, no_rh0_list=TestStatistics.phi_1(df_idx_diff_sa, cols_no_rho=no_rh0_list)
-results_phi1=TestStatistics.phi_1(df_idx_diff_sa, cols_norho=results_tau_mu[6])
+results_phi1=TestStatistics.phi_1(residual, cols_norho=results_tau_mu[6])
 print(f'Cantidad de secuencias que rH0: {results_phi1[3]}')
 print(f'Secuencias que rH0:{results_phi1[5]}')
 print('=====> Presencia de constante entonces de los resultados del paso 1, las series son RU y de phi_1 que gamma y/o a_0 son distintos de cero.')
@@ -264,7 +262,7 @@ print('Es a_0=0 con t-test?')
 print("#################################################################################")
 print(f'\n')
 #rh0_list, no_rh0_list=TestStatistics.a_0_t(df_idx_diff_sa, cols_rho=rh0_list)
-results_a0=TestStatistics.a_0_t_standard(df_idx_diff_sa, cols_rho=results_phi1[5])
+results_a0=TestStatistics.a_0_t_standard(residual, cols_rho=results_phi1[5])
 print(f'RH0): {results_a0["rho_list"]} =====> Para estas series se vuelve a un paso anterior y se evalúa $gamma=0$ con distribucion t\n')
 print(f'No RH0): {results_a0["no_rho_list"]} =====> Para estas series se pasa al modelo (a) y se evalúa tau')
 print(f'\n')
@@ -280,7 +278,7 @@ print('######### Tercer paso: se usa tau para testear la H0) gamma=0 para las se
 print("#############################################################################################")
 print(f'\n')
 # rh0_tau, no_rh0_tau, rh0_list, no_rh0_list = TestStatistics.tau(df_idx_diff_sa, cols_no_rho=no_rh0_list)
-results_tau=TestStatistics.tau(df_idx_diff_sa, cols_no_rho=results_phi1[6])
+results_tau=TestStatistics.tau(residual, cols_no_rho=results_phi1[6])
 print(f'Secuencias que no contienen RU:{results_tau["rho_list"]} ====> estacionarias en modelo (a)')
 print(f'Secuencias que contienen RU:{results_tau["no_rho_list"]} ====> no estacionarias en modelo (a)')
 # return {'rh0': rh0,'no_rh0': no_rh0,'rho_list': rh0_list, 'no_rho_list': no_rh0_list}  
@@ -291,7 +289,7 @@ print("################################ TESTS KPSS  ############################
 print("##################################################################################")
 print(f'\n')
 # Create an instance of KPSSAnalysis with your data
-kpss_analysis = KPSSAnalysis(df_idx_diff_sa)
+kpss_analysis = KPSSAnalysis(residual)
 # Performing the test
 kpss_analysis.perform_test()
 
@@ -312,8 +310,15 @@ for nlags in kpss_analysis.nlags_list:
     print(list(stationary_df.index))  # Get the index (column names) of the stationary DataFrame
     
     print(f"\nList of Non-Stationary series for trend={trend} and nlags method={nlags}:")
-    print(list(non_stationary_df.index))  # Get the index (column names) of the non-stationary DataFrame
+    print(list(non_stationary_df.index)) 
+    # Fetch and print counts
+    stationary_count = kpss_analysis.get_stationary_count_for_trend_nlags(trend, nlags)
+    non_stationary_count = kpss_analysis.get_non_stationary_count_for_trend_nlags(trend, nlags)
     
+    print(f"Count of Stationary series for trend={trend} and nlags method={nlags}: {stationary_count}")
+    print(f"Count of Non-Stationary series for trend={trend} and nlags method={nlags}: {non_stationary_count}")
+
     print("-------------------------------------------------------------")
+
 
 
