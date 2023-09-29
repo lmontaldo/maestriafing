@@ -1,6 +1,17 @@
 \chapter{Modelo de selección de Box-jenkins}
-El presente estudio se basa en la estrategia de Box-jenkins
-\section{Concepto de estacionariedad}
+\label{chap:box_jenkins_framework}
+Enders(año) se basa en la estrategia de \textit{Box-Jenkins} para hacer la selección del modelo más apropiado para series temporales unitarias de tipo \textit{ARIMA}, que se establece en tres etapas; identificación; estimación; diagnóstico. La etapa de \textit{identificación} se basa en herramientas visuales que permiten a simple vista detectar tendencias, quiebres estructurales, errores faltantes, datos atípicos, etc.
+En la etapa de \textit{estimación} se seleccionan modelos estacionarios y parsimoniosos que se ajustan a los datos. Y por último, en el \textit{diagnóstico} se evalúa si los residuos se parecen en comportamiento a un ruido blanco. Se sigue este enfoque de tipo unitario y se lleva a un universo con más series temporales para el mismo rango de tiempo, armando un \textit{dataframe} que constituyen los datos de entrada para el modelo dinámico.
+
+Algunas ideas claves relacionadas a Box-Jenkins son la parsimonia, estacionariedad e invertibilidad, bondad de ajuste y evaluación luego de la estimación.
+
+\subsection{Concepto de parsimonia}
+Con respecto a la parsimonia, implica que al incorporar más coeficientes en la estimación, se va a incrementar el ajuste  (el $R^2$ incrementa, por ejemplo) a costa de perder grados de libertad. Box-Jenkins sostiene que los modelos parsimoniosos performan mejor a la hora de realizar predicciones en comparación a modelos sobreparametrizados. Por este motivo, la parsimonia sería un objetivo a la hora de estimar modelos unitarios. Como en estudio, el foco no va a estar en realizar estimaciones unitarias, no se van a aplicar pruebas en los datos. Sin embargo, el próximo concepto si va a ser importante porque es un supuesto básico en los modelos \textit{VAR}, que son modelos fundamentales de los \textit{FAVAR}.
+
+
+
+
+\subsection{Concepto de estacionariedad}
 Se dice que un proceso estocástico $y_t$ con media y varianza finitas es estacionario en covarianza para todo $t$ y $t-s$ cuando
 
 \begin{align}
@@ -23,7 +34,10 @@ Para series estacionarias de segundo orden, se define la autocorrelación de $y_
 
 Como $\gamma_s/$ y $\gamma_0$ son independientes del tiempo, entonces los coeficientes de correlación $\rho_s$ también van a ser independientes del tiempo. Si bien la autocorrelación entre $y_t$ y $y_{t-1}$ podría ser distinta a la autocorrelación entre $y_t$ y $y_{t-2}$, la autocorrelación entre $y_t$ y $y_{t-1}$ va a ser igual a la autocorrelación entre $y_t$ y $y_{t-s-1}$. Asimismo, $\rho_0=1$.
 
-Las autocovarianzas y las autocorrelaciones son herramientas esenciales en la metodología de Box-Jenkins(1976) para identificar y estimar los modelos de series temporales. Dado que se está en un marco de ecuaciones en diferencias, se tienen que cumplir condiciones de estabilidad en el sistema y esto implica que las raíces características asociadas al sistema de interés caígan dentro del círculo unitario. De modo que para cada serie temporal estacionaria, individualmente considerada, su correlograma, que consiste en graficar $\rho_s$ contra $s$ debe converger a cero.  Además, cuando se quiera eliminar el efecto de los valores intermedios $y_{t-1}, ..., y_{t-s+1}$  entre  $y_t$ y $y_{t-s}$ se puede emplear la autocorrelación parcial dado que el correlograma incluye las correlaciones indirectas del proceso autorregresivo. Las autocorrelaciones parciales se calculan como
+Las autocovarianzas y las autocorrelaciones son herramientas esenciales en la metodología de Box-Jenkins(1976) para identificar y estimar los modelos de series temporales. 
+
+
+Como que se está en un marco de ecuaciones en diferencias, se tienen que cumplir condiciones de estabilidad en el sistema y esto implica que las raíces características asociadas al sistema de interés caígan dentro del círculo unitario. De modo que para cada serie temporal estacionaria, individualmente considerada, su correlograma, que consiste en graficar $\rho_s$ contra $s$ debe converger a cero.  Además, cuando se quiera eliminar el efecto de los valores intermedios $y_{t-1}, ..., y_{t-s+1}$  entre  $y_t$ y $y_{t-s}$ se puede emplear la autocorrelación parcial dado que el correlograma incluye las correlaciones indirectas del proceso autorregresivo. Las autocorrelaciones parciales se calculan como
 
 \begin{align}
 \label{eq: 2_35}
@@ -49,12 +63,3 @@ Un supuesto fundamental del enfoque Box-Jenkins es que la estructura del proceso
 CUSUM_N=\sum_{i=n}^{N}e_i(1)/\sigma_e,\quad N=n,...,T-1    
 \end{equation*}
 donde $n$ es la fecha para el primer error de predicción y $T$ la última observación del conjunto de datos y $\sigma_e$ la desviación estándar estimada de los errores de predicción.
-
-
-
-\section{Ecuaciones en diferencias}
-
-Una de las metodologías empleadas en este estudio para series temporales se basan en la teoría de las ecuaciones en diferencias. De forma general, las ecuaciones en diferencias expresan  valores de las variables de interés como funciones de sus propios valores rezagados, del tiempo y de otras variables.
-En este sentido, se van a realizar estimaciones de ecuaciones en diferencias que contienen componentes estocásticos. 
-Además, en los modelos de series temporales, se parte de descomponer a las series en distintos componentes: tendencia, ciclo y componente irregular. El primero se vincula al comportamiento de largo plazo de cada serie, el segundo representa los movimientos períodico regulares de las mismas, y el último es estocástico. Tanto la tendencia como el ciclo son funciones del tiempo mientras que el componente irregular es una función de sus propios rezagos y de un componente estocástico $\varepsilon_t$. El objetivo principal en los estudios de series temporales consiste en estimar el componente irregular estocástico y realizar predicciones, entre otras tareas.
-
