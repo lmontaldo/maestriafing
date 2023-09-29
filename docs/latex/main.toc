@@ -1,11 +1,15 @@
 \babel@toc {spanish}{}\relax 
 \contentsline {chapter}{Lista de figuras}{2}{chapter*.2}%
 \contentsline {chapter}{Lista de tablas}{3}{chapter*.3}%
-\contentsline {chapter}{\numberline {1}Preprocesamiento de los datos}{4}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Tipos de tendencia}{4}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Eliminación de la tendencia}{5}{subsection.1.1.1}%
-\contentsline {section}{\numberline {1.2}Ajuste estacional}{6}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Pruebas de raíces unitarias y de estacionariedad}{9}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}Pruebas de Dicky-Fuller Aumentado}{9}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {1.3.2}Pruebas de Kwiatkowski, Phillips, Schmidt y Shin}{13}{subsection.1.3.2}%
+\contentsline {chapter}{\numberline {1}Descripción del problema}{4}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Modelo de selección de Box-jenkins}{6}{chapter.2}%
+\contentsline {subsection}{\numberline {2.0.1}Concepto de parsimonia}{6}{subsection.2.0.1}%
+\contentsline {subsection}{\numberline {2.0.2}Concepto de estacionariedad}{7}{subsection.2.0.2}%
+\contentsline {chapter}{\numberline {3}Preprocesamiento de los datos}{10}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Tipos de tendencia}{10}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Eliminación de la tendencia}{11}{subsection.3.1.1}%
+\contentsline {section}{\numberline {3.2}Ajuste estacional}{12}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Pruebas de raíces unitarias y de estacionariedad}{15}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Pruebas de Dicky-Fuller Aumentado}{15}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Pruebas de Kwiatkowski, Phillips, Schmidt y Shin}{19}{subsection.3.3.2}%
 \contentsfinish 
