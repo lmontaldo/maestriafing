@@ -5,7 +5,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from config import DATA_BASE_PATH
 from utils import data_loader
-from utils.standarization import StandardScaler
+#from utils.standarization import StandardScaler
 import sqlite3
 import sys
 import numbers
@@ -89,6 +89,13 @@ end_time_clases = long_clases['ymd'].max()
 wide_clases_idx = long_clases.pivot(index='ymd', columns='c_codigo', values='value')
 wide_clases = wide_clases_idx.reset_index()
 wide_clases = wide_clases.rename_axis(None)
+#file_path = r'C:\Users\user\Desktop\Extremales\Curso_Extremales\lab_1\wide_clases.csv'  # Use 'r' before the path string
+# Save the DataFrame to a CSV file
+#wide_clases.to_csv(file_path, index=False)
+#print(f"Data saved to {file_path}")
+
+
+#################################################
 # log transform
 log_clases_idx = np.log1p(wide_clases_idx)
 # z-score rescaling
@@ -157,7 +164,13 @@ lst_external=['PBEEF','POILAPSP','PSOYB']
 ext_prices=log_externos_usd_idx.filter(lst_external)
 df_external_idx=pd.concat([ext_prices, avg_fb], axis=1)
 log_norm_external=df_external_idx.reset_index()
+
+
+
+
+
 log_norm_external['ymd'] = log_norm_external['ymd'].astype(str)
+
 #########################################
 # DB storage
 #########################################
