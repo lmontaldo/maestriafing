@@ -9,7 +9,7 @@ sys.path.append(parent_dir)
 import data_loader
 from config import DATA_BASE_PATH
 import sqlite3
-import sys
+from utils.log_norm import *
 import numbers
 import time
 import math
@@ -21,37 +21,11 @@ import lista_food
 #############################################
 # Retrieve the DataFrames from data_loader
 #############################################
-# Specify the database path
 path=DATA_BASE_PATH
-#path = 'C:/Users/Transitorio/Desktop/tesis2023/tesis2023-1/data/mydatabase.db'
-# Retrieve the DataFrames from data_loader
-#df_clases, df_univariado, df_fmi, df_clases_filter = data_loader.get_data(path)
-tables_list= ['Datosipc', 'ipc_general_ine','Datos_fmi_2022_external', 'clases_ipc_filtradas']
+tables_list= ['Datosipc', 'clases_ipc_filtradas']
 df_dict = data_loader.get_data(path, tables_list)
-df_univariado = df_dict['ipc_general_ine']
 df_clases_filter=df_dict['clases_ipc_filtradas']
 df_clases = df_dict['Datosipc']
-df_fmi = df_dict['Datos_fmi_2022_external']
-###########################################
-# Preprocessing functions
-###########################################
-# Create an instance of StandardScaler
-scaler = StandardScaler()
-#####################################
-# IPC general preprocessing
-#####################################
-df_gral=df_univariado
-df_gral[['month','year']]=df_gral.fecha.str.split('-',expand=True)
-df_gral['year']=str('20')+df_gral['year']
-months = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic']
-d = dict(zip(months, np.arange(1, 13)))
-df_gral['month']=df_gral['month'].replace(d, regex=True)
-df_gral['ymd'] = pd.to_datetime(df_gral[['year', 'month']].assign(day=1), format='%d/%b/%Y')
-ipc_gral=df_gral.loc[:,["ymd","indice"]]
-ipc_gral_idx=ipc_gral.set_index('ymd')
-# log transform
-log_gral_idx = np.log1p(ipc_gral_idx)
-log_IPC_gral = log_gral_idx.reset_index()
 
 #########################################
 # Clases IPC preprocessing
@@ -83,105 +57,32 @@ end_time_clases = long_clases['ymd'].max()
 wide_clases_idx = long_clases.pivot(index='ymd', columns='c_codigo', values='value')
 wide_clases = wide_clases_idx.reset_index()
 wide_clases = wide_clases.rename_axis(None)
-# log transform
-log_clases_idx = np.log1p(wide_clases_idx)
-# z-score rescaling
-# Apply z-score normalization to the DataFrame
-normalized_log_clases_idx = scaler.fit_transform(log_clases_idx)
-# Update the DataFrame with the normalized values
-log_clases_idx[:] = normalized_log_clases_idx
-log_clases=log_clases_idx.reset_index()
-##############################################################################################
-# IMF data preprocessing- df_fmi
-##############################################################################################
-cols_px = df_fmi.iloc[:,1:].select_dtypes(exclude=['float']).columns
-df_fmi[cols_px] = df_fmi[cols_px].apply(pd.to_numeric, downcast='float', errors='coerce')
-df_fmi[['year','month']]=df_fmi.date.str.split('M',expand=True)
-df_fmi['ymd'] = pd.to_datetime(df_fmi[['year', 'month']].assign(day=1), format='%d/%b/%Y')
-p_usd=df_fmi.drop(['year', 'month','date' ], axis=1)
-p_usd = p_usd.sort_values('ymd')
-# Truncate the datetime part of fmi prices to match the time span of ipc clases
-externos_usd = p_usd[(p_usd['ymd'] >= start_time_clases) & (p_usd['ymd'] <= end_time_clases)]
-df_fb=externos_usd [lista_food.lista_fb]
-avg_food=df_fb.mean(axis = 1).to_frame('avg_fb')
-################################################################################################
-###############################################################################################
+start_time_clases=wide_clases['ymd'].min()
+end_time_clases=wide_clases['ymd'].min()
+log1_clases_idx = transform_log1(wide_clases, index_column='ymd')
+log1_clases= log1_clases_idx.reset_index()
+transf_clases_idx=normalization(log1_clases, index_column='ymd')
+print(transf_clases_idx.head())
 
-externos_usd_idx=externos_usd.set_index('ymd')
-# log transform
-log_externos_usd_idx = np.log1p(externos_usd_idx)
-# z-score rescaling
-# Apply z-score normalization to the DataFrame
-normalized_log_fmi_idx = scaler.fit_transform(log_externos_usd_idx)
-# Update the DataFrame with the normalized values
-log_externos_usd_idx[:] = normalized_log_fmi_idx
-# variables associated with food and beverage
-lista_fb=['PBANSOP',
-'PBARL',
-'PBEEF',
-'PCOCO',
-'PCOFFOTM',
-'PCOFFROB',
-'PROIL',
-'PFSHMEAL',
-'PGNUTS',
-'PLAMB',
-'PMAIZMT',
-'POLVOIL',
-'PORANG',
-'PPOIL',
-'PPORK',
-'PPOULT',
-'PRICENPQ',
-'PSALM',
-'PSHRI',
-'PSMEA',
-'PSOIL',
-'PSOYB',
-'PSUGAISA',
-'PSUGAUSA',
-'PSUNO',
-'PTEA',
-'PWHEAMT', 
-'PSORG',
-'PTOMATO',
-'PMILK', 
-'PAPPLE']
-# creating a df for food and beverages
-df_fb=log_externos_usd_idx[lista_fb]
-avg_fb=df_fb.mean(axis = 1).to_frame('avg_fb')
-# df for external prices to keep: soy, petroleum, beef and average food
-lst_external=['PBEEF','POILAPSP','PSOYB']
-ext_prices=log_externos_usd_idx.filter(lst_external)
-df_external_idx=pd.concat([ext_prices, avg_fb], axis=1)
-df_external=df_external_idx.reset_index()
+
+
+
 
 #########################################
 # DB storage
 #########################################
 # Store the DataFrames in a dictionary
 dataframes = {
-    'IPC_gral': log_IPC_gral, 
-    'CLASES_IPC': log_clases,
-    'EXTERNAL': df_external
+    'CLASES_IPC': transf_clases_idx
 }
 
 # Create tables in the database
 def create_tables(path):
     conn = sqlite3.connect(path)
     cursor = conn.cursor()
-
-    # If the table already exists, replace it
-    cursor.execute(""" 
-        CREATE TABLE IF NOT EXISTS IPC_gral(
-            ymd TEXT,
-            indice FLOAT
-        );
-    """)
-
     # Create log_clases_idx table
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS CLASES_IPC (
+        CREATE TABLE IF NOT EXISTS transf_componentes (
             ymd TEXT,
             c0111 FLOAT,
             c0112 FLOAT,
@@ -274,16 +175,6 @@ def create_tables(path):
         );
     """)
 
-    # Create df_external table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS EXTERNAL (
-            ymd TEXT,
-            PBEEF FLOAT,
-            POILAPSP FLOAT,
-            PSOYB FLOAT,
-            avg_fb FLOAT
-        );
-    """)
 
     # Commit and close the connection
     conn.commit()
