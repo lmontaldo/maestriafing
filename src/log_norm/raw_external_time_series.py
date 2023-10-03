@@ -74,7 +74,6 @@ def main():
     create_tables(path)
     dataframes = {'externos_log_norm': df_externos}
     export_to_database(dataframes, path)
-    
     return df_externos
 
 if __name__ == "__main__":

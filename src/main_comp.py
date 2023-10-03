@@ -32,7 +32,7 @@ from config import DATA_BASE_PATH, image_path
 from utils import data_loader
 from utils.validators import *
 from utils.stl_decomposition import STL_procedure
-from utils.eda_decomposition import *
+from utils.datetime import *
 from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF_arch import ModelsADF
 from utils.KPSS_tests_arch import KPSSAnalysis

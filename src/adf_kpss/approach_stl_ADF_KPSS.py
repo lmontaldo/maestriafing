@@ -32,7 +32,7 @@ from config import DATA_BASE_PATH, image_path
 from utils import data_loader
 from utils.validators import *
 from utils.stl_decomposition import STL_procedure
-from utils.eda_decomposition import *
+from utils.datetime import *
 from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF_arch import ModelsADF
 from utils.KPSS_tests_arch import KPSSAnalysis
@@ -49,10 +49,13 @@ warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
 #############################################
 # Retrieve the DataFrames from database
 #############################################
-tables_list= ['COMP_DIFF1_DIFF12']
+    
+tables_list= ['STL_RESIDUALS', 
+    'STL_TREND',
+    'STL_SEASONAL']
 df_dict = data_loader.get_data(DATA_BASE_PATH, tables_list)
 # to df
-df=df_dict['COMP_DIFF1_DIFF12']
+df=df_dict['STL_RESIDUALS']
 df['ymd'] = pd.to_datetime(df['ymd']).dt.normalize()
 df_idx=df.set_index('ymd')
 
