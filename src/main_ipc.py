@@ -16,9 +16,9 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 from sklearn.preprocessing import StandardScaler
-from utils.eda_decomposition import decompose_dataframe, perform_seasonal_adjustment
+from utils.datetime import decompose_dataframe, perform_seasonal_adjustment
 from utils.stl_decomposition import STL_procedure
-from utils.eda_decomposition import *
+from utils.datetime import *
 from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF_arch import ModelsADF
 from utils.KPSS_tests_arch import KPSSAnalysis
