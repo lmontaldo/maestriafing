@@ -302,6 +302,9 @@ class TestStatistics:
         rh0_list=[]
         no_rh0_list=[]
         phi_1_values = {}
+        # Initialize the count variables before the loop
+        rho_count = 0
+        no_rho_count = 0
         
         T=len(df)
         if cols_norho is None:

@@ -2,18 +2,19 @@
 # IMPORTS
 # -------------------------------
 
-# Standard libraries
+# Standard Libraries
 import os
 import sys
-import numbers
-import time
-import math
-import datetime as dt
-import warnings
-
-# Third-party libraries
+sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
 import pandas as pd
 import numpy as np
+import sqlite3
+from config import DATA_BASE_PATH
+import time
+import warnings
+import datetime as dt
+import math
+import numbers
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
@@ -25,11 +26,9 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tabulate import tabulate
-
-# Local modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATA_BASE_PATH, image_path
+from src.decomposition.differentiation import *
 from utils import data_loader
+
 from utils.validators import *
 from utils.stl_decomposition import STL_procedure
 from utils.datetime import *
@@ -37,27 +36,19 @@ from utils.test_statistics_adf import TestStatistics
 from utils.models_ADF_arch import ModelsADF
 from utils.KPSS_tests_arch import KPSSAnalysis
 from utils.standarization import Standardization
-
 # -------------------------------
 # CONFIGURATIONS
 # -------------------------------
-
 warnings.simplefilter('ignore', InterpolationWarning)
 warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
-
-
 #############################################
 # Retrieve the DataFrames from database
 #############################################
-    
-tables_list= ['STL_RESIDUALS', 
-    'STL_TREND',
-    'STL_SEASONAL']
-df_dict = data_loader.get_data(DATA_BASE_PATH, tables_list)
-# to df
-df=df_dict['STL_RESIDUALS']
-df['ymd'] = pd.to_datetime(df['ymd']).dt.normalize()
-df_idx=df.set_index('ymd')
+d1_12_ipc_idx, d1_12_ext_idx, d1_12_comp_idx = load_and_process_data()
+ipc_idx=d1_12_ipc_idx
+ext_idx=d1_12_ext_idx
+comp_idx=d1_12_comp_idx
+
 
 print("############################################")
 print('######### ADF test con p-value #############')
