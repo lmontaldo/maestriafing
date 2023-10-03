@@ -1,13 +1,6 @@
 import os
 import sys
 sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
-from config import DATA_BASE_PATH
-# Get the current file directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Get the parent directory
-parent_dir = os.path.dirname(current_dir)
-# Add the parent directory to the module search path
-sys.path.append(parent_dir)
 import pandas as pd
 import numpy as np
 import sqlite3
@@ -31,11 +24,14 @@ def prepare_fmi_data(df_fmi, start_time_clases, end_time_clases):
     df_fmi['ymd'] = pd.to_datetime(df_fmi[['year', 'month']].assign(day=1), format='%d/%b/%Y')
     p_usd = df_fmi.drop(['year', 'month','date'], axis=1)
     p_usd = p_usd.sort_values('ymd')
-    return p_usd[(p_usd['ymd'] >= start_time_clases) & (p_usd['ymd'] <= end_time_clases)]
+    externos_usd= p_usd[(p_usd['ymd'] >= start_time_clases) & (p_usd['ymd'] <= end_time_clases)]
+    return externos_usd
 
-def compute_avg_food(externos_usd):
-    df_fb = externos_usd[lista_fb]
-    avg_food= df_fb.mean(axis=1).to_frame('avg_fb')
+def compute_avg_food(externos_usd, lista_fb=lista_fb):
+    df_idx=externos_usd.set_index('ymd')
+    df_fb = df_idx[lista_fb]
+    avg_food_idx= df_fb.mean(axis=1).to_frame('avg_fb')
+    avg_food=avg_food_idx.reset_index()
     log_AVG_food_idx = transform_log1(avg_food, index_column='ymd')
     log_AVG_food = log_AVG_food_idx.reset_index()
     return normalization(log_AVG_food, index_column='ymd')
@@ -61,14 +57,24 @@ def create_tables(path):
         );
     """)
     conn.close()
+    
+def export_to_database(dataframes, path):
+    conn = sqlite3.connect(path)
+    for table_name, dataframe in dataframes.items():
+        dataframe.to_sql(table_name, conn, if_exists='replace', index=False)
+    conn.close()    
 
 def main():
+    path = DATA_BASE_PATH
     _, start_time_clases, end_time_clases = componentes_main()
     df_dict = retrieve_dataframes()
     df_fmi = df_dict['Datos_fmi_2022_external']
     externos_usd = prepare_fmi_data(df_fmi, start_time_clases, end_time_clases)
     df_externos = prepare_external_prices(externos_usd)
-    create_tables(DATA_BASE_PATH)
+    create_tables(path)
+    dataframes = {'externos_log_norm': df_externos}
+    export_to_database(dataframes, path)
+    
     return df_externos
 
 if __name__ == "__main__":

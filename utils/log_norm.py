@@ -14,10 +14,8 @@ def transform_log1(df, index_column):
     Returns:
     - pd.DataFrame: Transformed dataframe with the log1p applied and the specified column set as the index.
     """
-    
     df = df.set_index(index_column)
     log1_df = np.log1p(df)
-    
     return log1_df
 
 def normalization(df, index_column):

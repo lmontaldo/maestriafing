@@ -1,20 +1,12 @@
 import os
 import sys
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir)
-
-from config import DATA_BASE_PATH
-
-#from config import DATA_BASE_PATH
+sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
 import pandas as pd
 import numpy as np
 import sqlite3
+from config import DATA_BASE_PATH
 from utils.data_loader import *
 from utils.log_norm import transform_log1, normalization
-
-
 
 # Constants
 MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'dic']
@@ -159,15 +151,17 @@ def export_to_database(dataframes, path):
 
 # Main execution
 def main():
+    path=DATA_BASE_PATH
     df_dict = retrieve_dataframes()
     df_clases_filter = df_dict['clases_ipc_filtradas']
     df_clases = df_dict['Datosipc']
     wide_clases= preprocess_clases_ipc(df_clases, df_clases_filter)
     transf_clases, start_time_clases, end_time_clases = transform_and_normalize(wide_clases)
     dataframes = {'componentes_log_norm': transf_clases}
-    create_tables(DATA_BASE_PATH)
-    export_to_database(dataframes, DATA_BASE_PATH)
+    create_tables(path)
+    export_to_database(dataframes, path)
     return transf_clases, start_time_clases, end_time_clases
 
 if __name__ == '__main__':
     transf_clases, start_time_clases, end_time_clases= main()
+    print(transf_clases.head())
