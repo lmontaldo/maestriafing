@@ -1,11 +1,6 @@
 import os
 import sys
-# Get the current file directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-# Get the parent directory
-parent_dir = os.path.dirname(current_dir)
-# Add the parent directory to the module search path
-sys.path.append(parent_dir)
+sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
 import pandas as pd
 import numpy as np
 import sqlite3
@@ -25,7 +20,6 @@ def preprocess_ipc_general(df_univariado):
     df_gral = df_univariado.copy()
     df_gral[['month', 'year']] = df_gral.fecha.str.split('-', expand=True)
     df_gral['year'] = '20' + df_gral['year']
-    
     months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'dic']
     month_mapping = dict(zip(months, np.arange(1, 13)))
     df_gral['month'] = df_gral['month'].replace(month_mapping)
@@ -36,7 +30,7 @@ def create_tables(path):
     conn = sqlite3.connect(path)
     cursor = conn.cursor()
     cursor.execute(""" 
-        CREATE TABLE IF NOT EXISTS IPC_gral_log1_norm(
+        CREATE TABLE IF NOT EXISTS IPC_gral_log_norm(
             ymd TEXT,
             indice FLOAT
         );
@@ -60,11 +54,11 @@ def main():
     log1_ipc = log1_ipc_idx.reset_index()
     transf_ipc_idx = normalization(log1_ipc, index_column='ymd')
     transf_ipc = transf_ipc_idx.reset_index()
-
-    dataframes = {'IPC_gral': transf_ipc}
+    dataframes = {'IPC_gral_log_norm': transf_ipc}
     create_tables(path)
     export_to_database(dataframes, path)
     return transf_ipc
 
 if __name__ == '__main__':
     transf_ipc=main()
+    print(transf_ipc.head())
