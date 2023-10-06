@@ -60,15 +60,15 @@ def main():
 
     ipc_gral = ipc_gral.reset_index()  # Reset the index so 'ymd' becomes a column again
     ipc_gral['ymd'] = ipc_gral['ymd'].astype(str)
-    
+    ipc_gral = ipc_gral.loc[:, ['ymd', 'indice']]
     dataframes = {'IPC_gral_log_norm': ipc_gral}
     create_tables(path)
     export_to_database(dataframes, path)
     return ipc_gral
 
 if __name__ == '__main__':
-    transf_ipc = main()
-    print(transf_ipc.head())
+    ipc_gral = main()
+    print(ipc_gral.head())
 
 
 
