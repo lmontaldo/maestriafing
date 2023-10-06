@@ -73,6 +73,8 @@ def load_and_process_data():
 if __name__ == "__main__":
     d1_12_ipc_idx, d1_12_ext_idx, d1_12_comp_idx = load_and_process_data()
     print(d1_12_ext_idx.head())
+    print(d1_12_ipc_idx.head())
+    print(d1_12_comp_idx.head())
     
     
 

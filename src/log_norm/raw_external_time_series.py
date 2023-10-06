@@ -9,9 +9,8 @@ from utils.data_loader import *
 from utils.log_norm import transform_log1, normalization
 from raw_componentes_time_series import main as componentes_main
 from utils.lista_food import lista_fb
-
-
-
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
 def retrieve_dataframes():
     path = DATA_BASE_PATH
     tables_list = ['Datos_fmi_2022_external']
@@ -27,22 +26,36 @@ def prepare_fmi_data(df_fmi, start_time_clases, end_time_clases):
     externos_usd= p_usd[(p_usd['ymd'] >= start_time_clases) & (p_usd['ymd'] <= end_time_clases)]
     return externos_usd
 
+
 def compute_avg_food(externos_usd, lista_fb=lista_fb):
-    df_idx=externos_usd.set_index('ymd')
-    df_fb = df_idx[lista_fb]
-    avg_food_idx= df_fb.mean(axis=1).to_frame('avg_fb')
-    avg_food=avg_food_idx.reset_index()
-    log_AVG_food_idx = transform_log1(avg_food, index_column='ymd')
-    log_AVG_food = log_AVG_food_idx.reset_index()
-    return normalization(log_AVG_food, index_column='ymd')
+    if 'ymd' in externos_usd.columns: 
+        externos_usd.set_index('ymd', inplace=True)
+    food_df = externos_usd[lista_fb]
+    log_food_idx = np.log1p(food_df)
+    normalized_log_food_idx= scaler.fit_transform(log_food_idx)
+    log_food_idx[:]=normalized_log_food_idx
+    avg_food_idx = log_food_idx.mean(axis=1).to_frame('avg_fb')
+    log_norm_avg_f=avg_food_idx.reset_index()
+    log_norm_avg_f['ymd'] = log_norm_avg_f['ymd'].astype(str)
+    return log_norm_avg_f
 
 def prepare_external_prices(externos_usd):
-    AVG_food_log_norm = compute_avg_food(externos_usd)
+    if 'ymd' in externos_usd.columns: 
+        externos_usd.set_index('ymd', inplace=True)    
     lst_external = ['PBEEF','POILAPSP','PSOYB']
-    externos_usd_idx = externos_usd.set_index('ymd')
-    ext_prices = externos_usd_idx.filter(lst_external)
-    df_external_idx = pd.concat([ext_prices, AVG_food_log_norm], axis=1)
-    return df_external_idx.reset_index()
+    ext_prices_df = externos_usd.filter(lst_external)
+    log_ext_prices_df = np.log1p(ext_prices_df)
+    normalized_log_ext = scaler.fit_transform(log_ext_prices_df)
+    log_ext_prices_df[:]=normalized_log_ext
+    log_ext_prices_df = log_ext_prices_df.reset_index()  # Reset the index so 'ymd' becomes a column again
+    log_ext_prices_df['ymd'] = log_ext_prices_df['ymd'].astype(str)
+    return log_ext_prices_df
+
+def join_df(avg_food_df, log_ext_prices_df):
+    return avg_food_df.merge(log_ext_prices_df, on='ymd')
+
+
+
 
 def create_tables(path):
     conn = sqlite3.connect(path)
@@ -70,13 +83,15 @@ def main():
     df_dict = retrieve_dataframes()
     df_fmi = df_dict['Datos_fmi_2022_external']
     externos_usd = prepare_fmi_data(df_fmi, start_time_clases, end_time_clases)
-    df_externos = prepare_external_prices(externos_usd)
+    food_avg=compute_avg_food(externos_usd)
+    precios_ext = prepare_external_prices(externos_usd)
+    df_exter=join_df(food_avg, precios_ext)
     create_tables(path)
-    dataframes = {'externos_log_norm': df_externos}
+    dataframes = {'externos_log_norm': df_exter}
     export_to_database(dataframes, path)
-    return df_externos
+    return df_exter
 
 if __name__ == "__main__":
-    df_externos = main()
-    print(df_externos.head())
+    f_exter = main()
+    print(f_exter)
 
