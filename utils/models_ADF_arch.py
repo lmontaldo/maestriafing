@@ -3,13 +3,34 @@ from arch.unitroot import ADF
 
 
 class ModelsADF:
-    def __init__(self, df, alfa=0.05):
+    """
+    Class to perform Augmented Dickey-Fuller test on given DataFrame.
+    """
+    def __init__(self, df, alpha=0.05):
+        """
+        Initialize the class with DataFrame and significance level.
+
+        Parameters:
+        - df (pd.DataFrame): Data to be tested.
+        - alpha (float): Significance level. Default is 0.05.
+        """
         self.df = df
-        self.alfa = alfa
+        self.alpha = alpha
 
-    def perform_adf_test(self, trends=['ct', 'c', 'n']):
+    def perform_adf_test(self, trends=None):
+        """
+        Perform ADF test on the series with different trends.
+
+        Parameters:
+        - trends (list): List of trends for the test. Default is ['ct', 'c', 'n'].
+
+        Returns:
+        - dict: Results of the tests.
+        """
+        if trends is None:
+            trends = ['ct', 'c', 'n']
+
         results = {}
-
         for trend in trends:
             columns = []
             stats = []
@@ -24,7 +45,7 @@ class ModelsADF:
                 stats.append(adf_result.stat)
                 p_values.append(adf_result.pvalue)
                 lags_used.append(adf_result.lags)
-                unit_root_results.append('No RU' if adf_result.pvalue <= self.alfa else 'RU')
+                unit_root_results.append('Stationary' if adf_result.pvalue <= self.alpha else 'Non-stationary')
 
             df_results = pd.DataFrame({
                 'stat': stats,
@@ -33,21 +54,21 @@ class ModelsADF:
                 'Result': unit_root_results
             }, index=columns)
 
-            RU = df_results[df_results['Result'] == 'RU']
-            not_RU = df_results[df_results['Result'] == 'No RU']
-            RU_count = RU.shape[0]
-            not_RU_count = not_RU.shape[0]
-            RU_series = list(RU.index)
-            not_RU_series = list(not_RU.index)
+            stationary_df = df_results[df_results['Result'] == 'Stationary']
+            non_stationary_df = df_results[df_results['Result'] == 'Non-stationary']
+            stationary_count = stationary_df.shape[0]
+            non_stationary_count = non_stationary_df.shape[0]
+            stationary_series = list(stationary_df.index)
+            non_stationary_series = list(non_stationary_df.index)
 
             results[trend] = {
                 'df_results': df_results,
-                'RU': RU,
-                'not_RU': not_RU,
-                'RU_count': RU_count,
-                'not_RU_count': not_RU_count,
-                'RU_series': RU_series,
-                'not_RU_series': not_RU_series
+                'Stationary': stationary_df,
+                'Non-stationary': non_stationary_df,
+                'Stationary_count': stationary_count,
+                'Non_stationary_count': non_stationary_count,
+                'Stationary_series': stationary_series,
+                'Non_stationary_series': non_stationary_series
             }
 
         return results
