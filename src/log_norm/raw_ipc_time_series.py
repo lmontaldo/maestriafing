@@ -7,7 +7,8 @@ import sqlite3
 from config import DATA_BASE_PATH
 from utils.data_loader import *
 from utils.log_norm import transform_log1, normalization
-
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
 def retrieve_dataframes():
     path = DATA_BASE_PATH
     tables_list = ['ipc_general_ine']
@@ -50,15 +51,25 @@ def main():
     df_dict = get_data(path, tables_list)
     df_univariado = df_dict['ipc_general_ine']
     ipc_gral = preprocess_ipc_general(df_univariado)
-    log1_ipc_idx = transform_log1(ipc_gral, index_column='ymd')
-    log1_ipc = log1_ipc_idx.reset_index()
-    transf_ipc_idx = normalization(log1_ipc, index_column='ymd')
-    transf_ipc = transf_ipc_idx.reset_index()
-    dataframes = {'IPC_gral_log_norm': transf_ipc}
+
+    # Apply log1p transformation
+    ipc_gral['indice'] = np.log1p(ipc_gral['indice'])
+
+    # Apply normalization using scaler
+    ipc_gral['indice'] = scaler.fit_transform(ipc_gral[['indice']])[:, 0]  # Flatten the array and assign
+
+    ipc_gral = ipc_gral.reset_index()  # Reset the index so 'ymd' becomes a column again
+    ipc_gral['ymd'] = ipc_gral['ymd'].astype(str)
+    
+    dataframes = {'IPC_gral_log_norm': ipc_gral}
     create_tables(path)
     export_to_database(dataframes, path)
-    return transf_ipc
+    return ipc_gral
 
 if __name__ == '__main__':
-    transf_ipc=main()
+    transf_ipc = main()
     print(transf_ipc.head())
+
+
+
+

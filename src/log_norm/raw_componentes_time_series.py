@@ -5,8 +5,10 @@ import pandas as pd
 import numpy as np
 import sqlite3
 from config import DATA_BASE_PATH
+from config import TABLE_SCHEMA_C
 from utils.data_loader import *
 from utils.log_norm import transform_log1, normalization
+from sklearn.preprocessing import StandardScaler
 
 # Constants
 MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'dic']
@@ -36,109 +38,25 @@ def preprocess_clases_ipc(df_clases, df_clases_filter):
 
 # Function to transform and normalize 'clases_ipc'
 def transform_and_normalize(wide_clases):
-    log1_clases_idx = transform_log1(wide_clases, index_column='ymd')
-    log1_clases = log1_clases_idx.reset_index()
-    transf_clases_idx = normalization(log1_clases, index_column='ymd')
-    transf_clases=transf_clases_idx.reset_index()
-    start_time_clases = transf_clases['ymd'].min()
-    end_time_clases = transf_clases['ymd'].max()
-    return transf_clases, start_time_clases, end_time_clases
+    if 'ymd' in wide_clases.columns:
+        wide_clases.set_index('ymd', inplace=True)
+    scaler = StandardScaler()
+    log_clases_idx = np.log1p(wide_clases)
+    normalized_log_clases_idx = scaler.fit_transform(log_clases_idx)
+    log_clases_idx[:] = normalized_log_clases_idx
+    log_norm_clases = log_clases_idx.reset_index()
+    log_norm_clases['ymd'] = log_norm_clases['ymd'].astype(str)
+    start_time_clases = log_norm_clases['ymd'].min()
+    end_time_clases = log_norm_clases['ymd'].max()
+    return log_norm_clases, start_time_clases, end_time_clases
+
+
 # Function to create table in database
 def create_tables(path):
     conn = sqlite3.connect(path)
     cursor = conn.cursor()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS componentes_log_norm (
-            ymd TEXT,
-            c0111 FLOAT,
-            c0112 FLOAT,
-            c0113 FLOAT,
-            c0114 FLOAT,
-            c0115 FLOAT,
-            c0116 FLOAT,
-            c0117 FLOAT,
-            c0118 FLOAT,
-            c0119 FLOAT,
-            c0121 FLOAT,
-            c0122 FLOAT,
-            c0211 FLOAT,
-            c0212 FLOAT,
-            c0213 FLOAT,
-            c0220 FLOAT,
-            c0312 FLOAT,
-            c0314 FLOAT,
-            c0321 FLOAT,
-            c0322 FLOAT,
-            c0411 FLOAT,
-            c0431 FLOAT,
-            c0432 FLOAT,
-            c0441 FLOAT,
-            c0442 FLOAT,
-            c0443 FLOAT,
-            c0444 FLOAT,
-            c0451 FLOAT,
-            c0452 FLOAT,
-            c0454 FLOAT,
-            c0511 FLOAT,
-            c0520 FLOAT,
-            c0531 FLOAT,
-            c0533 FLOAT,
-            c0540 FLOAT,
-            c0551 FLOAT,
-            c0552 FLOAT,
-            c0561 FLOAT,
-            c0562 FLOAT,
-            c0611 FLOAT,
-            c0613 FLOAT,
-            c0621 FLOAT,
-            c0622 FLOAT,
-            c0623 FLOAT,
-            c0630 FLOAT,
-            c0690 FLOAT,
-            c0711 FLOAT,
-            c0712 FLOAT,
-            c0713 FLOAT,
-            c0721 FLOAT,
-            c0722 FLOAT,
-            c0723 FLOAT,
-            c0724 FLOAT,
-            c0732 FLOAT,
-            c0733 FLOAT,
-            c0734 FLOAT,
-            c0735 FLOAT,
-            c0736 FLOAT,
-            c0810 FLOAT,
-            c0820 FLOAT,
-            c0830 FLOAT,
-            c0911 FLOAT,
-            c0912 FLOAT,
-            c0913 FLOAT,
-            c0914 FLOAT,
-            c0931 FLOAT,
-            c0933 FLOAT,
-            c0934 FLOAT,
-            c0935 FLOAT,
-            c0941 FLOAT,
-            c0942 FLOAT,
-            c0943 FLOAT,
-            c0951 FLOAT,
-            c0952 FLOAT,
-            c0954 FLOAT,
-            c0960 FLOAT,
-            c1010 FLOAT,
-            c1020 FLOAT,
-            c1040 FLOAT,
-            c1050 FLOAT,
-            c1111 FLOAT,
-            c1112 FLOAT,
-            c1120 FLOAT,
-            c1211 FLOAT,
-            c1213 FLOAT,
-            c1232 FLOAT,
-            c1252 FLOAT,
-            c1254 FLOAT,
-            c1270 FLOAT
-        );
-    """)
+    sql_statement = f"CREATE TABLE IF NOT EXISTS componentes_log_norm ({TABLE_SCHEMA_C});"
+    cursor.execute(sql_statement)
     conn.commit()
     conn.close()
 
@@ -156,13 +74,13 @@ def main():
     df_clases_filter = df_dict['clases_ipc_filtradas']
     df_clases = df_dict['Datosipc']
     wide_clases= preprocess_clases_ipc(df_clases, df_clases_filter)
-    transf_clases, start_time_clases, end_time_clases = transform_and_normalize(wide_clases)
-    dataframes = {'componentes_log_norm': transf_clases}
+    log_norm_clases, start_time_clases, end_time_clases = transform_and_normalize(wide_clases)
+    dataframes = {'componentes_log_norm': log_norm_clases}
     create_tables(path)
     export_to_database(dataframes, path)
-    return transf_clases, start_time_clases, end_time_clases
+    return log_norm_clases, start_time_clases, end_time_clases
 
 if __name__ == '__main__':
-    transf_clases, start_time_clases, end_time_clases= main()
-    print(transf_clases.head())
+    log_norm_clases, start_time_clases, end_time_clases= main()
+    print(log_norm_clases.head())
     
