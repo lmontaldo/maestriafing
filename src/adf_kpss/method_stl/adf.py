@@ -5,10 +5,10 @@
 import os
 import sys
 sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
+from config import DATA_BASE_PATH
 import pandas as pd
 import numpy as np
 import sqlite3
-from config import DATA_BASE_PATH
 import time
 import warnings
 import datetime as dt
@@ -25,7 +25,7 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tabulate import tabulate
-from src.decomposition.differentiation import *
+from src.decomposition.stl_loess import *
 from utils import data_loader
 
 from utils.validators import *
@@ -43,10 +43,10 @@ warnings.filterwarnings("ignore", category=UserWarning, module="seaborn")
 #############################################
 # Retrieve the DataFrames from database
 #############################################
-d1_12_ipc_idx, d1_12_ext_idx, d1_12_comp_idx = load_and_process_data()
-ipc_idx=d1_12_ipc_idx
-ext_idx=d1_12_ext_idx
-comp_idx=d1_12_comp_idx
+residual_c, residual_ext, residual_ipc = load_and_process_data()
+ipc_idx=residual_ipc
+ext_idx=residual_ext
+comp_idx=residual_c
 
 # Create a dictionary of DataFrames for easy iteration
 dfs = {
@@ -71,12 +71,12 @@ for df_name, df in dfs.items():
         
         # Display RU results
         print(f"RU Results for model {trend}:")
-        print(results['Stationary_series'])
+        print(results['Stationary'])
         print("--------------------------")
         
         # Display not_RU results
         print(f"Not RU Results for trend {trend}:")
-        print(results['Non_stationary_series'])
+        print(results['Non-stationary'])
         print("--------------------------")
         
         # Display counts
@@ -88,52 +88,12 @@ for df_name, df in dfs.items():
         print(f"RU Series for trend {trend}: {results['Stationary_series']}")
         print(f"Not RU Series for trend {trend}: {results['Non_stationary_series']}")
         print("\n======================================\n")
-    
-# For each dataframe, perform the KPSS analysis
-
-print("################################ TESTS KPSS #########################################################")
-
-for df_name, df in dfs.items():
-    print("######################################################################################")
-    print(f"################################ TESTS KPSS for {df_name} ###########################")
-    print("######################################################################################")
-    print(f'\n')
-    kpss_analysis = KPSSAnalysis(df)
-
-    # Performing the test
-    kpss_analysis.perform_test()
-
-    # Restricting the loop to only 'c' trend
-    trends = ['ct', 'c']
-
-    for trend in trends:
-        for nlags in kpss_analysis.nlags_list:
-            print(f"Results for model={trend} and nlags method={nlags}:")
-            
-            # Retrieve and print results
-            df_results = kpss_analysis.get_results_for_trend_nlags(trend, nlags)
-            stationary_df = kpss_analysis.get_stationary_for_trend_nlags(trend, nlags)
-            non_stationary_df = kpss_analysis.get_non_stationary_for_trend_nlags(trend, nlags)
-
-            print(f"\nDataFrame named {trend}_{nlags}:")
-            print(df_results)
-            
-            print(f"\nList of Stationary series for model={trend} and nlags method={nlags}:")
-            print(list(stationary_df.index))  # Get the index (column names) of the stationary DataFrame
-            
-            print(f"\nList of Non-Stationary series for model={trend} and nlags method={nlags}:")
-            print(list(non_stationary_df.index))
-            
-            # Fetch and print counts
-            stationary_count = kpss_analysis.get_stationary_count_for_trend_nlags(trend, nlags)
-            non_stationary_count = kpss_analysis.get_non_stationary_count_for_trend_nlags(trend, nlags)
-            
-            print(f"Count of Stationary series for model={trend} and nlags method={nlags}: {stationary_count}")
-            print(f"Count of Non-Stationary series for model={trend} and nlags method={nlags}: {non_stationary_count}")
-
-            print("-------------------------------------------------------------")
-            
+        
+        
+ 
+print("#######################################################################################################################################")          
 print("################################ TESTS ADF de lo general a lo particular: para modelos (b) y (a) ######################################")  
+print("#######################################################################################################################################") 
 # Define your dataframes
 df_ce = {
     'ext_idx': ext_idx,
@@ -159,7 +119,7 @@ for df_name, df in df_ce.items():
     print("\n#################################################################################")
     print('######### Segundo paso: se usa phi_1 para testear la $H0) a_0=gamma=0$ ##########')
     print("#################################################################################")
-
+    print(results_tau_mu[6])
     results_phi1 = TestStatistics.phi_1(df, cols_norho=results_tau_mu[6])
     print(f'Cantidad de secuencias que rH0: {results_phi1[3]}')
     print(f'Secuencias que rH0:{results_phi1[5]}')
@@ -182,4 +142,4 @@ for df_name, df in df_ce.items():
     print("\n===================================================================================")
     print(f"End of ADF tests for {df_name}")
     print("===================================================================================\n\n")
- 
+        
