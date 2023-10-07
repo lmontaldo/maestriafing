@@ -4,11 +4,16 @@
 # Standard Libraries
 import os
 import sys
-sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
+# Get the directory of the current file
+current_directory = os.path.dirname(os.path.abspath(__file__))
+# Define the path to your 'preprocesamiento' directory relative to the current file's directory
+preprocessing_path = os.path.join(current_directory, '..', 'preprocesamiento')
+# Append the preprocessing path to the system path
+sys.path.append(preprocessing_path)
+from config import DATA_BASE_PATH
 import pandas as pd
 import numpy as np
 import sqlite3
-from config import DATA_BASE_PATH
 import time
 import warnings
 import datetime as dt

@@ -5,10 +5,10 @@
 import os
 import sys
 sys.path.append("C:\\Users\\user\\Desktop\\preprocesamiento")
+from config import DATA_BASE_PATH
 import pandas as pd
 import numpy as np
 import sqlite3
-from config import DATA_BASE_PATH
 import time
 import warnings
 import datetime as dt
