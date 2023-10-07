@@ -71,22 +71,22 @@ for df_name, df in dfs.items():
         
         # Display RU results
         print(f"RU Results for model {trend}:")
-        print(results['RU'])
+        print(results['Stationary_series'])
         print("--------------------------")
         
         # Display not_RU results
         print(f"Not RU Results for trend {trend}:")
-        print(results['not_RU'])
+        print(results['Non_stationary_series'])
         print("--------------------------")
         
         # Display counts
-        print(f"RU Count for trend {trend}: {results['RU_count']}")
-        print(f"Not RU Count for trend {trend}: {results['not_RU_count']}")
+        print(f"RU Count for trend {trend}: {results['Stationary_count']}")
+        print(f"Not RU Count for trend {trend}: {results['Non_stationary_count']}")
         print("--------------------------")
         
         # Display series names
-        print(f"RU Series for trend {trend}: {results['RU_series']}")
-        print(f"Not RU Series for trend {trend}: {results['not_RU_series']}")
+        print(f"RU Series for trend {trend}: {results['Stationary_series']}")
+        print(f"Not RU Series for trend {trend}: {results['Non_stationary_series']}")
         print("\n======================================\n")
     
 # For each dataframe, perform the KPSS analysis
