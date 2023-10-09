@@ -65,3 +65,5 @@ plt.axvline(x=elbow, color='red', linestyle='--', label=f'Elbow at Component {el
 plt.legend()
 
 plt.show()
+ 
+ 
