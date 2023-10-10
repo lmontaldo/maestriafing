@@ -11,4 +11,6 @@ data/
 __pycache__/
 # ignore docs
 /docs/images/
+# ignore service account key
+service_account_key.json
 
