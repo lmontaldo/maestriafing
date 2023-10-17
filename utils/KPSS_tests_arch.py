@@ -76,3 +76,5 @@ class KPSSAnalysis:
     def get_non_stationary_count_for_trend_nlags(self, trend, nlags):
         return self.results.get(trend, {}).get(nlags, {}).get('Non-Stationary_count', None)
 
+
+
