@@ -36,8 +36,9 @@ for trend, trend_results in results.items():
     # Print the non-stationary series as a list
     print(f"\nNon-Stationary Series as a List:")
     print(non_stationary_series)
-
     print()
+    
+
 
 
 
