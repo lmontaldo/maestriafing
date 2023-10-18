@@ -54,6 +54,6 @@ plt.show()
 adf_test = ADF(stl_result.resid,trend='ct' )
 adf_test_result = adf_test.summary()
 print(adf_test_result)
-pickle_HOUTSMW_file_path = os.path.join(DATA_DIR, 'residuals.pkl')
+pickle_HOUTSMW_file_path = os.path.join(DATA_DIR, 'residualsHOUTSMW.pkl')
 with open(pickle_HOUTSMW_file_path, 'wb') as file:
     pickle.dump(stl_result.resid, file)
