@@ -8,7 +8,8 @@ from config import DATA_DIR, DATA_BASE_PATH
 from utils.adf_tests_arch import ModelsADF
 
 df = pd.read_csv(DATA_BASE_PATH, sep=",", index_col='index')
-print(f"Cantidad de columnas a testear: {df.shape[1]}\n")
+print(f"\nCantidad de columnas a testear: {df.shape[1]}")
+print(f"Cantidad de filas: {df.shape[0]}\n")
 adf_model = ModelsADF(df, alpha=0.05)
 results = adf_model.perform_adf_test()
 
