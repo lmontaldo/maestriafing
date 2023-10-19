@@ -11,6 +11,6 @@ LOG_DIR = os.path.join(ROOT_DIR, 'logs')
 MODEL_DIR = os.path.join(ROOT_DIR, 'models')
 IMAGE_PATH = os.path.join(ROOT_DIR, 'docs', 'images')
 #pickled data
-#PKL_RAW_DATA_PATH = os.path.join(DATA_DIR, 'fred_data.pkl')
+PKL_HOUTSMW_PATH = os.path.join(DATA_DIR, 'residualsHOUTSMW.pkl')
 #PKL_TRANSF_DATA_PATH = os.path.join(DATA_DIR, 'transf_data_fred_conditions.pkl')
 #PKL_TCODES_PATH = os.path.join(DATA_DIR, 'tcodes.pkl')

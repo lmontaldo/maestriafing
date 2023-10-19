@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATA_DIR, DATA_BASE_PATH
+from config import DATA_DIR, DATA_BASE_PATH, PICKLE_DATA_WITHOUT_NA_FILE_PATH
 from utils.f_statistics_ADF_arch import TestStatistics
 #
 df = pd.read_csv(DATA_BASE_PATH, sep=",", index_col='index')

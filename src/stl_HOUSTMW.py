@@ -41,11 +41,11 @@ plt.show()
 # Plot ACF and PACF for the original time series
 plt.figure(figsize=(12, 4))
 plt.subplot(121)
-plot_acf(HOUSTMW, lags=100, ax=plt.gca())
+plot_acf(HOUSTMW, lags=50, ax=plt.gca())
 plt.title('ACF for Original Time Series')
 
 plt.subplot(122)
-plot_pacf(HOUSTMW, lags=100, ax=plt.gca())
+plot_pacf(HOUSTMW, lags=50, ax=plt.gca())
 plt.title('PACF for Original Time Series')
 
 plt.tight_layout()
@@ -54,6 +54,8 @@ plt.show()
 adf_test = ADF(stl_result.resid,trend='ct' )
 adf_test_result = adf_test.summary()
 print(adf_test_result)
+#
+dfHOUTSMW = pd.DataFrame({'HOUTSMW': stl_result.resid})
 pickle_HOUTSMW_file_path = os.path.join(DATA_DIR, 'residualsHOUTSMW.pkl')
 with open(pickle_HOUTSMW_file_path, 'wb') as file:
-    pickle.dump(stl_result.resid, file)
+    pickle.dump(dfHOUTSMW , file)
