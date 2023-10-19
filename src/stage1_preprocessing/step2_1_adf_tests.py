@@ -1,13 +1,14 @@
 import pandas as pd
 import sys
 import os
-
-# Append the root directory to sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATA_DIR, DATA_BASE_PATH
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+sys.path.append(project_root)
+prepro_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
 from utils.adf_tests_arch import ModelsADF
 
-df = pd.read_csv(DATA_BASE_PATH, sep=",", index_col='index')
+
+df = pd.read_csv(prepro_file_path, sep=",", index_col='index')
 print(f"\nCantidad de columnas a testear: {df.shape[1]}")
 print(f"Cantidad de filas: {df.shape[0]}\n")
 adf_model = ModelsADF(df, alpha=0.05)
