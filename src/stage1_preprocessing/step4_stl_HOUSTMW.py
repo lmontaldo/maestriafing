@@ -1,20 +1,19 @@
-import pandas as pd
-import numpy as np
-import sys
-import os
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import STL
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-import pickle
-# Append the root directory to sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATA_DIR, DATA_BASE_PATH
-from utils.adf_tests_arch import ModelsADF
 from arch.unitroot import ADF
+import pickle
+import pandas as pd
+import sys
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+sys.path.append(project_root)
+prepro_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
+from utils.adf_tests_arch import ModelsADF
 
-
-df = pd.read_csv(DATA_BASE_PATH, sep=",", index_col='index')
+df = pd.read_csv(prepro_file_path, sep=",", index_col='index')
 HOUSTMW=df['HOUSTMW']
 stl_result = STL(HOUSTMW, seasonal=13, period=12).fit()
 fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(10, 8))
@@ -56,6 +55,6 @@ adf_test_result = adf_test.summary()
 print(adf_test_result)
 #
 dfHOUTSMW = pd.DataFrame({'HOUTSMW': stl_result.resid})
-pickle_HOUTSMW_file_path = os.path.join(DATA_DIR, 'residualsHOUTSMW.pkl')
-with open(pickle_HOUTSMW_file_path, 'wb') as file:
-    pickle.dump(dfHOUTSMW , file)
+pickle_HOUTSMW_file_path = os.path.join(project_root, "data", "prepro", 'residualsHOUTSMW.pkl')
+print(pickle_HOUTSMW_file_path)
+dfHOUTSMW.to_pickle(pickle_HOUTSMW_file_path)

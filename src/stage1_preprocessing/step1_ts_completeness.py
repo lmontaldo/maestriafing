@@ -1,13 +1,12 @@
 import pandas as pd
+import pickle
 import sys
 import os
-
-# Append the root directory to sys.path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATA_DIR, DATA_BASE_PATH
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+prepro_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
 def main():
-    fred = pd.read_csv(DATA_BASE_PATH, sep=",", index_col='index')
+    fred = pd.read_csv(prepro_file_path, sep=",", index_col='index')
     start_date = fred.index.min()
     end_date = fred.index.min()
     expected_index = pd.date_range(start=start_date, end=end_date, freq='MS')  # 'MS' for monthly start
