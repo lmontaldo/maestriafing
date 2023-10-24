@@ -2,6 +2,8 @@ import pandas as pd
 import sys
 import os
 import pickle
+from sklearn.decomposition import PCA
+import numpy as np
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 sys.path.append(project_root)
@@ -90,8 +92,12 @@ xdata_sf = pd.concat([x_slow, x_fast], axis=1)
 print("Datos X_t ordenados para identificacion por slow y fast: ")
 print(xdata_sf.head())
 
+PKL_X_SLOW_PATH = os.path.join(project_root, "data", "prepro", 'x_slow.pkl')
+PKL_X_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_fast.pkl')
 PKL_X_SLOW_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_slow_fast.pkl')
 PKL_YDATA_PATH = os.path.join(project_root, "data", "prepro", 'ydata.pkl')
+x_slow.to_pickle(PKL_X_SLOW_PATH)
+x_fast.to_pickle(PKL_X_FAST_PATH)
 xdata_sf.to_pickle(PKL_X_SLOW_FAST_PATH)
 ydata.to_pickle(PKL_YDATA_PATH)
 
