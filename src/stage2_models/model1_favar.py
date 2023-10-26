@@ -78,3 +78,7 @@ for r in range(1, max_factors + 1):
 optimal_num_factors = np.argmin(icp2_values) + 1  # Add 1 because factors are 1-indexed
 
 print(f"Optimal Number of Factors (ICp2): {optimal_num_factors}")
+
+
+pc = PCA(X_t, standardize=False)
+pc.factors.shape
