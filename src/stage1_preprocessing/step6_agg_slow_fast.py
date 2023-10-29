@@ -48,7 +48,7 @@ print(f"After dropping columns that are aggregates, the shape of df is {df.shape
 xdata = df.drop(columns='FEDFUNDS', axis=1)
 print(f"Shape xdata: {xdata.shape}")
 print(f"Columns in xdata: {xdata.columns}")
-ydata=df['FEDFUNDS']
+rdata=df['FEDFUNDS']
 # Filter descrip to keep only 'fred' values that are columns in xdata
 valid_fred_values = [col for col in descrip['fred'] if col in xdata.columns]
 filtered_descrip = descrip[descrip['fred'].isin(valid_fred_values)]
@@ -81,25 +81,41 @@ print("x_slow shape:")
 print(x_slow.shape)
 print("x_slow head:")
 print(x_slow.head())
-
-
+column_names_slow = x_slow.columns.tolist()
+slow = pd.DataFrame(columns=["slow"])
+slow["slow"] = column_names_slow
+SLOW_COL_PATH = os.path.join(project_root, "data", "prepro", 'slow_columns.csv')
+slow.to_csv(SLOW_COL_PATH, index=False)
 print("\nx_fast shape:")
 print(x_fast.shape)
 print("x_fast head:")
 print(x_fast.head())
+column_names_fast = x_fast.columns.tolist()
+fast = pd.DataFrame(columns=["fast"])
+fast["fast"] = column_names_fast
+FAST_COL_PATH = os.path.join(project_root, "data", "prepro", 'fast_columns.csv')
+fast.to_csv(FAST_COL_PATH, index=False)
 # Concatenate x_slow and x_fast horizontally by index to reoder the df
 xdata_sf = pd.concat([x_slow, x_fast], axis=1)
-print("Datos X_t ordenados para identificacion por slow y fast: ")
-print(xdata_sf.head())
-
+ffr_data=rdata.to_frame(name='FEDFUNDS')
+print(ffr_data.head())
+df_sfr=pd.concat([x_slow, x_fast, ffr_data], axis=1)
+print("Datos Y_t=[slow, fast, r] ordenados para identificacion por slow, fast y r: ")
+df_sfr_sin_idx=df_sfr.reset_index()
+print(df_sfr_sin_idx.head())
+print(df_sfr_sin_idx.shape)
+print(df_sfr_sin_idx.shape[1])
+CSV_Y_PATH = os.path.join(project_root, "data", "prepro", 'sfr.csv')
+df_sfr_sin_idx.to_csv(CSV_Y_PATH, index=False)
+# pickles
 PKL_X_SLOW_PATH = os.path.join(project_root, "data", "prepro", 'x_slow.pkl')
 PKL_X_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_fast.pkl')
 PKL_X_SLOW_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_slow_fast.pkl')
-PKL_YDATA_PATH = os.path.join(project_root, "data", "prepro", 'ydata.pkl')
+PKL_rDATA_PATH = os.path.join(project_root, "data", "prepro", 'rdata.pkl')
 x_slow.to_pickle(PKL_X_SLOW_PATH)
 x_fast.to_pickle(PKL_X_FAST_PATH)
 xdata_sf.to_pickle(PKL_X_SLOW_FAST_PATH)
-ydata.to_pickle(PKL_YDATA_PATH)
+rdata.to_pickle(PKL_rDATA_PATH)
 
 
 
