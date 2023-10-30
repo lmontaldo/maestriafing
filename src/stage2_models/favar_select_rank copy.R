@@ -3,21 +3,19 @@ library(boot)
 library(tsDyn)
 library(vars)
 library(repr)
+library(dplyr)
 df <- read_csv("../data/prepro/sfr.csv")
 slow <- read_csv("../data/prepro/slow_columns.csv")
 fast <- read_csv("../data/prepro/fast_columns.csv")
-#print(dim(df))
-#print(colnames(df))
+descr <- read.table("../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
+#
 data_s <- df[, 2:ncol(df)]
-print(head(data_s))
 rank_values <- c(3, 5, 10)
 results <- list()  # Create a list to store results for all ranks
-
 cat("\n------ Trying many ranks and assess results: \n")
 for (rank_val in rank_values) {
     cat("\n------------------ Results: ------------------------\n")
     cat("Rank =", rank_val, "\n")
-    
     # Step 1: Extract principal components of all X (including Y)
     pc_all <- prcomp(data_s, center = FALSE, scale. = FALSE, rank. = rank_val)
     C <- pc_all$x  # Saving the principal components
@@ -111,3 +109,18 @@ for(k in 1:nsteps){
 }
 rm(var_boot)
 rm(IRFs)
+#
+print("\n------ IRF plots: \n")
+cols_d<-c("fred", "description")
+var_descr<-descr[,cols_d]
+# Get the column names of data_s
+data_s_column_names <- colnames(data_s)
+# Subset var_descr to keep only matching rows
+var_descr_subset <- var_descr[var_descr$fred %in% data_s_column_names, ]
+print(var_descr_subset)
+# Print the resulting var_descr_subset dataframe
+print(head(data_s))
+data_s_ordered <- data_s[, c("FEDFUNDS", setdiff(names(data_s), c("FEDFUNDS")))]
+print(dim(data_s_ordered))
+#"FEDFUNDS", "CUSR0000SAC", "TB3MS","GS5",  "EXJPUSx", "M1SL", "M2SL", "EXJPUSx", "CUSR0000SAC", "CUSR0000SA0L5","CPIMEDSL", 
+#"CUMFNS",  "PCEPI", "DDURRG3M086SBEA", "DNDGRG3M086SBEA"
