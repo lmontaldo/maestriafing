@@ -1,13 +1,16 @@
 library(readxl)
+library(readr)
 library(boot)
 library(tsDyn)
 library(vars)
 library(repr)
 library(dplyr)
-df <- read_csv("../data/prepro/sfr.csv")
-slow <- read_csv("../data/prepro/slow_columns.csv")
-fast <- read_csv("../data/prepro/fast_columns.csv")
-descr <- read.table("../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
+# ../data/prepro/sfr.csv
+cat("Working directory: ", getwd(), "\n")
+df <- read_csv("data/prepro/sfr.csv")
+slow <- read_csv("data/prepro/slow_columns.csv")
+fast <- read_csv("data/prepro/fast_columns.csv")
+descr <- read.table("data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 #
 data_s <- df[, 2:ncol(df)]
 rank_values <- c(3, 5, 10)
