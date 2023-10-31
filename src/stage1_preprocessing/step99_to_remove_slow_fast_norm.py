@@ -8,11 +8,13 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 sys.path.append(project_root)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-prepro_data_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
-descriptions_file_path = os.path.join(project_root, "data", "prepro", 'descripciones.txt')    
-#   
-df_fred = pd.read_csv(prepro_data_file_path, sep=",", index_col='index')
-df=df_fred.drop(["HOUSTMW"], axis=1)
+PKL_NORM_PATH = os.path.join(project_root, "data", "prepro", 'data_normalized.pkl')
+descriptions_file_path = os.path.join(project_root, "data", "prepro", 'descripciones.txt')
+
+
+with open(PKL_NORM_PATH, 'rb') as file:
+    df = pickle.load(file)
+print(df.head())    
 #  
 descrip = pd.read_csv(descriptions_file_path, sep='\t')
 #
@@ -99,9 +101,17 @@ df_sfr_sin_idx=df_sfr.reset_index()
 print(df_sfr_sin_idx.head())
 print(df_sfr_sin_idx.shape)
 print(df_sfr_sin_idx.shape[1])
-CSV_Y_PATH = os.path.join(project_root, "data", "prepro", 'sfr_sin_normalizar.csv')
+CSV_Y_PATH = os.path.join(project_root, "data", "prepro", 'sfr.csv')
 df_sfr_sin_idx.to_csv(CSV_Y_PATH, index=False)
-
+# pickles
+PKL_X_SLOW_PATH = os.path.join(project_root, "data", "prepro", 'x_slow.pkl')
+PKL_X_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_fast.pkl')
+PKL_X_SLOW_FAST_PATH = os.path.join(project_root, "data", "prepro", 'x_slow_fast.pkl')
+PKL_rDATA_PATH = os.path.join(project_root, "data", "prepro", 'rdata.pkl')
+x_slow.to_pickle(PKL_X_SLOW_PATH)
+x_fast.to_pickle(PKL_X_FAST_PATH)
+xdata_sf.to_pickle(PKL_X_SLOW_FAST_PATH)
+rdata.to_pickle(PKL_rDATA_PATH)
 
 
 

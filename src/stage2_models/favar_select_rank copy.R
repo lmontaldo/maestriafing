@@ -5,11 +5,12 @@ library(tsDyn)
 library(vars)
 library(repr)
 library(dplyr)
+library(dfms)
 # ../data/prepro/sfr.csv
 cat("Working directory: ", getwd(), "\n")
-df <- read_csv("data/prepro/sfr.csv")
-slow <- read_csv("data/prepro/slow_columns.csv")
-fast <- read_csv("data/prepro/fast_columns.csv")
+df <- read_csv("data/prepro/sfr.csv", show_col_types = FALSE)
+slow <- read_csv("data/prepro/slow_columns.csv", show_col_types = FALSE)
+fast <- read_csv("data/prepro/fast_columns.csv", show_col_types = FALSE)
 descr <- read.table("data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 #
 data_s <- df[, 2:ncol(df)]
@@ -21,7 +22,9 @@ for (rank_val in rank_values) {
     cat("Rank =", rank_val, "\n")
     # Step 1: Extract principal components of all X (including Y)
     pc_all <- prcomp(data_s, center = FALSE, scale. = FALSE, rank. = rank_val)
+    
     C <- pc_all$x  # Saving the principal components
+    print(dim(C))
     slow_vars <- unlist(slow$slow)
     data_slow <- data_s[, slow_vars]
     pc_slow <- prcomp(data_slow, center = FALSE, scale. = FALSE, rank. = rank_val)
