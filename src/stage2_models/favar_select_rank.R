@@ -18,6 +18,7 @@ for (rank_val in rank_values) {
   pc_all <- prcomp(data_s, center = FALSE, scale. = FALSE, rank. = rank_val)
   #print(summary(pc_all))
   C <- pc_all$x  # Saving the principal components
+  print(dim(C))
   slow_vars <- unlist(slow$slow)
   data_slow <- data_s[, slow_vars]
   pc_slow <- prcomp(data_slow, center = FALSE, scale. = FALSE, rank. = rank_val)
