@@ -40,10 +40,6 @@ df.rename(columns={'IPB51222S': 'IPB51222s', 'HOUTSMW': 'HOUSTMW'}, inplace=True
 df.drop(columns='BOGMBASE', inplace=True)    
 check_columns_in_descrip(df, descrip)
 print(f"After dropping the 'BOGMBASE' column, the shape of df is {df.shape}.")
-# drop aggregates variables
-columns_to_drop = descrip.loc[descrip['drop_aggregate_1'] == 1, 'fred']
-df.drop(columns=columns_to_drop, inplace=True)
-print(f"After dropping columns that are aggregates, the shape of df is {df.shape}.")
 # split df in xdata and ydata
 xdata = df.drop(columns='FEDFUNDS', axis=1)
 print(f"Shape xdata: {xdata.shape}")
