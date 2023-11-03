@@ -5,12 +5,18 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 sys.path.append(project_root)
 prepro_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
+imputed_file_path = os.path.join(project_root, "data", "prepro", "imputed_na_fred_data.csv")
 from utils.adf_tests_arch import ModelsADF
+#
 
-
-df = pd.read_csv(prepro_file_path, sep=",", index_col='index')
+#df = pd.read_csv(prepro_file_path, sep=",", index_col='index')
+df = pd.read_csv(imputed_file_path, sep=",")
+print(df.head())
+df.set_index('date', inplace=True)
+#
 print(f"\nCantidad de columnas a testear: {df.shape[1]}")
 print(f"Cantidad de filas: {df.shape[0]}\n")
+#
 adf_model = ModelsADF(df, alpha=0.05)
 results = adf_model.perform_adf_test()
 

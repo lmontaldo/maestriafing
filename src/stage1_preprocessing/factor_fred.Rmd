@@ -1,0 +1,197 @@
+---
+title: "Factor model using the FRED-MD data set"
+author: "Yankang Bennie Chen"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{factor_fred}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Import data
+
+```{r}
+library(imputeTS)
+library(tseries)
+library(fbi)
+library(readr)
+library(dfms)
+library(xts)
+library(zoo)
+filepath <- "https://files.stlouisfed.org/files/htdocs/fred-md/monthly/2021-08.csv"
+data <- fredmd(filepath, date_start = NULL, date_end = NULL, transform = TRUE)
+N <- ncol(data)
+
+# View the head lines of data
+head(data)
+```
+
+
+
+```{r}
+class(data)
+```
+
+
+```{r}
+data(fredmd_description)
+fredmd_description[,c("fred","description" )]
+description_column <- fredmd_description$description
+matches_sent <- grepl(".*expecta.*", description_column)
+positions <- which(matches_sent)
+positions
+```
+
+
+## Check for outliers and remove
+
+
+```{r}
+data_clean <- rm_outliers.fredmd(data)
+col_na_prop <- apply(is.na(data_clean), 2, mean)
+data_select <- data_clean[, (col_na_prop < 0.05)]
+dim(data_select)
+```
+# check for na at the beginning and end of df
+
+```{r}
+# Check if the head has NA values
+head_has_na <- any(apply(head(data_select), 1, anyNA))
+
+# Check if the tail has NA values
+tail_has_na <- any(apply(tail(data_select), 1, anyNA))
+
+# Remove rows from the head until there are no NA values
+while (head_has_na) {
+  data_select <- data_select[-1, ]  # Remove the first row
+  head_has_na <- any(apply(head(data_select), 1, anyNA))
+}
+
+# Remove rows from the tail until there are no NA values
+while (tail_has_na) {
+  data_select <- data_select[-nrow(data_select), ]  # Remove the last row
+  tail_has_na <- any(apply(tail(data_select), 1, anyNA))
+}
+
+# Resulting dataframe (data_select) with NAs removed from both head and tail
+print(dim(data_select))
+```
+```{r}
+na_check <- is.na(data_select)
+# Sum the total number of NAs
+total_na_count <- sum(na_check)
+# Print the total number of NAs
+print(total_na_count)
+```
+```{r}
+date_df <- data.frame(date = data_select[, 1])
+```
+
+
+```{r}
+# For time series imputation using Kalman filter
+# Identify numeric columns
+numeric_cols <- sapply(data_select, is.numeric)
+
+# Apply na_kalman to each numeric column
+imputed_data_select <- lapply(data_select[, numeric_cols], function(x) {
+  na_kalman(x, model = "StructTS", smooth = TRUE)
+})
+
+# Convert the list of imputed columns back to a dataframe
+imputed_data_select <- as.data.frame(imputed_data_select)
+
+# Combine the imputed numeric columns with non-numeric columns (if any)
+imputed_data_select <- cbind(date_df, imputed_data_select)
+
+
+# Print the resulting dataframe with all columns imputed using Kalman filter
+print(imputed_data_select)
+
+```
+```{r}
+sum(is.na(imputed_data_select))
+```
+
+```{r}
+# Assuming 'date_column' is the name of your date column
+date_column <- imputed_data_select$date
+date_column <- as.Date(date_column)
+# Check if the date column is a complete time series
+min_date <- as.Date(min(date_column))
+max_date <- as.Date(max(date_column))
+expected_dates <- seq(min_date, max_date, by = "1 month")  # Assuming monthly data
+# Check if there are any missing dates
+missing_dates <- setdiff(expected_dates, unique(date_column))
+
+if (length(missing_dates) == 0) {
+  cat("The date column forms a complete time series from \n")
+} else {
+  cat("There are missing dates in the time series.\n")
+}
+```
+```{r}
+head(imputed_data_select)
+```
+
+
+
+```{r}
+setwd("C:/Users/user/Desktop/Tesis_Maestria")
+write.csv(imputed_data_select, file = "C:/Users/user/Desktop/Tesis_Maestria/data/prepro/imputed_na_fred_data.csv", row.names = FALSE, sep=",")
+```
+
+
+
+```{r}
+# Assuming 'date_column' is the name of your date column
+date_column <- as.Date(imputed_data_select$date)
+# Remove the date column from the dataframe (it will be used as the index)
+imputed_data_select <- imputed_data_select[, -which(names(imputed_data_select) == 'date')]
+# Convert the dataframe to xts format with date as the index
+imputed_data_xts <- xts(imputed_data_select, order.by = date_column)
+# Print the resulting xts object
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## datos de panel porque saco filas con na
+
+
+```{r}
+data_bal <- na.omit(data_select)
+dim(data_bal)
+```
+
+
+```{r}
+setwd("C:/Users/user/Desktop/Tesis_Maestria")
+write.csv2(data_bal, file = "C:/Users/user/Desktop/Tesis_Maestria/data/prepro/datos_panel_fred.csv", row.names = FALSE)
+```
+
+
+```{r}
+length(data_bal[,1])
+```
+
+
+
+

@@ -21,313 +21,131 @@ library(dfms)
 library(xts)
 library(vars)
 library(fbi)
-# ../data/prepro/sfr.csv
-setwd("C:/Users/user/Desktop/Tesis_Maestria ")
-cat("Working directory: ", getwd(), "\n")
-df <- read_csv("data/prepro/sfr.csv", show_col_types = FALSE)
-slow <- read_csv("data/prepro/slow_columns.csv", show_col_types = FALSE)
-fast <- read_csv("data/prepro/fast_columns.csv", show_col_types = FALSE)
-descr <- read.table("data/prepro/descripciones.txt", header = TRUE, sep = "\t")
-```
-
-```{r}
-dim(df)
-```
-
-```{r}
-data_s <- df[, 2:ncol(df)]
+library(forecast)
+library(OOS)
+library(zoo)
 ```
 
 
 ```{r}
-ics = ICr(data_s)
-print(ics)
-plot(ics)
-screeplot(ics)
-screeplot(ics, type="ev")
-screeplot(ics,type="cum.pve")
+cat("My Working directory is: ", getwd(), "\n")
+df <- read_csv("../../data/prepro/sfr_train.csv", show_col_types = FALSE)
+df_test <- read_csv("../../data/prepro/sfr_test.csv", show_col_types = FALSE)
+slow <- read_csv("../../data/prepro/slow_columns.csv", show_col_types = FALSE)
+fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
+descr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 ```
-
-```{r}
-C<-ics$F_pca[, 1:8]
-slow_vars <- unlist(slow$slow)
-data_slow <- data_s[, slow_vars]
-fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
-ics_slow = ICr(data_slow)
-```
-
-```{r}
-dim(C)
-```
+## Dataframe a objeto xts  
 
 
 ```{r}
-print(ics_slow)
-plot(ics_slow)
-screeplot(ics_slow)
-screeplot(ics_slow, type="ev")
-screeplot(ics_slow,type="cum.pve")
+# Convert the date_column to Date type
+df$index <- as.Date(df$index)
+# Create an xts object with the date_column as the index
+xts_object <- xts(df[, -which(colnames(df) == "index")], order.by = df$index)
+range(index(xts_object))
+```
+```{r}
+class(xts_object)
+```
+```{r}
+# Subset the numeric columns (excluding the index)
+numeric_columns <- xts_object[, sapply(xts_object, is.numeric)]
+# Scale the numeric columns
+scaled_numeric <- scale(numeric_columns, center = TRUE, scale = TRUE)
+# Combine the scaled numeric columns with the original index
+scaled_xts <- xts(scaled_numeric, order.by = index(xts_object))
 ```
 
 ```{r}
-F_slow<-ics$F_pca[, 1:4]
-dim(F_slow)
-```
-```{r}
-fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
-```
-
-
-```{r}
-reg <- lm(C ~ F_slow + fedfunds)
+dim(scaled_xts)
 ```
 
 ```{r}
-F_hat <- C - data.matrix(data_s[, "FEDFUNDS"]) %*% reg$coefficients[5,]
+plot(scaled_xts, lwd = 1, main= "Stationary series (all)")
 ```
-
-
+## Se determina la estructura de los datos
+### Cantidad de factores según criterio de información IC de Bai y Ng (2002)
 ```{r}
-data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
-```
-
-```{r}
-var_select <- VARselect(data_var, lag.max = 15, type = "both")
-```
-
-
-```{r}
-best_lag <- var_select$selection
+ic = ICr(scaled_xts)
+print(ic)
 ```
 
 ```{r}
-cat("Best # lags according to AIC:", best_lag[1], "\n")
+plot(ic)
 ```
-```{r}
-var = VAR(data_var, p = 6)
-irf_point = irf(var, n.ahead = 48, impulse = "FEDFUNDS", response = "FEDFUNDS", boot = FALSE)
-# Shock size of 25 basis points
-impulse_sd = 0.25/sd(df$FEDFUNDS)
-scale = impulse_sd/(irf_point$irf$FEDFUNDS[1]) # position of FYFF response at step 0
-# Computing Loading Factors
-matriz_s<- as.matrix(data_s)
-matriz_fhat<- as.matrix(F_hat)
-reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s$FEDFUNDS)
-loadings = reg_loadings$coefficients
-#head(reg_loadings$coefficients)
-#summary(reg_loadings)
-```
+Otra opción es utilizar un Gráfico de Scree para evaluar el número de factores buscando un quiebre en el gráfico. Un procedimiento matemático para encontrar el quiebre fue propuesto por Onatski (2010)5, pero actualmente no está implementado en ICr()
 
 ```{r}
-dim(data_s)[2]
+screeplot(ic)
+```
+
+Basándose tanto en los criterios de información como en el Gráfico de Scree, estimo que se debe calcular un modelo con 3 factores, ya que los factores 4, 5, 6 y 7 no aportan mucho a la capacidad explicativa del modelo. Además del número de factores, se debe estimar el orden de rezago de la ecuación de transición del factor-VAR (el valor predeterminado es 1 rezago). Esto se puede hacer utilizando la función VARselect() del paquete vars, con las estimaciones de factores de PCA informadas por ICr()
+
+
+```{r}
+var_select=vars::VARselect(ic$F_pca[, 1:3])
+var_select$selection[1]
+```
+## Estimación del dfm con 3 factores
+
+```{r}
+model1 = DFM(scaled_xts, r = 3, p = 1, em.method="DGR", rQ="identity")
+```
+```{r}
+dim(model1$A)
+```
+```{r}
+dim(model1$Q)
+```
+```{r}
+dim(model1$R)
 ```
 
 
 ```{r}
-#### BOOTSTRAPING ########
-R = 500 # Number of simulations
-nvars = dim(data_s)[2] # Number of variables
-nsteps = 49 # numbers of steps
-IRFs = array(c(0,0,0), dim = c(nsteps,nvars,R))
-var = lineVar(data_var, lag = best_lag[1], include = "const")
-for(j in 1:R){    
-    data_boot = VAR.boot(var, boot.scheme ="resample")
-    var_boot = VAR(data_boot, lag = best_lag[1])
-    irf1 = irf(var_boot, n.ahead = 48, impulse = "FEDFUNDS", boot = FALSE)
-    for(i in 1:nvars){
-        IRFs[,i,j] = (irf1$irf$FEDFUNDS %*% matrix(loadings[, i]))*scale
-        }
-} ## Boot simulations done
-
-# Extract the quantiles of IRFs we are interested: 90% confidence intervals in BBE
-Upper = array(c(0,0), dim = c(nsteps, nvars))
-for(k in 1:nsteps){
-    for(i in 1:nvars){
-        Upper[k,i] = quantile(IRFs[k,i,], probs = c(0.95))[1]
-        }
-}
-Lower = array(c(0,0), dim = c(nsteps, nvars))
-for(k in 1:nsteps){
-    for(i in 1:nvars){
-        Lower[k,i] = quantile(IRFs[k,i,], probs = c(0.05))[1]
-        }
-}
-IRF = array(c(0,0), dim = c(nsteps, nvars))
-for(k in 1:nsteps){
-    for(i in 1:nvars){
-        IRF[k,i] = quantile(IRFs[k,i,], probs = c(0.5))[1]
-        }
-}
-rm(var_boot)
-rm(IRFs)
+print(model1)
 ```
 
+```{r}
+plot(model1)
+```
+
+El modelo se puede investigar utilizando summary(), que devuelve un objeto de clase 'dfm_summary' que contiene las matrices del sistema y estadísticas resumidas de los factores y los residuos en la ecuación de medición, así como el R-cuadrado del modelo de factores para las series individuales. El método de impresión ajusta automáticamente la cantidad de información impresa al tamaño de los datos. Para bases de datos grandes con más de 40 series, no se imprimen estadísticas a nivel de series.
+
+
+```{r}
+dfm_summary <- summary(model1)
+print(dfm_summary)
+```
+
+Además del resumen del modelo, los métodos residuals() y fitted() de dfm devuelven los residuos de las observaciones y los valores ajustados del modelo. El formato predeterminado es una matriz simple, pero estas funciones también tienen un argumento para devolver los datos en el formato original (de entrada).
 
 
 
 ```{r}
-matching_names <- intersect(names(data_s), descr$fred)
-filtered_descr <- descr %>%filter(fred %in% matching_names)
-filtered_descr
+plot(resid(model1, orig.format = TRUE))
 ```
-
+```{r}
+plot(fitted(model1, orig.format = TRUE))
+```
+Otra forma de examinar visualmente el modelo de factores es trazar las estimaciones de factores de Máxima Verosimilitud Cuasi (QML) frente a las estimaciones de PCA y las estimaciones de Dos Pasos siguiendo el enfoque de Doz, Giannone y Reichlin (2011)8, donde el Filtro de Kalman y el Suavizador se ejecutan solo una vez. Ambas estimaciones también se calculan mediante DFM() durante la estimación EM y también se pueden visualizar con plot.dfm.
 
 
 ```{r}
-variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
-              grep("^INDPRO$", colnames(data_s)), #IP Index
-              grep("^CPIAUCSL$", colnames(data_s)), #CPI : All Items
-            grep("^TB3MS$", colnames(data_s)), #3-Month Treasury Bill:
-            grep("^GS5$", colnames(data_s)), #5-Year Treasury Rate
-            grep("^M1SL$", colnames(data_s)),# M1 Money Stock
-            grep("^M2SL$", colnames(data_s)), #M2 Money Stock
-            grep("^EXJPUSx$", colnames(data_s)), #Japan / U.S. Foreign Exchange Rate
-            grep("^CUSR0000SAC$", colnames(data_s)),#CPI : Commodities
-            grep("^CUMFNS$", colnames(data_s)),#Capacity Utilization: Manufacturing
-            grep("^DPCERA3M086SBEA$", colnames(data_s)),#Real personal consumption expenditures
-            grep("^DDURRG3M086SBEA$", colnames(data_s)), #Personal Cons. Exp: Durable goods
-
-            grep("^DNDGRG3M086SBEA$", colnames(data_s)), #Personal Cons. Exp: Nondurable goods
-            grep("^UNRATE$", colnames(data_s)), #Civilian Unemployment Rate
-
-            grep("^CE16OV$", colnames(data_s)), #Civilian Employment
-            grep("^CES0600000008$", colnames(data_s)), #Avg Hourly Earnings : Goods-Producing
-
-            grep("^AMDMNOx$", colnames(data_s)), #New Orders for Durable Goods
-            grep("^S&P div yield$", colnames(data_s))#S&P s Composite Common Stock: Dividend Yield
-             )
-variables
-```
-```{r}
-data_s
+plot(model1, method = "all", type = "individual")
 ```
 
+## Predicción
+
+Las predicciones de DFM se pueden obtener con el método predict(), que pronostica dinámicamente los factores utilizando la ecuación de transición (predeterminadamente 10 períodos), y luego también realiza pronósticos de datos utilizando la ecuación de observación. Los objetos pertenecen a la clase 'dfm_forecast'.
 
 ```{r}
-variable_names = c("Fed Funds Rate", "IP Index","CPI : All Items",
-"3-Month Treasury Bill",
-"5-Year Treasury Rate",
-"M1 Money Stock",
-"M2 Money Stock",
-"Japan / U.S. Foreign Exchange Rate",
-"CPI : Commodities",
-"Capacity Utilization: Manufacturing",
-"Real personal consumption expenditures",
-"Personal Cons. Exp: Durable goods",
-"Personal Cons. Exp: Nondurable goods",
-"Civilian Unemployment Rate",
-"Civilian Employment",
-"Avg Hourly Earnings : Goods-Producing",
-"New Orders for Durable Goods",
-"S&P s Composite Common Stock: Dividend Yield")
-length(variable_names)
-```
-
-```{r}
-transf_code = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 )
-length(transf_code)
-```
-```{r}
-18/4
+fc = predict(model1, h = 136, method="pca", use="both")
+pred=as.data.frame(fc$X_fcst, pivot = "wide")
+head(pred)
 ```
 
 
-```{r}
-colnames(IRF)
-```
-```{r}
-which(variables == i)
-```
 
-
-```{r}
-# Set the plot dimensions
-options(repr.plot.width = 12, repr.plot.height = 8)
-
-# Set the layout using 'par'
-par(mfrow = c(5, 4), mar = c(2, 2, 2, 2))
-
-# Loop through the 'variables' and plot each one
-for (i in variables) {
-  index = which(variables == i)
-    # Create the plot for the current variable
-  plot(IRF[, i], type = 'l', lwd = 2,main = variable_names[index],
-       ylab = "", xlab = "Steps", ylim = range(Lower[, i], Upper[, i]),
-       cex.main = 1.8, cex.axis = 1.3)
-  
-  lines(Upper[, i], lty = 2, col = "red")
-  lines(Lower[, i], lty = 2, col = "red")
-  abline(h = 0)
-}
-```
-
-```{r}
-names(data_s)
-```
-
-### Step 5: FEVD
-
-```{r}
-best_lag[1]
-```
-
-
-```{r}
-hor = 60
-var = VAR(data_var, p = best_lag[1])
-irf_point = irf(var, n.ahead = hor, boot = FALSE)
-```
-
-```{r}
-results = summary(reg_loadings) # the warning comes because of FYFF
-
-key_nvars = length(variables)
-irf_X_pc1 = array(c(0,0), dim=c(hor+1, key_nvars))
-irf_X_pc2 = array(c(0,0), dim=c(hor+1, key_nvars))
-irf_X_pc3 = array(c(0,0), dim=c(hor+1, key_nvars))
-irf_X_fyff = array(c(0,0), dim=c(hor+1, key_nvars))
-
-for(i in 1:key_nvars){
-    irf_X_pc1[,i] = irf_point$irf$PC1 %*% matrix(loadings[, variables[i]])
-    irf_X_pc2[,i] = irf_point$irf$PC2 %*% matrix(loadings[, variables[i]])
-    irf_X_pc3[,i] = irf_point$irf$PC3 %*% matrix(loadings[, variables[i]])
-    irf_X_fyff[,i] = (irf_point$irf$FYFF) %*% matrix(loadings[, variables[i]])
-    }
-```
-
-```{r}
-# Get the IRFs squared and accumulate them
-psi2_pc1 = array(0, dim = key_nvars)
-psi2_pc2 = array(0, dim = key_nvars)
-psi2_pc3 = array(0, dim = key_nvars)
-psi2_fyff = array(0, dim = key_nvars)
-
-for(i in 1:key_nvars){
-    for(j in 1:hor){
-        psi2_pc1[i] = psi2_pc1[i] + irf_X_pc1[j,i]^2
-        psi2_pc2[i] = psi2_pc2[i] + irf_X_pc2[j,i]^2
-        psi2_pc3[i] = psi2_pc3[i] + irf_X_pc3[j,i]^2
-        psi2_fyff[i] = psi2_fyff[i] + irf_X_fyff[j,i]^2    
-    }
-}
-```
-
-```{r}
-var_total= array(0, dim = key_nvars)
-var_fac= array(0, dim = key_nvars)
-var_e= array(0, dim = key_nvars)
-
-for(i in 1:key_nvars){
-    var_fac[i] = psi2_pc1[i] + psi2_pc2[i] + psi2_pc3[i] + psi2_fyff[i]
-    var_total[i] = psi2_pc1[i] + psi2_pc2[i] + psi2_pc3[i] + psi2_fyff[i] + results[[variables[i]]]$sigma^2
-    var_e[i] = results[[variables[i]]]$sigma^2
-}
-```
-
-```{r}
-table = data.frame("PC1" = round((psi2_pc1),3), "PC2" = round((psi2_pc2),3), "PC3" = round((psi2_pc3),3), "FYFF" = round((psi2_fyff),3),
-                  "Factor_Y_total" = round(var_fac,3) ,"e" = round((var_e),3), "Total" = round(var_total,3))
-row.names(table) = variable_names
-table
-```
 
