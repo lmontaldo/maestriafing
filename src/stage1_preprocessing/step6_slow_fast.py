@@ -8,11 +8,14 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 sys.path.append(project_root)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-prepro_data_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
+#prepro_data_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
+imputed_file_path = os.path.join(project_root, "data", "prepro", "imputed_na_fred_data.csv")
+df = pd.read_csv(imputed_file_path, sep=",")
+df.set_index('date', inplace=True)
 descriptions_file_path = os.path.join(project_root, "data", "prepro", 'descripciones.txt')    
 #   
-df_fred = pd.read_csv(prepro_data_file_path, sep=",", index_col='index')
-df=df_fred.drop(["HOUSTMW"], axis=1)
+#df_fred = pd.read_csv(prepro_data_file_path, sep=",", index_col='index')
+df=df.drop(['HOUSTNE', 'HOUSTMW', 'HOUSTS', 'PERMITMW'], axis=1)
 #  
 descrip = pd.read_csv(descriptions_file_path, sep='\t')
 #

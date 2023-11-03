@@ -11,7 +11,7 @@ CSV_Y_PATH = os.path.join(project_root, "data", "prepro", 'sfr_sin_normalizar.cs
 # read data  
 df= pd.read_csv(CSV_Y_PATH, sep=",")
 # split df into train and test
-df_idx=df.set_index('index')
+df_idx=df.set_index('date')
 df_idx.index = pd.to_datetime(df_idx.index, format='%Y-%m-%d')
 df_idx.index = df_idx.index.date
 df_idx.sort_index(inplace=True)
