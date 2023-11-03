@@ -4,11 +4,9 @@ import os
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
 sys.path.append(project_root)
+from utils.adf_tests_arch import ModelsADF
 prepro_file_path = os.path.join(project_root, "data", "prepro", "datos_fred_procesados.csv")
 imputed_file_path = os.path.join(project_root, "data", "prepro", "imputed_na_fred_data.csv")
-from utils.adf_tests_arch import ModelsADF
-#
-
 #df = pd.read_csv(prepro_file_path, sep=",", index_col='index')
 df = pd.read_csv(imputed_file_path, sep=",")
 print(df.head())
