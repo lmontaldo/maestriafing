@@ -29,7 +29,7 @@ library(zoo)
 
 ```{r}
 cat("My Working directory is: ", getwd(), "\n")
-df <- read_csv("../../data/prepro/sfr_train.csv", show_col_types = FALSE)
+df_train <- read_csv("../../data/prepro/sfr_train.csv", show_col_types = FALSE)
 df_test <- read_csv("../../data/prepro/sfr_test.csv", show_col_types = FALSE)
 slow <- read_csv("../../data/prepro/slow_columns.csv", show_col_types = FALSE)
 fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
@@ -39,11 +39,13 @@ descr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = 
 
 
 ```{r}
+df=df_train
 # Convert the date_column to Date type
 df$index <- as.Date(df$index)
 # Create an xts object with the date_column as the index
 xts_object <- xts(df[, -which(colnames(df) == "index")], order.by = df$index)
-range(index(xts_object))
+cat("Rango de datos:", as.character(range(index(xts_object))), "\n")
+data_s = scale(xts_object, center = TRUE, scale = TRUE)
 ```
 ```{r}
 class(xts_object)
@@ -90,7 +92,7 @@ var_select$selection[1]
 ## Estimación del dfm con 3 factores
 
 ```{r}
-model1 = DFM(scaled_xts, r = 3, p = 1, em.method="DGR", rQ="identity")
+model1 = DFM(scaled_xts, r = 3, p = 1, em.method="DGR", rQ="identity", rR="diagonal")
 ```
 ```{r}
 dim(model1$A)
@@ -136,16 +138,83 @@ Otra forma de examinar visualmente el modelo de factores es trazar las estimacio
 plot(model1, method = "all", type = "individual")
 ```
 
+```{r}
+summary(mod)
+```
+
+
+
 ## Predicción
+
+
+```{r}
+df_test$index <- as.Date(df_test$index)
+test_set=df_test[,2:ncol(df_test)]
+actual_df=as.data.frame(scale(test_set, center = TRUE, scale = TRUE))
+
+# Create an xts object with the date_column as the index
+xts_test <- xts(df_test[, -which(colnames(df_test) == "index")], order.by = df_test$index)
+cat("Rango de datos:", as.character(range(index(xts_test))), "\n")
+data_test_s = scale(xts_test, center = TRUE, scale = TRUE)
+cat("Tamaño de mi muestra de prueba:", dim(df_test), "\n")
+```
+```{r}
+dim(actual_df)
+```
+
 
 Las predicciones de DFM se pueden obtener con el método predict(), que pronostica dinámicamente los factores utilizando la ecuación de transición (predeterminadamente 10 períodos), y luego también realiza pronósticos de datos utilizando la ecuación de observación. Los objetos pertenecen a la clase 'dfm_forecast'.
 
 ```{r}
-fc = predict(model1, h = 136, method="pca", use="both")
-pred=as.data.frame(fc$X_fcst, pivot = "wide")
-head(pred)
+fc = predict(model1, h = dim(df_test)[1], method="pca", use="both")
+predictions_df=as.data.frame(fc$X_fcst, pivot = "wide")
+dim(predictions_df)
 ```
 
+```{r}
+compute_accuracy_measures_df <- function(actual_df, predictions_df) {
+  if(ncol(actual_df) != ncol(predictions_df) || nrow(actual_df) != nrow(predictions_df)) {
+    stop("Dimensions of actual and predicted data must match.")
+  }
 
+  measures_list <- list()
+
+  for(i in 1:ncol(actual_df)) {
+    actual <- actual_df[, i]
+    predicted <- predictions_df[, i]
+
+    # MAE
+    mae <- mean(abs(actual - predicted), na.rm = TRUE)
+    
+    # MSE
+    mse <- mean((actual - predicted)^2, na.rm = TRUE)
+
+    # MAPE
+    mape <- mean(abs((actual - predicted) / actual) * 100, na.rm = TRUE)
+    
+    # RMSFE (Root Mean Squared Forecast Error)
+    rmsfe <- sqrt(mse)
+
+    # Store in list
+    measures_list[[colnames(actual_df)[i]]] <- c(MAE = mae, MSE = mse, MAPE = mape, RMSFE = rmsfe)
+  }
+
+  # Convert the list to a dataframe
+  results_df <- do.call(rbind, measures_list)
+  return(results_df)
+}
+
+# Usage:
+results_df <- compute_accuracy_measures_df(actual_df, predictions_df)
+
+# View the results:
+print(results_df)
+```
+
+```{r}
+averages <- colMeans(results_df, na.rm = TRUE)
+# Print the averages:
+print(averages)
+```
 
 

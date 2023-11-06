@@ -549,6 +549,7 @@ cat("Number of months between the two test dates:", diff_months, "\n")
 forecast_multivariate(Data, target= "INDPRO", forecast.dates = tail(Data$date,diff_months+1),method='ols',horizon = diff_months+1,freq = 'month', outlier.clean = FALSE,
        impute.missing = FALSE,lag.n=NULL )
 ```
+
 ```{r}
 class(colnames(data_s))
 ```
