@@ -17,4 +17,7 @@ docs/
 # ignore service account key
 service_account_key.json
 >>>>>>> 64bad91ecc507734ab71f6da571abdb8dc20bbd3
-
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
