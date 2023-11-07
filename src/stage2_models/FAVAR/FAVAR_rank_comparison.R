@@ -17,13 +17,14 @@ library(forecast)
 library(OOS)
 library(zoo)
 #
-setwd("C:/Users/user/Desktop/Tesis_Maestria/src/stage2_models")
+
+#setwd("C:/Users/user/Desktop/Tesis_Maestria/src/stage2_models")
 cat("My Working directory is: ", getwd(), "\n")
-df_train <- read_csv("../../data/prepro/sfr_train.csv", show_col_types = FALSE)
-df_test <- read_csv("../../data/prepro/sfr_test.csv", show_col_types = FALSE)
-slow <- read_csv("../../data/prepro/slow_columns.csv", show_col_types = FALSE)
-fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
-descr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
+df_train <- read_csv("data/prepro/sfr_train.csv", show_col_types = FALSE)
+df_test <- read_csv("data/prepro/sfr_test.csv", show_col_types = FALSE)
+slow <- read_csv("data/prepro/slow_columns.csv", show_col_types = FALSE)
+fast <- read_csv("data/prepro/fast_columns.csv", show_col_types = FALSE)
+descr <- read.table("data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 #
 df=df_train
 # Convert the date_column to Date type
