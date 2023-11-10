@@ -1,7 +1,6 @@
 import pandas as pd
 import sys
 import os
-from sklearn.model_selection import TimeSeriesSplit
 import numpy as np
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
@@ -20,13 +19,14 @@ train, test = df_idx.iloc[:train_size], df_idx.iloc[train_size:]
 print(train.index.min(),train.index.max())
 print(test.index.min(),test.index.max())
 print(len(test))
+print(train.shape)
 #
 train.reset_index(inplace=True)
 test.reset_index(inplace=True)
  # save data
-train_PATH = os.path.join(project_root, "data", "prepro", 'sfr_train.csv')
+train_PATH = os.path.join(project_root, "data", "train_test", 'sfr_train.csv')
 train.to_csv(train_PATH, index=False)
-test_PATH = os.path.join(project_root, "data", "prepro", 'sfr_test.csv')
+test_PATH = os.path.join(project_root, "data", "train_test", 'sfr_test.csv')
 test.to_csv(test_PATH, index=False)
 
 
