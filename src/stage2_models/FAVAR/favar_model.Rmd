@@ -238,6 +238,9 @@ filtered_descr
 ```
 
 
+```{r}
+names(data_s)
+```
 
 
 ```{r}
@@ -259,7 +262,7 @@ variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
             grep("^CES0600000008$", colnames(data_s)), #Avg Hourly Earnings : Goods-Producing
             grep("^HOUST$", colnames(data_s)),	#Housing Starts: Total New Privately Owned
             grep("^AMDMNOx$", colnames(data_s)), #New Orders for Durable Goods
-            grep("^S&P div yield$", colnames(data_s))#S&P s Composite Common Stock: Dividend Yield
+            grep("^S.P.div.yield$", colnames(data_s))#S&P s Composite Common Stock: Dividend Yield
              )
 length(variables)
 ```
@@ -489,13 +492,8 @@ table
 ```
 
 ```{r}
-r2 = array(0, dim = key_nvars)
-for(i in 1:key_nvars){
-    r2[i] = results[[variables[i]]]$r.squared
-}
 
-table2 = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-table2
+
 ```
 
 
