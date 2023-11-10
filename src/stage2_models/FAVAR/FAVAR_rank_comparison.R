@@ -138,8 +138,8 @@ for(factor in factor_values){
   cat("\nMétricas promedio de desempeño: \n")
   averages <- colMeans(results_df, na.rm = TRUE)
   print(averages)#
-  filename <- paste0("results_factor_", factor, ".RData")
+  #filename <- paste0("favarBBE/data/results_factor_", factor, ".RData")
   # Save objects to that file
-  save(C, reg, var, loadings, predictions_df, results_df, file = filename)
+  #save(list = ls(), file = filename)
 
 }
