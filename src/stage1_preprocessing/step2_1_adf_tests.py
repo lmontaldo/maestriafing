@@ -24,7 +24,7 @@ for trend, trend_results in results.items():
     print(f"Results for trend '{trend}':")
 
     print("ADF Test Results:")
-    print(trend_results.get('df_results'))  # Using .get() to handle missing key gracefully
+    #print(trend_results.get('df_results'))  # Using .get() to handle missing key gracefully
 
     # Filter column names for stationary and non-stationary series
     stationary_series = trend_results.get('Stationary_series', [])
