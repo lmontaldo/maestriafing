@@ -1,5 +1,7 @@
-#
-rm(list = ls())
+#setwd("C:/Users/user/Desktop/Tesis_Maestria - copia")
+# What is in the R directory before adding a function?
+cat("My Working directory is: ", getwd(), "\n")
+# libraries
 library(Metrics)
 library(forecast)
 library(readxl)
@@ -17,41 +19,30 @@ library(forecast)
 library(OOS)
 library(zoo)
 #
-#setwd("C:/Users/user/Desktop/Tesis_Maestria/src/stage2_models")
-cat("My Working directory is: ", getwd(), "\n")
-df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
-df_test <- read_csv("data/train_test/sfr_test.csv", show_col_types = FALSE)
-slow <- read_csv("data/prepro/slow_variables.csv", show_col_types = FALSE)
-#fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
-#escr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
+df_train <- read_csv("data/prepro/sfr_train.csv", show_col_types = FALSE)
+print(names(df_train))
+df_test <- read_csv("data/prepro/sfr_test.csv", show_col_types = FALSE)
+slow <- read_csv("data/prepro/slow_columns.csv", show_col_types = FALSE)
 #
-df=df_train
-# Convert the date_column to Date type
-df$index <- as.Date(df$index)
-xts_object_train <- xts(df[, -which(colnames(df) == "index")], order.by = df$index)
-data_s = scale(xts_object_train, center = TRUE, scale = TRUE)
-print(head(data_s))
-#cat("Rango de datos:", as.character(range(index(xts_object))), "\n")
-#cat("Tamaño de mi muestra de entrenamiento:", dim(data_s), "\n")
+df_train$index <- as.Date(df_train$index)
+xts_train <- xts(df_train[, -which(colnames(df_train) == "index")], order.by = df_train$index)
+train_xts_s = scale(xts_train, center = TRUE, scale = TRUE)
 #
 df_test$index <- as.Date(df_test$index)
-xts_object_test <- xts(df_test[, -which(colnames(df_test) == "index")], order.by = df_test$index)
-actual_s = scale(xts_object_test, center = TRUE, scale = TRUE)
-
-#
+xts_test <- xts(df_test[, -which(colnames(df_test) == "index")], order.by = df_test$index)
+test_s = scale(xts_test, center = TRUE, scale = TRUE)
+actual_xts_s=scale(test_s, center = TRUE, scale = TRUE)
 test_set=df_test[,2:ncol(df_test)]
 actual_df=scale(test_set, center = TRUE, scale = TRUE)
-print(actual_df)
-
-
 #
-n_forecasts = dim(actual_s)[1]  # assuming this is the forecast length
+data_s=train_xts_s
+n_forecasts = dim(test_set)[1]  # assuming this is the forecast length
 # Initialize matrix to store forecasts
-ics = ICr(data_s)
+ics = ICr(train_xts_s)
 ic_p2_factors=ics$r.star[2]
 #
 # Define factor values to iterate over
-factor_values <- c(2,3,ic_p2_factors)
+factor_values <- c(2,3,4,ic_p2_factors)
 # Initialize empty lists to store results
 results_list <- list()
 #
@@ -71,7 +62,7 @@ for(factor in factor_values){
   var_select <- VARselect(data_var, lag.max = 15, type="none")
   best_lag <- var_select$selection
   n_lags=best_lag[1]
-  cat("Cantidad de rezagos del VAR según AIC:", n_lags, "\n")
+  #cat("Cantidad de rezagos del VAR según AIC:", n_lags, "\n")
   var = VAR(data_var, p =n_lags)
   # Calculando el peso de los factores
   matriz_s<- as.matrix(data_s)
@@ -83,7 +74,7 @@ for(factor in factor_values){
   Lamda_F=loadings[1:factor,]
   Lambda_ffr=loadings[nrow(loadings),]
   #Predicciones
-  predicciones=predict(var, n.ahead = n_forecasts)
+  predicciones=predict(var, n.ahead = dim(df_test)[1])
   #predicciones$fcst$PC1[,1]
   #predicciones$fcst$PC2[,1]
   #predicciones$fcst$PC3[,1]
@@ -122,16 +113,14 @@ for(factor in factor_values){
       # MSE
       mse <- mean((actual - predicted)^2, na.rm = TRUE)
 
-      # mse_scaled
-      std_predicted <- sd(predicted)
-      scaled_mse <- mse / std_predicted
-
+      # MAPE
+      mape <- mean(abs((actual - predicted) / actual) * 100, na.rm = TRUE)
 
       # RMSFE (Root Mean Squared Forecast Error)
       rmsfe <- sqrt(mse)
 
       # Store in list
-      measures_list[[colnames(actual_df)[i]]] <- c(MAE = mae, MSE = mse, ScaledMSE = scaled_mse, RMSFE = rmsfe)
+      measures_list[[colnames(actual_df)[i]]] <- c(MAE = mae, MSE = mse, MAPE = mape, RMSFE = rmsfe)
     }
 
     # Convert the list to a dataframe
@@ -140,13 +129,9 @@ for(factor in factor_values){
   }
 
   # Usage:
-  results_df <- compute_accuracy_measures_df(actual_s, predictions_df)
+  results_df <- compute_accuracy_measures_df(actual_df, predictions_df)
   #results_df
   cat("\nMétricas promedio de desempeño: \n")
   averages <- colMeans(results_df, na.rm = TRUE)
-  print(averages)#
-  #filename <- paste0("results_factor_", factor, ".RData")
-  # Save objects to that file
-  #save(C, reg, var, loadings, predictions_df, results_df, file = filename)
-
+  print(averages)
 }
