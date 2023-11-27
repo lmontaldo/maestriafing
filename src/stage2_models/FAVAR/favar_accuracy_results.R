@@ -1,57 +1,10 @@
 #
 rm(list = ls())
-library(Metrics)
-library(forecast)
-library(readxl)
-library(readr)
-library(boot)
-library(tsDyn)
-library(vars)
-library(repr)
-library(dplyr)
-library(dfms)
-library(xts)
-library(vars)
-library(fbi)
-library(forecast)
-library(OOS)
-library(zoo)
-#
-#setwd("C:/Users/user/Desktop/Tesis_Maestria/src/stage2_models")
-cat("My Working directory is: ", getwd(), "\n")
-df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
-df_test <- read_csv("data/train_test/sfr_test.csv", show_col_types = FALSE)
-slow <- read_csv("data/prepro/slow_variables.csv", show_col_types = FALSE)
-#fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
-#escr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
-#
-df=df_train
-# Convert the date_column to Date type
-df$index <- as.Date(df$index)
-xts_object_train <- xts(df[, -which(colnames(df) == "index")], order.by = df$index)
-data_s = scale(xts_object_train, center = TRUE, scale = TRUE)
-print(head(data_s))
-#cat("Rango de datos:", as.character(range(index(xts_object))), "\n")
-#cat("Tamaño de mi muestra de entrenamiento:", dim(data_s), "\n")
-#
-df_test$index <- as.Date(df_test$index)
-xts_object_test <- xts(df_test[, -which(colnames(df_test) == "index")], order.by = df_test$index)
-actual_s = scale(xts_object_test, center = TRUE, scale = TRUE)
-
-#
-test_set=df_test[,2:ncol(df_test)]
-actual_df=scale(test_set, center = TRUE, scale = TRUE)
-print(actual_df)
-
-
-#
-n_forecasts = dim(actual_s)[1]  # assuming this is the forecast length
-# Initialize matrix to store forecasts
-ics = ICr(data_s)
-ic_p2_factors=ics$r.star[2]
+load("data/Rdata/favar_dfms_output.RData")
+libraries=source("utils/load_libraries.R")
 #
 # Define factor values to iterate over
-factor_values <- c(2,3,ic_p2_factors)
+factor_values <- c(2,3,4,5, ic_p2_factors)
 # Initialize empty lists to store results
 results_list <- list()
 #
@@ -77,6 +30,7 @@ for(factor in factor_values){
   matriz_s<- as.matrix(data_s)
   matriz_fhat<- as.matrix(F_hat)
   reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
+  print(dim(matriz_fhat))
   loadings = reg_loadings$coefficients
   #head(reg_loadings$coefficients)
   #summary(reg_loadings)
@@ -104,10 +58,24 @@ for(factor in factor_values){
   X_pred=F_part+Y_part
   X_forec=as.data.frame(X_pred)
   predictions_df <- as.data.frame(X_pred)
+
+  predictions_xts=xts(predictions_df,
+                      order.by = df_test_index)
+
   # Desempeño
   compute_accuracy_measures_df <- function(actual_df, predictions_df) {
+    # Check if inputs are xts or zoo objects
+    if(!("xts" %in% class(actual_df) | "zoo" %in% class(actual_df)) ||
+       !("xts" %in% class(predictions_df) | "zoo" %in% class(predictions_df))) {
+      stop("Both actual_df and predictions_df must be xts or zoo objects.")
+    }
+
+    # Align the time index of predictions_df to that of actual_df
+    index(predictions_df) <- index(actual_df)
+
+    # Ensure dimensions match
     if(ncol(actual_df) != ncol(predictions_df) || nrow(actual_df) != nrow(predictions_df)) {
-      stop("Dimensions of actual and predicted data must match.")
+      stop("Dimensions of actual and predicted data must match after index alignment.")
     }
 
     measures_list <- list()
@@ -122,10 +90,9 @@ for(factor in factor_values){
       # MSE
       mse <- mean((actual - predicted)^2, na.rm = TRUE)
 
-      # mse_scaled
+      # Scaled MSE
       std_predicted <- sd(predicted)
       scaled_mse <- mse / std_predicted
-
 
       # RMSFE (Root Mean Squared Forecast Error)
       rmsfe <- sqrt(mse)
@@ -136,17 +103,18 @@ for(factor in factor_values){
 
     # Convert the list to a dataframe
     results_df <- do.call(rbind, measures_list)
+    rownames(results_df) <- colnames(actual_df)
     return(results_df)
   }
 
   # Usage:
-  results_df <- compute_accuracy_measures_df(actual_s, predictions_df)
+  results_df <- compute_accuracy_measures_df(actual_s, predictions_xts)
   #results_df
   cat("\nMétricas promedio de desempeño: \n")
   averages <- colMeans(results_df, na.rm = TRUE)
-  print(averages)#
-  #filename <- paste0("results_factor_", factor, ".RData")
+  print(averages)
+  filename <- paste0("data/Rdata/results_favar_factor_", factor, ".RData")
   # Save objects to that file
-  #save(C, reg, var, loadings, predictions_df, results_df, file = filename)
+  save(reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
 
 }

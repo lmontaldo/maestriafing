@@ -1,6 +1,10 @@
  
 *.csv
-
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+#R/dataread.r
 # Ignore a specific directory
 data/
 # Ignore CSV files
