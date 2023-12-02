@@ -1,8 +1,9 @@
 rm(list = ls())
 obj1=load("data/Rdata/favar_dfms_output.RData")
-obj2=load("data/Rdata/results_favar_factor_6.RData")
+F_hat=read.csv('data/ddfm/f_hat_ddfm_fact6.csv')
 libraries=source("utils/load_libraries.R")
 #
+F_hat <- as.matrix(F_hat)
 #
 data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
 var_select <- VARselect(data_var, lag.max = 15, type = "both")
@@ -59,6 +60,20 @@ for(k in 1:nsteps){
 rm(var_boot)
 rm(IRFs)
 #
+options(repr.plot.width=12, repr.plot.height=8)
+
+par(mfrow=c(5,4),
+    mar = c(2, 2, 2, 2))
+for(i in variables){
+  plot(cumsum(IRF[,i]), type ='l',lwd=2, main = variable_names[index],
+       ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]),cumsum(Upper[,i])),
+       cex.main=1, cex.axis=1)
+  lines(cumsum(Upper[,i]), lty=2, col="red")
+  lines(cumsum(Lower[,i]), lty=2, col="red")
+  abline(h=0)
+}
+
+#
 transf_cumsum=c(1,5,5,5,5,5,5,5,1,1,5,5,5,1,1,5,1,1,5,5)
 options(repr.plot.width=12, repr.plot.height=8)
 
@@ -98,12 +113,12 @@ irf_X_pc6 = array(c(0,0), dim=c(hor+1, key_nvars))
 #irf_X_pc7 = array(c(0,0), dim=c(hor+1, key_nvars))
 irf_X_ffr = array(c(0,0), dim=c(hor+1, key_nvars))
 for(i in 1:key_nvars){
-  irf_X_pc1[,i] = irf_points$irf$PC1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc2[,i] = irf_points$irf$PC2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc3[,i] = irf_points$irf$PC3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc4[,i] = irf_points$irf$PC4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc5[,i] = irf_points$irf$PC5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc6[,i] = irf_points$irf$PC6%*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc1[,i] = irf_points$irf$f1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc2[,i] = irf_points$irf$f2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc3[,i] = irf_points$irf$f3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc4[,i] = irf_points$irf$f4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc5[,i] = irf_points$irf$f5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc6[,i] = irf_points$irf$f6 %*% matrix(loadings[1:nrow(loadings), variables[i]])
   #irf_X_pc7[,i] = irf_points$irf$f7 %*% matrix(loadings[1:nrow(loadings), variables[i]])
   irf_X_ffr[,i] = (irf_points$irf$FEDFUNDS) %*% matrix(loadings[1:nrow(loadings), variables[i]])
 }
@@ -159,6 +174,6 @@ r2 = array(0, dim = key_nvars)
 for(i in 1:key_nvars){
   r2[i] = results[[variables[i]]]$r.squared
 }
-table_favar = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
-xtable(table_favar, digits=3)
+tableddfm = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
+tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]*100
+xtable(tableddfm, digits=3)

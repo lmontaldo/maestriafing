@@ -25,15 +25,11 @@
       # MSE
       mse <- mean((actual - predicted)^2, na.rm = TRUE)
 
-      # Scaled MSE
-      #std_predicted <- sd((actual - predicted)^2)
-      #scaled_mae <- mae / std_predicted
-
       # RMSFE (Root Mean Squared Forecast Error)
       rmsfe <- sqrt(mse)
 
       # Store in list
-      measures_list[[colnames(actual_df)[i]]] <- c(MAE = mae, MSE = mse, ScaledMSE = scaled_mse, RMSFE = rmsfe)
+      measures_list[[colnames(actual_df)[i]]] <- c(MAE = mae, MSE = mse,  RMSFE = rmsfe)
     }
 
     # Convert the list to a dataframe

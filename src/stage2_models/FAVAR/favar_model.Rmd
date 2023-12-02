@@ -5,10 +5,12 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
+
 ```{r setup1, include=FALSE}
 #knitr::opts_knit$set(root.dir = '~/Desktop/Tesis_Maestria')
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 ```
+
 
 
 ```{r}
@@ -28,25 +30,35 @@ library(OOS)
 library(zoo)
 ```
 
+
 ```{r}
 cat("My Working directory is: ", getwd(), "\n")
-df <- read_csv("../../data/prepro/sfr_train.csv", show_col_types = FALSE)
+load("../../../data/Rdata/favar_dfms_output.RData")
+libraries=source("../../../utils/load_libraries.R")
+source("../../../utils/accuracy_measures.R")
+```
+
+```{r eval=FALSE, include=FALSE}
+cat("My Working directory is: ", getwd(), "\n")
+df <- read_csv("../../../../data/train_test/sfr_train.csv", show_col_types = FALSE)
 df_test <- read_csv("../../data/prepro/sfr_test.csv", show_col_types = FALSE)
 slow <- read_csv("../../data/prepro/slow_columns.csv", show_col_types = FALSE)
 fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
 descr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 ```
 
-```{r}
+
+
+```{r eval=FALSE, include=FALSE}
 data_bal <- as.data.frame(df)
 dim(data_bal)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 head(data_bal)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 data_scaled = scale(data_bal[,2:ncol(data_bal)], center = TRUE, scale = TRUE)
 data_s=as.data.frame(data_scaled)
 rownames(data_s) <- data_bal[,1]
@@ -132,6 +144,8 @@ screeplot(ics_slow,type="cum.pve")
 F_slow<-ics$F_pca[,1:ic_p2_slow_factors]
 dim(F_slow)
 ```
+
+
 ```{r}
 dim(C)
 ```
@@ -141,6 +155,14 @@ dim(C)
 fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
 reg <- lm(C ~ F_slow + fedfunds)
 ```
+
+```{r}
+reg$coefficients[nrow(reg$coefficients),]
+```
+```{r}
+dim(data.matrix(data_s[, "FEDFUNDS"]))
+```
+
 
 ### $\hat{F}_t$
 ```{r}

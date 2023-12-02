@@ -4,7 +4,7 @@ libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 #
 # Define factor values to iterate over
-factor_values <- c(2,3,4,5, ic_p2_factors)
+factor_values <- c(3,4,5,6, ic_p2_factors)
 #
 results_list <- list()
 for (factor in factor_values) {
@@ -32,7 +32,7 @@ for (factor in factor_values) {
   print(averages)
   results_df <- compute_accuracy_measures_df(actual_s, predictions_xts)
   filename <- paste0("data/Rdata/F_hat_dfms_factor_", factor, ".RData")
-  # Save objects to that file
+  #Save objects to that file
   #save(F_hat, file = filename)
 }
 
