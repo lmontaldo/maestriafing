@@ -5,19 +5,19 @@ libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 #
 # Define factor values to iterate over
-factor_values <- c(2,3,4,5, 6, ic_p2_factors)
+factor_values <- c(1,2,3, 4, ic_p2_factors-1)
 # Initialize empty lists to store results
 results_list <- list()
 #
 for(factor in factor_values){
-  C<-ics$F_pca[, 1:factor]
+  C<-ics$F_pca[, 1:factor, drop = FALSE]
   cat("\n---------------------------------------------- \n")
-  cat("Resultados para", factor,"factores inobservables \n")
+  cat("Resultados para", factor,"factores \n")
   cat("---------------------------------------------- \n")
   slow_vars <- unlist(slow$slow)
   data_slow <- data_s[, slow_vars]
   ics_slow = ICr(data_slow)
-  F_slow<-ics$F_pca[,1:factor]
+  F_slow<-ics$F_pca[,1:factor, drop = FALSE]
   fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
   reg <- lm(C ~ F_slow + fedfunds)
   dim(reg$coefficients[nrow(reg$coefficients),])
@@ -63,15 +63,16 @@ for(factor in factor_values){
   predictions_xts=xts(predictions_df,
                       order.by = df_test_index)
 
-####################################################################################
-####################################################################################
+  ####################################################################################
+  ####################################################################################
   # Usage:
   results_df <- compute_accuracy_measures_df(actual_s, predictions_xts)
   #results_df
   cat("\nMétricas promedio de desempeño: \n")
   averages <- colMeans(results_df, na.rm = TRUE)
   print(averages)
-  filename <- paste0("data/Rdata/results_favar_factor_", factor, ".RData")
+  #filename <- paste0("data/Rdata/results_favar_factor_", factor, ".RData")
   # Save objects to that file
   #save(reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
+
 }

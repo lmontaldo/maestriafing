@@ -1,8 +1,7 @@
 rm(list = ls())
 obj1=load("data/Rdata/favar_dfms_output.RData")
-obj2=load("data/Rdata/results_favar_factor_6.RData")
+obj2=load("data/Rdata/F_hat_dfms_factor_6.RData")
 libraries=source("utils/load_libraries.R")
-#
 #
 data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
 var_select <- VARselect(data_var, lag.max = 15, type = "both")
@@ -98,12 +97,12 @@ irf_X_pc6 = array(c(0,0), dim=c(hor+1, key_nvars))
 #irf_X_pc7 = array(c(0,0), dim=c(hor+1, key_nvars))
 irf_X_ffr = array(c(0,0), dim=c(hor+1, key_nvars))
 for(i in 1:key_nvars){
-  irf_X_pc1[,i] = irf_points$irf$PC1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc2[,i] = irf_points$irf$PC2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc3[,i] = irf_points$irf$PC3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc4[,i] = irf_points$irf$PC4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc5[,i] = irf_points$irf$PC5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc6[,i] = irf_points$irf$PC6%*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc1[,i] = irf_points$irf$f1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc2[,i] = irf_points$irf$f2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc3[,i] = irf_points$irf$f3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc4[,i] = irf_points$irf$f4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc5[,i] = irf_points$irf$f5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc6[,i] = irf_points$irf$f6 %*% matrix(loadings[1:nrow(loadings), variables[i]])
   #irf_X_pc7[,i] = irf_points$irf$f7 %*% matrix(loadings[1:nrow(loadings), variables[i]])
   irf_X_ffr[,i] = (irf_points$irf$FEDFUNDS) %*% matrix(loadings[1:nrow(loadings), variables[i]])
 }
@@ -139,7 +138,7 @@ for(i in 1:key_nvars){
     psi2_ffr[i]
   var_total[i] = psi2_pc1[i] + psi2_pc2[i] + psi2_pc3[i] +psi2_pc4[i]+psi2_pc5[i]+psi2_pc6[i]+
     #psi2_pc7[i]+
-    psi2_ffr[i] + results[[variables[i]]]$sigma^2
+      psi2_ffr[i] + results[[variables[i]]]$sigma^2
   var_e[i] = results[[variables[i]]]$sigma^2
 }
 table = data.frame("PC1" = round((psi2_pc1),3),
@@ -159,6 +158,6 @@ r2 = array(0, dim = key_nvars)
 for(i in 1:key_nvars){
   r2[i] = results[[variables[i]]]$r.squared
 }
-table_favar = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
-xtable(table_favar, digits=3)
+table_dfm = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
+table_dfm$DV=table_dfm["Contribution"]*table_dfm["R.squared"]
+xtable(table_dfm, digits=3)

@@ -13,10 +13,11 @@ print(getwd())
 
 ```{r}
 obj1=load("../../../data/Rdata/favar_dfms_output.RData")
-obj2=load("../../../data/Rdata/results_favar_factor_7.RData")
+obj2=load("../../../data/Rdata/results_favar_factor_6.RData")
 libraries=source("../../../utils/load_libraries.R")
-obj2
 ```
+
+
 
 ```{r}
 irf_point = irf(var, n.ahead = 48, impulse = "FEDFUNDS", response = "FEDFUNDS", boot = FALSE)
@@ -71,6 +72,20 @@ rm(var_boot)
 rm(IRFs)
 ```
 
+```{r}
+options(repr.plot.width=12, repr.plot.height=8)
+par(mfrow=c(5,4), 
+   mar = c(2, 2, 2, 2))
+for(i in variables){
+    index = which(variables == i)
+    plot(IRF[,i], type ='l',lwd=2, main = variable_names[index],
+             ylab= "", xlab="Steps", ylim=range((Lower[,i]),(Upper[,i])),
+             cex.main=1, cex.axis=1)
+        lines((Upper[,i]), lty=2, col="red")
+        lines((Lower[,i]), lty=2, col="red")
+        abline(h=0)
+}
+```
 
 
 ```{r}
@@ -103,6 +118,10 @@ for(i in variables){
 hor=60
 irf_points = irf(var, n.ahead = hor,  boot = FALSE)
 ```
+
+
+
+
 
 ```{r}
 # Get IRFs for all of X we are interested in, Dimensions: (hor, key_nvars)

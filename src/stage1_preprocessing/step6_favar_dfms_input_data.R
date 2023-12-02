@@ -33,6 +33,7 @@ ic_p2_factors=ics$r.star[2]
 ###########################################################################################################################################
 # variables as in https://jbduarte.com/blog/time%20series/r/favar/2020/04/24/FAVAR-Replication.html#Step-4:-Estimate-FAVAR-and-get-IRFs
 ###########################################################################################################################################
+colnames(data_s)[93] <- "S&P div yield"
 variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
               grep("^INDPRO$", colnames(data_s)), #IP Index
               grep("^CPIAUCSL$", colnames(data_s)), #CPI : All Items
@@ -51,8 +52,22 @@ variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
               grep("^CES0600000008$", colnames(data_s)), #Avg Hourly Earnings : Goods-Producing
               grep("^HOUST$", colnames(data_s)),	#Housing Starts: Total New Privately Owned
               grep("^AMDMNOx$", colnames(data_s)), #New Orders for Durable Goods
-              grep("^S.P.div.yield$", colnames(data_s))#S&P s Composite Common Stock: Dividend Yield
+              grep("^S&P div yield$", colnames(data_s))#S&P s Composite Common Stock: Dividend Yield
 )
+
+var=c("FEDFUNDS","INDPRO","CPIAUCSL","TB3MS", "GS5", "M1SL", "M2SL", "EXJPUSx", "CUSR0000SAC", "CUMFNS", "DPCERA3M086SBEA", "DDURRG3M086SBEA",
+"DNDGRG3M086SBEA", "UNRATE", "CE16OV", "CES0600000008", "HOUST", "AMDMNOx", "S&P div yield")
+data("fredmd_description")
+descrip=fredmd_description
+kpis=descrip[descrip$fred %in% var, ]
+kpis[, c("fred", "description")]
+kpis_ordenado <- kpis[order(kpis$group), ]
+xtable(kpis_ordenado[, c( "gsi:description", "group")], caption="variables para análisis de impacto de PL")
+descrip_tcode=kpis[,c("tcode","fred")]
+ix <- match(var, descrip_tcode$fred)
+ordered_descrip_tcode <- descrip_tcode[ix, ]
+ordered_descrip_tcode
+
 variable_names = c("Fed Funds Rate",
                    "IP Index",
                    "CPI",
@@ -72,8 +87,8 @@ variable_names = c("Fed Funds Rate",
                    "Housing Starts",
                    "New Orders",
                    "Dividend Yield")
-
-transf_code = c(1,5,5,1,1,5,5,5,1,1,5,5,5,1,1,5,1,1,1)
+transf_code <- as.numeric(as.character(ordered_descrip_tcode$tcode))
+#transf_code = c(1,5,5,1,1,5,5,5,1,1,5,5,5,1,1,5,1,1,1)
 ################################################################################
 # save data ####################################################################
 ################################################################################
