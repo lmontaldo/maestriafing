@@ -11,8 +11,6 @@ from tools.getters_converters_tools import convert_decoder_to_numpy, get_transit
 
 
 # tf.config.run_functions_eagerly(True)
-
-
 class DDFM(BaseModel):
     """
     A class implementing Deep Dynamic Factor Models.
@@ -105,6 +103,7 @@ class DDFM(BaseModel):
         self.state_space = None
         self.state_space_dict = dict()
         self.latents = dict()
+        self.loss_now=None
 
     def build_inputs(self, interpolate: bool = True) -> None:
         """
@@ -249,14 +248,14 @@ class DDFM(BaseModel):
             prediction_iter = np.mean(np.array([self.decoder(self.factors[i, :, :]) for i in range(self.factors.shape[0]
                                                                                                    )]), axis=0)
             if iter > 1:
-                delta, loss_now = convergence_checker(prediction_prev_iter, prediction_iter, self.z_actual)
-                loss_now = loss_now
+                delta, self.loss_now = convergence_checker(prediction_prev_iter, prediction_iter, self.z_actual)
+                #loss_now = loss_now
                 if iter % self.disp == 0:
-                    return loss_now
-                    print(f'@Info: iteration: {iter} - new loss: {loss_now} - delta: {delta}')
+                    return self.loss_now
+                    print(f'@Info: iteration: {iter} - new loss: {self.loss_now} - delta: {delta}')
                 if delta < self.tolerance:
                     not_converged = False
-                    print(f'@Info: Convergence achieved in {iter} iterations - new loss: {loss_now} - delta: {delta} < {self.tolerance}')
+                    print(f'@Info: Convergence achieved in {iter} iterations - new loss: {self.loss_now} - delta: {delta} < {self.tolerance}')
             # store previous prediction to monitor convergence
             prediction_prev_iter = prediction_iter.copy()
             # update missings
@@ -317,6 +316,16 @@ class DDFM(BaseModel):
         # get filtered factors
         self.latents["filtered"], self.latents["sigma_kf"] = self.filter(self.data.values)
         self.factors_filtered = self.latents["filtered"][:, 1:self.structure_encoder[-1] + 1]
+    def get_last_state(self):
+        """
+        Retrieves the last state and its variance-covariance matrix from the fitted model.
+        Returns:
+        tuple: A tuple containing the last state and its variance-covariance matrix.
+        """
+        last_state = self.latents["filtered"][-1]
+        last_state_var_cov_matrix = self.latents["sigma_kf"][-1]
+        return last_state, last_state_var_cov_matrix
+
 
     def filter(self, z_t: np.ndarray, standardize: bool = False) -> Tuple[
         np.ndarray, np.ndarray]:
@@ -331,6 +340,7 @@ class DDFM(BaseModel):
         """
         return self.state_space.filter(z_t, standardize=standardize)
 
+
     def predict(self, x_hat_start: np.ndarray, sigma_x_hat_start: np.ndarray, steps_ahead: int = 1) -> dict:
         """
         Method to carry out the prediction in state-space.
@@ -344,51 +354,18 @@ class DDFM(BaseModel):
         """
         return self.state_space.predict(x_hat_start, sigma_x_hat_start, steps_ahead=steps_ahead)
 
-
-if __name__ == "__main__":
-    # import tensorflow as tf
-    import sklearn  # maybe we can remove this dependency
-    import random
-    from timeit import default_timer as timer
-    from datetime import timedelta
-
-    random.seed(0)
-    np.random.seed(0)
-    print('tf version: ', tf.__version__)
-    print('sklearn version: ', sklearn.__version__)
-    obs_dim = 20
-    scale_idio = 0.2
-    scale_idio_error = 0.01
-    latent_dim = 4
-    rho = 0.5
-    t_obs = 100
-    non_lin_factors = True
-    # simulate factors
-    f = np.random.multivariate_normal(np.zeros(latent_dim), np.identity(latent_dim), t_obs)
-    if non_lin_factors:
-        f = np.hstack((f, f ** 2, f ** 3))
-    # simulate idios
-    v_t = scale_idio * np.random.multivariate_normal(np.zeros(obs_dim), np.identity(obs_dim), t_obs)
-    eps = np.zeros_like(v_t)
-    for t in range(t_obs):
-        if t > 0:
-            eps[t, :] = eps[t - 1, :] @ np.diag(rho * np.ones(obs_dim)) + v_t[t, :]
-        else:
-            eps[t, :] = v_t[t, :]
-    # gen observables
-    x = f @ np.random.rand(f.shape[1], obs_dim) + eps
-    # fit models
-    n_lags = 0
-    start = timer()
-    ddfm = DDFM(pd.DataFrame(x), lags_input=n_lags,
-                structure_encoder=(f.shape[1] * 6, f.shape[1] * 3, f.shape[1]),
-                max_iter=100)
-    ddfm.fit()
-    stop = timer()
-    print('Elapsed time: ', timedelta(seconds=stop - start))
-    # evaluate (Stock and Watson (2002a) and Doz, Giannone, and Reichlin (2006) and use the trace R2)
-    f_hat = np.mean(ddfm.factors, axis=0)
-    precision_score = np.trace(
-        f[n_lags:].T @ f_hat @ np.linalg.pinv(f_hat.T @ f_hat) @ f_hat.T @ f[n_lags:]) / np.trace(
-        f[n_lags:].T @ f[n_lags:])
-    print('Precision score non filtered: ', precision_score)
+    def predict_observations(self, x_hat_start: np.ndarray, sigma_x_hat_start: np.ndarray, steps_ahead: int = 1) -> np.ndarray:
+      """
+      Predicts future observations (y_{t+k}) using the deep dynamic factor model.
+      Args:
+        x_hat_start: Starting values for the state mean.
+        sigma_x_hat_start: Starting values for the state variance covariance matrix.
+        steps_ahead: Number of steps ahead.
+      Returns:
+        Predicted future observations (y_{t+k}).
+      """
+      # Predict future states (f_{t+k})
+      future_states = self.predict(x_hat_start, sigma_x_hat_start, steps_ahead)['states']
+      # Predict future observations (y_{t+k})
+      future_observations = self.state_space.predict_measurement(future_states)
+      return future_observations
