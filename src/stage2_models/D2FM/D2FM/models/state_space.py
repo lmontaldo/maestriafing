@@ -3,7 +3,6 @@ import numpy as np
 from pykalman import KalmanFilter
 from models.base_model import BaseModel
 
-
 class StateSpace(BaseModel):
     """
     Base class for state-space models.
@@ -57,8 +56,6 @@ class StateSpace(BaseModel):
         self.predict = self.predict_lgss
         self.filter = self.kalman_filter
 
-    def predict_lgss(self, x_hat_start: np.ndarray, sigma_x_hat_start: np.ndarray, steps_ahead: int = 1) -> dict:
-        raise NotImplementedError("TODO")
 
     def kalman_filter(self, z: np.ndarray, standardize=False, do_em: bool = False) -> Tuple[
         np.ndarray, np.ndarray]:
@@ -86,3 +83,33 @@ class StateSpace(BaseModel):
         else:
             (filtered_state_means, filtered_state_covariances) = self.filter_predict.filter(z_cpy)
         return filtered_state_means, filtered_state_covariances
+
+
+    def predict_lgss(self, x_hat_start: np.ndarray, sigma_x_hat_start: np.ndarray, steps_ahead: int = 1) -> dict:
+        x_hat = x_hat_start
+        sigma_x_hat = sigma_x_hat_start
+        predicted_states = []
+        #predicted_covariances = []
+        for _ in range(steps_ahead):
+          # Predict the next state
+          x_hat_next = self.F @x_hat
+          #sigma_x_hat_next = self.state_space_dict["transition"]["F"] @ sigma_x_hat @ self.state_space_dict["transition"]["F"].T + self.Q
+          # Store the predictions
+          predicted_states.append(x_hat_next)
+          #predicted_covariances.append(sigma_x_hat_next)
+          # Update current state and covariance for next iteration
+          x_hat = x_hat_next
+          #sigma_x_hat = sigma_x_hat_next
+        #return {"states": np.array(predicted_states), "covariances": np.array(predicted_covariances)}
+        return {"states": np.array(predicted_states)}
+
+    def predict_measurement(self, future_states: np.ndarray) -> np.ndarray:
+      """
+      Predicts future observations given future states.
+      Args:
+        future_states: Future states (f_{t+k}) estimated by the state-space model.
+      Returns:
+        Predicted future observations (y_{t+k}).
+      """
+      predicted_observations = self.H @ future_states.T
+      return predicted_observations.T

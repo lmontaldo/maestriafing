@@ -60,20 +60,8 @@ for(k in 1:nsteps){
 rm(var_boot)
 rm(IRFs)
 #
-options(repr.plot.width=12, repr.plot.height=8)
 
-par(mfrow=c(5,4),
-    mar = c(2, 2, 2, 2))
-for(i in variables){
-  plot(cumsum(IRF[,i]), type ='l',lwd=2, main = variable_names[index],
-       ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]),cumsum(Upper[,i])),
-       cex.main=1, cex.axis=1)
-  lines(cumsum(Upper[,i]), lty=2, col="red")
-  lines(cumsum(Lower[,i]), lty=2, col="red")
-  abline(h=0)
-}
 
-#
 transf_cumsum=c(1,5,5,5,5,5,5,5,1,1,5,5,5,1,1,5,1,1,5,5)
 options(repr.plot.width=12, repr.plot.height=8)
 
@@ -175,5 +163,5 @@ for(i in 1:key_nvars){
   r2[i] = results[[variables[i]]]$r.squared
 }
 tableddfm = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]*100
+tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]
 xtable(tableddfm, digits=3)
