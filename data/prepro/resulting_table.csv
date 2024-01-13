@@ -1,0 +1,118 @@
+fred,description,gsi:description,group,slow_1_fast_0
+RPI,Real Personal Income,PI,Output and Income,1
+W875RX1,Real personal income ex transfer receipts,PI less transfers,Output and Income,1
+DPCERA3M086SBEA,Real personal consumption expenditures,Real Consumption,"Consumption, Orders, and Inventories",1
+CMRMTSPLx,Real Manu. and Trade Industries Sales,M&T sales,"Consumption, Orders, and Inventories",0
+RETAILx,Retail and Food Services Sales,Retail sales,"Consumption, Orders, and Inventories",0
+INDPRO,IP Index,IP: total,Output and Income,1
+IPFPNSS,IP: Final Products and Nonindustrial Supplies,IP: products,Output and Income,1
+IPFINAL,IP: Final Products (Market Group),IP: nal prod,Output and Income,1
+IPCONGD,IP: Consumer Goods,IP: cons gds,Output and Income,1
+IPDCONGD,IP: Durable Consumer Goods,IP: cons dble,Output and Income,1
+IPNCONGD,IP: Nondurable Consumer Goods,IP: cons nondble,Output and Income,1
+IPBUSEQ,IP: Business Equipment,IP: bus eqpt,Output and Income,1
+IPMAT,IP: Materials,IP: matls,Output and Income,1
+IPDMAT,IP: Durable Materials,IP: dble matls,Output and Income,1
+IPNMAT,IP: Nondurable Materials,IP: nondble matls,Output and Income,1
+IPMANSICS,IP: Manufacturing (SIC),IP: mfg,Output and Income,1
+IPB51222S,IP: Residential Utilities,IP: res util,Output and Income,1
+IPFUELS,IP: Fuels,IP: fuels,Output and Income,1
+CUMFNS,Capacity Utilization: Manufacturing,Cap util,Output and Income,1
+HWI,Help-Wanted Index for United States,Help wanted indx,Labor Market,1
+HWIURATIO,Ratio of Help Wanted/No. Unemployed,Help wanted/unemp,Labor Market,1
+CLF16OV,Civilian Labor Force,Emp CPS total,Labor Market,1
+CE16OV,Civilian Employment,Emp CPS nonag,Labor Market,1
+UNRATE,Civilian Unemployment Rate,U: all,Labor Market,1
+UEMPMEAN,Average Duration of Unemployment (Weeks),U: mean duration,Labor Market,1
+UEMPLT5,Civilians Unemployed - Less Than 5 Weeks,U < 5 wks,Labor Market,1
+UEMP5TO14,Civilians Unemployed for 5-14 Weeks,U 5-14 wks,Labor Market,1
+UEMP15OV,Civilians Unemployed - 15 Weeks & Over,U 15+ wks,Labor Market,1
+UEMP15T26,Civilians Unemployed for 15-26 Weeks,U 15-26 wks,Labor Market,1
+UEMP27OV,Civilians Unemployed for 27 Weeks and Over,U 27+ wks,Labor Market,1
+CLAIMSx,Initial Claims,UI claims,Labor Market,1
+PAYEMS,All Employees: Total nonfarm,Emp: total,Labor Market,1
+USGOOD,All Employees: Goods-Producing Industries,Emp: gds prod,Labor Market,1
+CES1021000001,All Employees: Mining and Logging: Mining,Emp: mining,Labor Market,1
+USCONS,All Employees: Construction,Emp: const,Labor Market,1
+MANEMP,All Employees: Manufacturing,Emp: mfg,Labor Market,1
+DMANEMP,All Employees: Durable goods,Emp: dble gds,Labor Market,1
+NDMANEMP,All Employees: Nondurable goods,Emp: nondbles,Labor Market,1
+SRVPRD,All Employees: Service-Providing Industries,Emp: services,Labor Market,1
+USTPU,"All Employees: Trade, Transportation & Utilities",Emp: TTU,Labor Market,1
+USWTRADE,All Employees: Wholesale Trade,Emp: wholesale,Labor Market,1
+USTRADE,All Employees: Retail Trade,Emp: retail,Labor Market,1
+USFIRE,All Employees: Financial Activities,Emp: FIRE,Labor Market,1
+USGOVT,All Employees: Government,Emp: Govt,Labor Market,1
+CES0600000007,Avg Weekly Hours : Goods-Producing,Avg hrs,Labor Market,1
+AWOTMAN,Avg Weekly Overtime Hours : Manufacturing,Overtime: mfg,Labor Market,1
+AWHMAN,Avg Weekly Hours : Manufacturing,Avg hrs: mfg,Labor Market,1
+HOUST,Housing Starts: Total New Privately Owned,Starts: nonfarm,Housing,0
+HOUSTNE,"Housing Starts, Northeast",Starts: NE,Housing,0
+HOUSTW,"Housing Starts, West",Starts: West,Housing,0
+PERMIT,New Private Housing Permits (SAAR),BP: total,Housing,0
+PERMITNE,"New Private Housing Permits, Northeast (SAAR)",BP: NE,Housing,0
+PERMITS,"New Private Housing Permits, South (SAAR)",BP: South,Housing,0
+PERMITW,"New Private Housing Permits, West (SAAR)",BP: West,Housing,0
+AMDMNOx,New Orders for Durable Goods,Orders: dble gds,"Consumption, Orders, and Inventories",0
+AMDMUOx,Un lled Orders for Durable Goods,Unf orders: dble,"Consumption, Orders, and Inventories",0
+BUSINVx,Total Business Inventories,M&T invent,"Consumption, Orders, and Inventories",0
+ISRATIOx,Total Business: Inventories to Sales Ratio,M&T invent/sales,"Consumption, Orders, and Inventories",0
+M1SL,M1 Money Stock,M1,Money and Credit,0
+M2SL,M2 Money Stock,M2,Money and Credit,0
+M2REAL,Real M2 Money Stock,M2 (real),Money and Credit,0
+TOTRESNS,Total Reserves of Depository Institutions,Reserves tot,Money and Credit,0
+NONBORRES,Reserves Of Depository Institutions,Reserves nonbor,Money and Credit,0
+BUSLOANS,Commercial and Industrial Loans,C&I loan plus,Money and Credit,0
+REALLN,Real Estate Loans at All Commercial Banks,DC&I loans,Money and Credit,0
+NONREVSL,Total Nonrevolving Credit,Cons credit,Money and Credit,0
+CONSPI,Nonrevolving consumer credit to Personal Income,Inst cred/PI,Money and Credit,0
+S.P.500,S&P s Common Stock Price Index: Composite,S&P 500,Stock Market,0
+S.P..indust,S&P s Common Stock Price Index: Industrials,S&P: indust,Stock Market,0
+S.P.div.yield,S&P s Composite Common Stock: Dividend Yield,S&P div yield,Stock Market,0
+S.P.PE.ratio,S&P s Composite Common Stock: Price-Earnings Ratio,S&P PE ratio,Stock Market,0
+CP3Mx,3-Month AA Financial Commercial Paper Rate,Comm paper,Interest and Exchange Rates,0
+TB3MS,3-Month Treasury Bill:,3 mo T-bill,Interest and Exchange Rates,0
+TB6MS,6-Month Treasury Bill:,6 mo T-bill,Interest and Exchange Rates,0
+GS1,1-Year Treasury Rate,1 yr T-bond,Interest and Exchange Rates,0
+GS5,5-Year Treasury Rate,5 yr T-bond,Interest and Exchange Rates,0
+GS10,10-Year Treasury Rate,10 yr T-bond,Interest and Exchange Rates,0
+AAA,Moody s Seasoned Aaa Corporate Bond Yield,Aaa bond,Interest and Exchange Rates,0
+BAA,Moody s Seasoned Baa Corporate Bond Yield,Baa bond,Interest and Exchange Rates,0
+COMPAPFFx,3-Month Commercial Paper Minus FEDFUNDS,CP-FF spread,Interest and Exchange Rates,0
+TB3SMFFM,3-Month Treasury C Minus FEDFUNDS,3 mo-FF spread,Interest and Exchange Rates,0
+TB6SMFFM,6-Month Treasury C Minus FEDFUNDS,6 mo-FF spread,Interest and Exchange Rates,0
+T1YFFM,1-Year Treasury C Minus FEDFUNDS,1 yr-FF spread,Interest and Exchange Rates,0
+T5YFFM,5-Year Treasury C Minus FEDFUNDS,5 yr-FF spread,Interest and Exchange Rates,0
+T10YFFM,10-Year Treasury C Minus FEDFUNDS,10 yr-FF spread,Interest and Exchange Rates,0
+AAAFFM,Moody s Aaa Corporate Bond Minus FEDFUNDS,Aaa-FF spread,Interest and Exchange Rates,0
+BAAFFM,Moody s Baa Corporate Bond Minus FEDFUNDS,Baa-FF spread,Interest and Exchange Rates,0
+EXSZUSx,Switzerland / U.S. Foreign Exchange Rate,Ex rate: Switz,Interest and Exchange Rates,0
+EXJPUSx,Japan / U.S. Foreign Exchange Rate,Ex rate: Japan,Interest and Exchange Rates,0
+EXUSUKx,U.S. / U.K. Foreign Exchange Rate,Ex rate: UK,Interest and Exchange Rates,0
+EXCAUSx,Canada / U.S. Foreign Exchange Rate,EX rate: Canada,Interest and Exchange Rates,0
+WPSFD49207,PPI: Finished Goods,PPI: n gds,Prices,1
+WPSFD49502,PPI: Finished Consumer Goods,PPI: cons gds,Prices,1
+WPSID61,PPI: Intermediate Materials,PPI: int matls,Prices,1
+WPSID62,PPI: Crude Materials,PPI: crude matls,Prices,1
+OILPRICEx,"Crude Oil, spliced WTI and Cushing",Spot market price,Prices,1
+PPICMM,PPI: Metals and metal products:,PPI: nonferrous,Prices,1
+CPIAUCSL,CPI : All Items,CPI-U: all,Prices,1
+CPIAPPSL,CPI : Apparel,CPI-U: apparel,Prices,1
+CPITRNSL,CPI : Transportation,CPI-U: transp,Prices,1
+CPIMEDSL,CPI : Medical Care,CPI-U: medical,Prices,1
+CUSR0000SAC,CPI : Commodities,CPI-U: comm.,Prices,1
+CUSR0000SAD,CPI : Durables,CPI-U: dbles,Prices,1
+CUSR0000SAS,CPI : Services,CPI-U: services,Prices,1
+CPIULFSL,CPI : All Items Less Food,CPI-U: ex food,Prices,1
+CUSR0000SA0L2,CPI : All items less shelter,CPI-U: ex shelter,Prices,1
+CUSR0000SA0L5,CPI : All items less medical care,CPI-U: ex med,Prices,1
+PCEPI,Personal Cons. Expend.: Chain Index,PCE de,Prices,1
+DDURRG3M086SBEA,Personal Cons. Exp: Durable goods,PCE de : dlbes,Prices,1
+DNDGRG3M086SBEA,Personal Cons. Exp: Nondurable goods,PCE de : nondble,Prices,1
+DSERRG3M086SBEA,Personal Cons. Exp: Services,PCE de : service,Prices,1
+CES0600000008,Avg Hourly Earnings : Goods-Producing,AHE: goods,Labor Market,1
+CES2000000008,Avg Hourly Earnings : Construction,AHE: const,Labor Market,1
+CES3000000008,Avg Hourly Earnings : Manufacturing,AHE: mfg,Labor Market,1
+DTCOLNVHFNM,Consumer Motor Vehicle Loans Outstanding,,Money and Credit,0
+DTCTHFNM,Total Consumer Loans and Leases Outstanding,,Money and Credit,0
+INVEST,Securities in Bank Credit at All Commercial Banks,,Money and Credit,0
