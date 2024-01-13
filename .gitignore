@@ -1,27 +1,11 @@
  
-*.csv
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-#R/dataread.r
-# Ignore a specific directory
-data/
-# Ignore CSV files
-*.csv
 # Ignore files with a specific extension
 *.log
 # Ignore __pycache__/
 __pycache__/
-# ignore docs
-<<<<<<< HEAD
-docs/
-=======
-/docs/images/
-# ignore service account key
+# ignore service accont key
 service_account_key.json
 >>>>>>> 64bad91ecc507734ab71f6da571abdb8dc20bbd3
 .Rproj.user
 .Rhistory
-.RData
-.Ruserdata
+
