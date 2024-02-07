@@ -1,10 +1,7 @@
-library(imputeTS)
-library(tseries)
-library(fbi)
-library(readr)
-library(dfms)
-library(xts)
-library(zoo)
+rm(list = ls())
+devtools::install_github("cykbennie/fbi")
+libraries=source("utils/load_libraries.R")
+cat("My Working directory is: ", getwd(), "\n")
 ###################################################################
 ################  load data #######################################
 ###################################################################
@@ -40,6 +37,7 @@ while (tail_has_na) {
   tail_has_na <- any(apply(tail(data_select), 1, anyNA))
 }
 date_df <- data.frame(date = data_select[, 1])
+
 ###################################################################
 ################  NA imputation using Kalman filter      ##########
 ###################################################################
@@ -53,6 +51,7 @@ imputed_data_select <- lapply(data_select[, numeric_cols], function(x) {
 imputed_data_select <- as.data.frame(imputed_data_select)
 # Combine the imputed numeric columns with non-numeric columns (if any)
 imputed_data_select <- cbind(date_df, imputed_data_select)
+
 ###################################################################
 ################ check continuity of time series ##################
 ###################################################################
@@ -63,6 +62,7 @@ date_column <- as.Date(date_column)
 min_date <- as.Date(min(date_column))
 max_date <- as.Date(max(date_column))
 expected_dates <- seq(min_date, max_date, by = "1 month")  # Assuming monthly data
+
 # Check if there are any missing dates
 missing_dates <- setdiff(expected_dates, unique(date_column))
 if (length(missing_dates) == 0) {
@@ -75,4 +75,16 @@ if (length(missing_dates) == 0) {
 ###################################################################
 #commented line: not erase, change path if needed
 #write.csv(imputed_data_select, file = "data/prepro/imputed_na_fred_data_prueba_borrar.csv", row.names = FALSE, sep=",")
-
+csv_file_exist <- function(file_path, data_to_write) {
+  # Check if the file exists
+  if (file.exists(file_path)) {
+    cat("The CSV file at", file_path, "already exists.\n")
+  } else {
+    # The file does not exist, create it
+    cat("The CSV file at", file_path, "does not exist. Creating the file...\n")
+    write.csv2(data_to_write, file = file_path, row.names = FALSE, quote = FALSE)
+    cat("CSV file created at", file_path, "\n")
+  }
+}
+path_imputed_na_fred_data="data/prepro/imputed_na_fred_data.csv"
+csv_file_exist(path_imputed_na_fred_data, data_to_write)
