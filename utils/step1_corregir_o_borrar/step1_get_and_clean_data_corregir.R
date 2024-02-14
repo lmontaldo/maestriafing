@@ -1,11 +1,12 @@
 rm(list = ls())
 # Import labraries
 libraries=source("utils/load_libraries.R")
-
+source("utils/step1_corregir_o_borrar/fred_preprocessing.R")
+source("utils/functions_csv.R")
 # install fbi
 devtools::install_github("cykbennie/fbi")
 
-source("utils/fred_preprocessing.R")
+#source("utils/fred_preprocessing.R")
 cat("My Working directory is: ", getwd(), "\n")
 
 # Load data
@@ -18,11 +19,7 @@ descripcion_df=fredmd_description[, c("fred", "gsi:description", "group")]
 # If the descripcion_df csv does not exist then create else skip function
 path_descripcion_df="data/prepro/descripcion_df.csv"
 descripcion_df_file_exists <-csv_file_exist(path_descripcion_df, data_to_write)
-if (descripcion_df_file_exists) {
- cat("descripcion_df exists\n")
-} else {
-  cat("descripcion_df created\n")
-}
+
 
 # Clean and select data
 data_select <- clean_and_select_data(data)

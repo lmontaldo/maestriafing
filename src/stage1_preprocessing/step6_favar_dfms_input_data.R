@@ -1,8 +1,5 @@
 #
 rm(list = ls())
-library(Metrics)
-library(forecast)
-library(readxl)
 libraries=source("utils/load_libraries.R")
 cat("My Working directory is: ", getwd(), "\n")
 df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
