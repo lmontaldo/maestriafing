@@ -1,6 +1,7 @@
 rm(list = ls())
 devtools::install_github("cykbennie/fbi")
 libraries=source("utils/load_libraries.R")
+source("utils/functions_csv.R")
 cat("My Working directory is: ", getwd(), "\n")
 ###################################################################
 ################  load data #######################################
@@ -10,7 +11,6 @@ data <- fredmd(filepath, date_start = NULL, date_end = NULL, transform = TRUE)
 N <- ncol(data)
 data(fredmd_description)
 names(fredmd_description)
-print(getwd())
 descripcion_df=fredmd_description[, c("fred", "gsi:description", "group")]
 #write.csv2(descripcion_df, file = "data/prepro/descripcion_df.csv", row.names = FALSE, quote=FALSE)
 ###################################################################
@@ -47,6 +47,7 @@ numeric_cols <- sapply(data_select, is.numeric)
 imputed_data_select <- lapply(data_select[, numeric_cols], function(x) {
   na_kalman(x, model = "StructTS", smooth = TRUE)
 })
+
 # Convert the list of imputed columns back to a dataframe
 imputed_data_select <- as.data.frame(imputed_data_select)
 # Combine the imputed numeric columns with non-numeric columns (if any)
@@ -75,16 +76,5 @@ if (length(missing_dates) == 0) {
 ###################################################################
 #commented line: not erase, change path if needed
 #write.csv(imputed_data_select, file = "data/prepro/imputed_na_fred_data_prueba_borrar.csv", row.names = FALSE, sep=",")
-csv_file_exist <- function(file_path, data_to_write) {
-  # Check if the file exists
-  if (file.exists(file_path)) {
-    cat("The CSV file at", file_path, "already exists.\n")
-  } else {
-    # The file does not exist, create it
-    cat("The CSV file at", file_path, "does not exist. Creating the file...\n")
-    write.csv2(data_to_write, file = file_path, row.names = FALSE, quote = FALSE)
-    cat("CSV file created at", file_path, "\n")
-  }
-}
 path_imputed_na_fred_data="data/prepro/imputed_na_fred_data.csv"
 csv_file_exist(path_imputed_na_fred_data, data_to_write)
