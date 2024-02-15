@@ -43,9 +43,10 @@ for(factor in factor_values){
   #predicciones$fcst$PC1[,1]
   #predicciones$fcst$PC2[,1]
   #predicciones$fcst$PC3[,1]
-  #pred_F <- cbind(predicciones$fcst$PC1[,1],
-  #                       predicciones$fcst$PC2[,1],
-  #                       predicciones$fcst$PC3[,1])
+  pred_F <- cbind(predicciones$fcst$PC1[,1],
+                         predicciones$fcst$PC2[,1],
+                         predicciones$fcst$PC3[,1])
+  head(pred_F)
   vec_list <- list()
   for(factor_name in names(predicciones$fcst)) {
     if (startsWith(factor_name, "PC")) {
