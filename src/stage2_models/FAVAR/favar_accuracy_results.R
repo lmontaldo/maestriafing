@@ -20,7 +20,6 @@ for(factor in factor_values){
   F_slow<-ics$F_pca[,1:factor]
   fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
   reg <- lm(C ~ F_slow + fedfunds)
-  dim(reg$coefficients[nrow(reg$coefficients),])
   F_hat <- C - data.matrix(data_s[, "FEDFUNDS"]) %*% reg$coefficients[nrow(reg$coefficients),]
   data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
   var_select <- VARselect(data_var, lag.max = 15, type="none")
@@ -32,21 +31,25 @@ for(factor in factor_values){
   matriz_s<- as.matrix(data_s)
   matriz_fhat<- as.matrix(F_hat)
   reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
-  print(dim(matriz_fhat))
   loadings = reg_loadings$coefficients
+  #cat("norma", loadings[1,]%*%t(loadings[1,]),"\n")
+  #cat("suma fila", sum(loadings[1,])," \n")
   #head(reg_loadings$coefficients)
   #summary(reg_loadings)
   Lamda_F=loadings[1:factor,]
+  cat("lambda F", Lamda_F[1,]%*%t(Lamda_F[1,])," \n")
   Lambda_ffr=loadings[nrow(loadings),]
+  ############################################
+  #############################################
   #Predicciones
   predicciones=predict(var, n.ahead = n_forecasts)
+  ###
   #predicciones$fcst$PC1[,1]
   #predicciones$fcst$PC2[,1]
   #predicciones$fcst$PC3[,1]
   pred_F <- cbind(predicciones$fcst$PC1[,1],
-                         predicciones$fcst$PC2[,1],
+                        predicciones$fcst$PC2[,1],
                          predicciones$fcst$PC3[,1])
-  head(pred_F)
   vec_list <- list()
   for(factor_name in names(predicciones$fcst)) {
     if (startsWith(factor_name, "PC")) {
@@ -55,6 +58,7 @@ for(factor in factor_values){
   }
 
   pred_F <- do.call(cbind, vec_list)
+  ###################################################
   pred_FFR=predicciones$fcst$FEDFUNDS[,1]
   F_part=pred_F%*%Lamda_F
   Y_part=outer(pred_FFR, Lambda_ffr)
