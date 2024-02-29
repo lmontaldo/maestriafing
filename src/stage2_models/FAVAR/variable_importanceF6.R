@@ -33,6 +33,27 @@ if (length(similar_index) > 0) {
   print("No similar value found.")
 }
 ####
-print(factor6)
+is_identity_matrix <- function(matrix, tol=1e-10) {
+  # Check if matrix is square
+  if (ncol(matrix) != nrow(matrix)) {
+    return(FALSE)
+  }
+
+  # Check if diagonal elements are close to 1 within tolerance
+  if (!all(abs(diag(matrix) - 1) < tol)) {
+    return(FALSE)
+  }
+
+  # Check if off-diagonal elements are close to 0 within tolerance
+  if (!all(abs(matrix - diag(diag(matrix))) < tol)) {
+    return(FALSE)
+  }
+
+  return(TRUE)
+}
+
+
+
+is_identity_matrix(t(Lamda_F)%*%Lamda_F)
 
 

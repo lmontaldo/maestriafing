@@ -17,6 +17,7 @@ for(factor in factor_values){
   slow_vars <- unlist(slow$slow)
   data_slow <- data_s[, slow_vars]
   ics_slow = ICr(data_slow)
+  print(ics_slow)
   F_slow<-ics$F_pca[,1:factor]
   fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
   reg <- lm(C ~ F_slow + fedfunds)
@@ -30,6 +31,10 @@ for(factor in factor_values){
   # Calculando el peso de los factores
   matriz_s<- as.matrix(data_s)
   matriz_fhat<- as.matrix(F_hat)
+  #####
+  print(F_hat%*%t(F_hat))
+
+  #########
   reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
   loadings = reg_loadings$coefficients
   #cat("norma", loadings[1,]%*%t(loadings[1,]),"\n")
@@ -37,7 +42,6 @@ for(factor in factor_values){
   #head(reg_loadings$coefficients)
   #summary(reg_loadings)
   Lamda_F=loadings[1:factor,]
-  cat("lambda F", Lamda_F[1,]%*%t(Lamda_F[1,])," \n")
   Lambda_ffr=loadings[nrow(loadings),]
   ############################################
   #############################################
