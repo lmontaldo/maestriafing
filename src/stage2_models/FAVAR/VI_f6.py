@@ -12,7 +12,8 @@ ng= pd.read_csv("/Users/lauramontaldo/Desktop/lau/maestriafing/data/variable_imp
 df= pd.read_csv("/Users/lauramontaldo/Desktop/lau/maestriafing/data/variable_importance/abs_lambda_F6.csv", sep=",",  index_col=0)
 df=df.T
 df_sin_idx=df.reset_index()
-
+print(df)
+print(ng)
 merged_df = pd.merge(df, ng[['fred', 'group']], left_index=True, right_on='fred', how='left')
 #grouped_df = merged_df.groupby('group')
 #mean_by_group = grouped_df.mean()
