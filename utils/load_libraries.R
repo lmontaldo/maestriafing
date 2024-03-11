@@ -1,7 +1,7 @@
 # List of packages
 packages <- c("readxl", "readr", "boot", "tsDyn", "vars", "repr", "dplyr",
               "dfms", "xts", "fbi", "forecast", "OOS", "zoo", "xtable",
-              "tseries", "Metrics", "forecast", "readxl","stats","pracma", "devtools", "imputeTS","ggplot2","cowplot")
+              "tseries", "Metrics", "forecast", "readxl","stats","pracma", "devtools", "imputeTS","ggplot2","cowplot", 'expm')
 
 # Install and load packages
 for (package in packages) {
@@ -31,3 +31,4 @@ library(Metrics)
 library(imputeTS)
 library(ggplot2)
 library(cowplot)
+library(expm)
