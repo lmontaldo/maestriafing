@@ -2,6 +2,7 @@ rm(list = ls())
 load("data/Rdata/favar_dfms_output.RData")
 libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
+
 #
 perform_pca <- function(data_s, n_components = NULL) {
   # Convert data_s to a matrix X
@@ -10,16 +11,6 @@ perform_pca <- function(data_s, n_components = NULL) {
   # Calculate mean and standard deviation
   mean_values <- apply(X, 2, mean)
   sd_values <- apply(X, 2, sd)
-
-  # Print mean and standard deviation
-  print("Mean values:")
-  print(mean_values)
-  print("Standard deviation values:")
-  print(sd_values)
-
-  # Print dimensions of X
-  print("Dimensions of X:")
-  print(dim(X))
 
   # Calculate baricentro
   pp <- matrix(rep(1/nrow(X), nrow(X)))
@@ -36,15 +27,15 @@ perform_pca <- function(data_s, n_components = NULL) {
   correlation_matrix <- var(Xce)
 
   # Print correlation matrix
-  print("Correlation matrix:")
-  print(correlation_matrix)
+  # cat("Correlation matrix:\n")
+  # print(correlation_matrix)
 
   # Calculate eigenvalues of the correlation matrix
   desc <- eigen(correlation_matrix, symmetric = TRUE)
 
   # Print eigenvalues
-  print("Eigenvalues:")
-  print(desc$values)
+  # cat("Eigenvalues:\n")
+  # print(round(desc$values))
 
   # Calculate M1
   M1 <- nrow(Xc) / (nrow(Xc) - 1) * solve(diag(x = apply(Xc, 2, var), ncol(Xc), ncol(Xc)))
@@ -61,8 +52,8 @@ perform_pca <- function(data_s, n_components = NULL) {
   I1 <- sum(diag(t(Xc) %*% D %*% Xc %*% M1))
 
   # Print global inertia
-  print("Global inertia:")
-  print(I1)
+  # cat("Global inertia:\n")
+  # print(I1)
 
   # Perform PCA
   desc1 <- eigen(sqrtm(M1) %*% t(Xc) %*% D %*% Xc %*% sqrtm(M1))
@@ -71,15 +62,15 @@ perform_pca <- function(data_s, n_components = NULL) {
   lambda1 <- desc1$values
 
   # Print eigenvalues
-  print("Eigenvalues (lambda1):")
-  print(lambda1)
+  # cat("Eigenvalues (lambda1): \n")
+  # print(lambda1)
 
   # Cumulative sum of eigenvalues
   cumulative_eigenvalues <- cumsum(lambda1 / sum(lambda1))
 
   # Print cumulative sum of eigenvalues
-  print("Cumulative sum of eigenvalues:")
-  print(cumulative_eigenvalues)
+  # cat("Cumulative sum of eigenvalues: \n")
+  # print(cumulative_eigenvalues)
 
   # Get eigenvectors
   Ustar <- desc1$vectors
@@ -91,15 +82,15 @@ perform_pca <- function(data_s, n_components = NULL) {
   F <- Xc %*% M1 %*% U
 
   # Print F
-  print("F:")
-  print(round(F, 6))
+  # cat("F:\n")
+  # print(round(F, 6))
 
   # Verify norms
-  print("Norms of the principal components:")
-  print(t(F[,1]) %*% D %*% F[,1])
-  print(t(F[,2]) %*% D %*% F[,2])
-  print(t(F[,3]) %*% D %*% F[,3])
-  print(sum(diag(t(F) %*% D %*% F)))
+  # cat("Norms of the principal components:\n")
+  # print(t(F[,1]) %*% D %*% F[,1])
+  # print(t(F[,2]) %*% D %*% F[,2])
+  # print(t(F[,3]) %*% D %*% F[,3])
+  # print(sum(diag(t(F) %*% D %*% F)))
 
   # Determine the number of components to return
   if (!is.null(n_components)) {
@@ -111,6 +102,6 @@ perform_pca <- function(data_s, n_components = NULL) {
 }
 
 # Example usage:
-#result <- perform_pca(data_s, n_components =7)
-#principal_components <- result$principal_components
-#global_inertia <- result$global_inertia
+result <- perform_pca(data_s, n_components =7)
+principal_components <- result$principal_components
+global_inertia <- result$global_inertia
