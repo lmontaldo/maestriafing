@@ -1,6 +1,7 @@
 #
 rm(list = ls())
 libraries=source("utils/load_libraries.R")
+library(zoo)
 cat("My Working directory is: ", getwd(), "\n")
 df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
 df_test <- read_csv("data/train_test/sfr_test.csv", show_col_types = FALSE)
@@ -89,4 +90,10 @@ transf_code <- as.numeric(as.character(ordered_descrip_tcode$tcode))
 ################################################################################
 # save data ####################################################################
 ################################################################################
-save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_dfms_output.RData")
+df_actual_s <- fortify.zoo(actual_s)
+df_data_s<- fortify.zoo(data_s)
+write.csv(df_actual_s, 'data/scaled_train_test/scaled_test.csv', row.names=FALSE)
+write.csv(df_data_s, 'data/scaled_train_test/scaled_train.csv', row.names=FALSE)
+
+
+save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")

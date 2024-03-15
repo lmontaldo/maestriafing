@@ -1,8 +1,15 @@
 rm(list = ls())
+# instalaciones necesarias
+install.packages("devtools")
+install.packages("stats")
+install.packages("readr")
+install.packages("pracma")
 devtools::install_github("cykbennie/fbi")
+#
 libraries=source("utils/load_libraries.R")
 source("utils/functions_csv.R")
 cat("My Working directory is: ", getwd(), "\n")
+cat('Carga y transformacion de las series temporales:\n')
 ###################################################################
 ################  load data #######################################
 ###################################################################
