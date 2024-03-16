@@ -1,4 +1,5 @@
 rm(list = ls())
+<<<<<<< HEAD
 # instalaciones necesarias
 install.packages("devtools")
 install.packages("stats")
@@ -10,6 +11,12 @@ libraries=source("utils/load_libraries.R")
 source("utils/functions_csv.R")
 cat("My Working directory is: ", getwd(), "\n")
 cat('Carga y transformacion de las series temporales:\n')
+=======
+devtools::install_github("cykbennie/fbi")
+libraries=source("utils/load_libraries.R")
+source("utils/functions_csv.R")
+cat("My Working directory is: ", getwd(), "\n")
+>>>>>>> origin/feature_paquetes
 ###################################################################
 ################  load data #######################################
 ###################################################################
@@ -84,4 +91,8 @@ if (length(missing_dates) == 0) {
 #commented line: not erase, change path if needed
 #write.csv(imputed_data_select, file = "data/prepro/imputed_na_fred_data_prueba_borrar.csv", row.names = FALSE, sep=",")
 path_imputed_na_fred_data="data/prepro/imputed_na_fred_data.csv"
+<<<<<<< HEAD
 #csv_file_exist(path_imputed_na_fred_data, data_to_write)
+=======
+csv_file_exist(path_imputed_na_fred_data, data_to_write)
+>>>>>>> origin/feature_paquetes

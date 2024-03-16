@@ -2,10 +2,7 @@ rm(list = ls())
 load("data/Rdata/favar_dfms_output.RData")
 libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/feature_paquetes
 #
 perform_pca <- function(data_s, n_components = NULL) {
   # Convert data_s to a matrix X
@@ -15,19 +12,6 @@ perform_pca <- function(data_s, n_components = NULL) {
   mean_values <- apply(X, 2, mean)
   sd_values <- apply(X, 2, sd)
 
-<<<<<<< HEAD
-=======
-  # Print mean and standard deviation
-  print("Mean values:")
-  print(mean_values)
-  print("Standard deviation values:")
-  print(sd_values)
-
-  # Print dimensions of X
-  print("Dimensions of X:")
-  print(dim(X))
-
->>>>>>> origin/feature_paquetes
   # Calculate baricentro
   pp <- matrix(rep(1/nrow(X), nrow(X)))
   cc <- t(X) %*% pp
@@ -43,25 +27,15 @@ perform_pca <- function(data_s, n_components = NULL) {
   correlation_matrix <- var(Xce)
 
   # Print correlation matrix
-<<<<<<< HEAD
   # cat("Correlation matrix:\n")
   # print(correlation_matrix)
-=======
-  print("Correlation matrix:")
-  print(correlation_matrix)
->>>>>>> origin/feature_paquetes
 
   # Calculate eigenvalues of the correlation matrix
   desc <- eigen(correlation_matrix, symmetric = TRUE)
 
   # Print eigenvalues
-<<<<<<< HEAD
   # cat("Eigenvalues:\n")
   # print(round(desc$values))
-=======
-  print("Eigenvalues:")
-  print(desc$values)
->>>>>>> origin/feature_paquetes
 
   # Calculate M1
   M1 <- nrow(Xc) / (nrow(Xc) - 1) * solve(diag(x = apply(Xc, 2, var), ncol(Xc), ncol(Xc)))
@@ -78,13 +52,8 @@ perform_pca <- function(data_s, n_components = NULL) {
   I1 <- sum(diag(t(Xc) %*% D %*% Xc %*% M1))
 
   # Print global inertia
-<<<<<<< HEAD
   # cat("Global inertia:\n")
   # print(I1)
-=======
-  print("Global inertia:")
-  print(I1)
->>>>>>> origin/feature_paquetes
 
   # Perform PCA
   desc1 <- eigen(sqrtm(M1) %*% t(Xc) %*% D %*% Xc %*% sqrtm(M1))
@@ -93,25 +62,15 @@ perform_pca <- function(data_s, n_components = NULL) {
   lambda1 <- desc1$values
 
   # Print eigenvalues
-<<<<<<< HEAD
   # cat("Eigenvalues (lambda1): \n")
   # print(lambda1)
-=======
-  print("Eigenvalues (lambda1):")
-  print(lambda1)
->>>>>>> origin/feature_paquetes
 
   # Cumulative sum of eigenvalues
   cumulative_eigenvalues <- cumsum(lambda1 / sum(lambda1))
 
   # Print cumulative sum of eigenvalues
-<<<<<<< HEAD
   # cat("Cumulative sum of eigenvalues: \n")
   # print(cumulative_eigenvalues)
-=======
-  print("Cumulative sum of eigenvalues:")
-  print(cumulative_eigenvalues)
->>>>>>> origin/feature_paquetes
 
   # Get eigenvectors
   Ustar <- desc1$vectors
@@ -123,7 +82,6 @@ perform_pca <- function(data_s, n_components = NULL) {
   F <- Xc %*% M1 %*% U
 
   # Print F
-<<<<<<< HEAD
   # cat("F:\n")
   # print(round(F, 6))
 
@@ -133,17 +91,6 @@ perform_pca <- function(data_s, n_components = NULL) {
   # print(t(F[,2]) %*% D %*% F[,2])
   # print(t(F[,3]) %*% D %*% F[,3])
   # print(sum(diag(t(F) %*% D %*% F)))
-=======
-  print("F:")
-  print(round(F, 6))
-
-  # Verify norms
-  print("Norms of the principal components:")
-  print(t(F[,1]) %*% D %*% F[,1])
-  print(t(F[,2]) %*% D %*% F[,2])
-  print(t(F[,3]) %*% D %*% F[,3])
-  print(sum(diag(t(F) %*% D %*% F)))
->>>>>>> origin/feature_paquetes
 
   # Determine the number of components to return
   if (!is.null(n_components)) {
@@ -155,12 +102,6 @@ perform_pca <- function(data_s, n_components = NULL) {
 }
 
 # Example usage:
-<<<<<<< HEAD
 result <- perform_pca(data_s, n_components =7)
 principal_components <- result$principal_components
 global_inertia <- result$global_inertia
-=======
-#result <- perform_pca(data_s, n_components =7)
-#principal_components <- result$principal_components
-#global_inertia <- result$global_inertia
->>>>>>> origin/feature_paquetes

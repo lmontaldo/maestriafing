@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> origin/feature_paquetes
 # Ignore files with a specific extension
 *.log
 # Ignore __pycache__/

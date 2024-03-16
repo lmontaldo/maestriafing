@@ -1,0 +1,86 @@
+rm(list = ls())
+load("data/Rdata/favar_dfms_output.RData")
+libraries=source("utils/load_libraries.R")
+source("utils/accuracy_measures.R")
+source("utils/pca_norm.R")
+
+# Define factor values to iterate over
+#n_factors =7
+factor_values <- c(2,3,4,5, 6, ic_p2_factors)
+# Initialize empty lists to store results
+path <- "docs/images/favar_n_factor_estimated"
+results_list <- list()
+for(n_factors in factor_values){
+  cat("\n---------------------------------------------- \n")
+  cat("Results for", n_factors,"latent factors \n")
+  cat("---------------------------------------------- \n")
+  cat('Step 1: Extract principal componentes of all X (including Y) \n')
+  result <- perform_pca(data_s, n_components =n_factors)
+  C<-result$principal_components
+  cat('Step 2: Extract principal componentes of Slow Variables \n')
+  slow_vars <- unlist(slow$slow)
+  data_slow <- data_s[, slow_vars]
+  pc_slow= perform_pca(data_slow, n_components =n_factors)
+  F_slow=pc_slow$principal_components
+  cat('Step 3: Clean the PC from the effect of observed Y \n')
+  fedfunds <- as.matrix(data_s[, "FEDFUNDS"])
+  reg <- lm(C ~ F_slow + fedfunds)
+  F_hat <- C - data.matrix(data_s[, "FEDFUNDS"]) %*% reg$coefficients[nrow(reg$coefficients),]
+  cat('Step 4: Estimate FAVAR and get IRFs \n')
+  data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
+  var_select <- VARselect(data_var, lag.max = 15, type="none")
+  best_lag <- var_select$selection
+  n_lags=best_lag[1]
+  cat("Lags number in VAR according AIC:", n_lags, "\n")
+  var = VAR(data_var, p =n_lags)
+  # Calculando el peso de los factores
+  cat("Computing Loading Factors \n")
+  matriz_s<- as.matrix(data_s)
+  matriz_fhat<- as.matrix(F_hat)
+  reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
+  loadings = reg_loadings$coefficients
+  Lamda_F=loadings[1:n_factors,]
+  Lambda_ffr=loadings[nrow(loadings),]
+  cat("Predictions ahead in test timeframe \n")
+  predicciones=predict(var, n.ahead = n_forecasts)
+  vec_list <- list()
+  for(factor_name in names(predicciones$fcst)) {
+    if (startsWith(factor_name, "X")) {
+      vec_list[[factor_name]] <- predicciones$fcst[[factor_name]][,1]}}
+  pred_F <- do.call(cbind, vec_list)
+  pred_FFR=predicciones$fcst$FEDFUNDS[,1]
+  F_part=pred_F%*%Lamda_F
+  Y_part=outer(pred_FFR, Lambda_ffr)
+  X_pred=F_part+Y_part
+  X_forec=as.data.frame(X_pred)
+  predictions_df <- as.data.frame(X_pred)
+  predictions_xts=xts(predictions_df,
+                      order.by = df_test_index)
+
+  cat('Accuracy measures \n')
+  results_df <- compute_accuracy_measures_df(actual_s, predictions_xts)
+  # print(results_df)
+  cat("\n Peformance metrics: \n")
+  averages <- colMeans(results_df, na.rm = TRUE)
+  print(averages)
+
+  filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_", n_factors, ".RData")
+  cat('Saved objects in data/Rdata/favar_estimation_results \n')
+  save(data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
+
+
+  # Convert the row names of F_hat to a Date object
+  dates <- as.Date(rownames(F_hat))
+
+  # Plot all principal components together
+  png(file.path(path, paste0("favar_n_factor_", n_factors, ".png")), width = 1200, height = 800)
+  par(mar = c(5, 5, 4, 2) + 0.1, cex.lab = 2, cex.main = 2)
+  matplot(dates, F_hat, type = "l",
+          xlab = "Date", ylab = "Principal Components",
+          main = paste(n_factors, "factores latentes estimados en el conjunto de entrenamiento", sep = " "),
+          col = 1:ncol(F_hat), lty = 1)
+
+  dev.off()
+
+}
+
