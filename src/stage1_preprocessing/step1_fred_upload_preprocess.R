@@ -4,7 +4,7 @@ install.packages("devtools")
 install.packages("stats")
 install.packages("readr")
 install.packages("pracma")
-devtools::install_github("cykbennie/fbi")
+#devtools::install_github("cykbennie/fbi")
 #
 libraries=source("utils/load_libraries.R")
 source("utils/functions_csv.R")
@@ -84,4 +84,4 @@ if (length(missing_dates) == 0) {
 #commented line: not erase, change path if needed
 #write.csv(imputed_data_select, file = "data/prepro/imputed_na_fred_data_prueba_borrar.csv", row.names = FALSE, sep=",")
 path_imputed_na_fred_data="data/prepro/imputed_na_fred_data.csv"
-csv_file_exist(path_imputed_na_fred_data, data_to_write)
+#csv_file_exist(path_imputed_na_fred_data, data_to_write)
