@@ -1,6 +1,6 @@
 rm(list = ls())
 obj1=load("data/Rdata/favar_dfms_output.RData")
-obj2=load("data/Rdata/results_favar_factor_6.RData")
+obj2=load("data/Rdata/favar_estimation_results/results_favar_factor_6.RData")
 libraries=source("utils/load_libraries.R")
 #
 #
@@ -21,8 +21,9 @@ reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
 loadings = reg_loadings$coefficients
 #head(reg_loadings$coefficients)
 #summary(reg_loadings)
-#
-#### BOOTSTRAPING ########
+#######################################
+#### BOOTSTRAPING #####################
+#######################################
 R = 500 # Number of simulations
 nvars = dim(data_s)[2] # Number of variables
 nsteps = 49 # numbers of steps
@@ -58,8 +59,10 @@ for(k in 1:nsteps){
 }
 rm(var_boot)
 rm(IRFs)
-#
-transf_cumsum=c(1,5,5,5,5,5,5,5,1,1,5,5,5,1,1,5,1,1,5,5)
+################################################
+# plots
+################################################
+transf_cumsum=c(1,5,5,1,1,5,5,5,1,1,5,5,5,1,1,5,1,1,1)
 options(repr.plot.width=12, repr.plot.height=8)
 
 par(mfrow=c(5,4),
@@ -83,7 +86,9 @@ for(i in variables){
     abline(h=0)
   }
 }
-#
+##################################################
+####### DESCOMPOSICION DE LA VARIANZA
+##################################################
 hor=60
 irf_points = irf(var, n.ahead = hor,  boot = FALSE)
 results = summary(reg_loadings) # the warning comes because of FEDFUNDS
@@ -98,12 +103,12 @@ irf_X_pc6 = array(c(0,0), dim=c(hor+1, key_nvars))
 #irf_X_pc7 = array(c(0,0), dim=c(hor+1, key_nvars))
 irf_X_ffr = array(c(0,0), dim=c(hor+1, key_nvars))
 for(i in 1:key_nvars){
-  irf_X_pc1[,i] = irf_points$irf$PC1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc2[,i] = irf_points$irf$PC2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc3[,i] = irf_points$irf$PC3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc4[,i] = irf_points$irf$PC4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc5[,i] = irf_points$irf$PC5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
-  irf_X_pc6[,i] = irf_points$irf$PC6%*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc1[,i] = irf_points$irf$X1 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc2[,i] = irf_points$irf$X2 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc3[,i] = irf_points$irf$X3 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc4[,i] = irf_points$irf$X4 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc5[,i] = irf_points$irf$X5 %*% matrix(loadings[1:nrow(loadings), variables[i]])
+  irf_X_pc6[,i] = irf_points$irf$X6%*% matrix(loadings[1:nrow(loadings), variables[i]])
   #irf_X_pc7[,i] = irf_points$irf$f7 %*% matrix(loadings[1:nrow(loadings), variables[i]])
   irf_X_ffr[,i] = (irf_points$irf$FEDFUNDS) %*% matrix(loadings[1:nrow(loadings), variables[i]])
 }
@@ -162,3 +167,4 @@ for(i in 1:key_nvars){
 table_favar = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
 table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
 xtable(table_favar, digits=3)
+

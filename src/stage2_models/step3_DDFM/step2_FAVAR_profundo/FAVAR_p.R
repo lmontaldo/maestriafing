@@ -253,3 +253,6 @@ X_explain <- X
 set.seed(1)
 bg_X <-X[sample(nrow(X), 118), ]
 s <- kernelshap(fit, X_explain, bg_X = bg_X)
+sum(abs(s$S[,1]))
+18.50535/118 # en promedio me deberia dar aproximdada
+# ordernar las variables
