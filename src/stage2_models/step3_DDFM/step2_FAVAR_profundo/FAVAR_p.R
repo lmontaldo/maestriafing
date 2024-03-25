@@ -2,6 +2,7 @@ rm(list = ls())
 libraries=source("utils/load_libraries.R")
 library(MASS)
 load("data/Rdata/favar_dfms_output.RData")
+load("data/Rdata/ng_dataframe/ng.RData")
 source("utils/accuracy_measures.R")
 F_hat <- read.csv("data/FAVAR_profundo/f_hat_DDFM_fact6.csv")
 #######################################################################
@@ -160,6 +161,32 @@ for(i in variables){
   }
 }
 
+########### con kernel
+options(repr.plot.width=12, repr.plot.height=8)
+par(mfrow=c(5,4), mar = c(2, 2, 2, 2))
+
+for(i in variables){
+  index <- which(variables == i)
+  if(transf_cumsum[index] == 5){
+    plot(cumsum(IRF[,i]), type ='l', lwd=2, main = variable_names[index],
+         ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]), cumsum(Upper[,i])),
+         cex.main=1, cex.axis=1)
+    lines(cumsum(Upper[,i]), lty=2, col="red")
+    lines(cumsum(Lower[,i]), lty=2, col="red")
+    abline(h=0)
+  } else {
+    smoothed_irf <- stats::filter(IRF[,i], transf_cumsum[index], sides = 2)
+    plot(cumsum(smoothed_irf), type ='l', lwd=2, main = variable_names[index],
+         ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]), cumsum(Upper[,i])),
+         cex.main=1, cex.axis=1)
+    lines(cumsum(Upper[,i]), lty=2, col="red")
+    lines(cumsum(Lower[,i]), lty=2, col="red")
+    abline(h=0)
+  }
+}
+
+
+
 ##################################################
 ####### DESCOMPOSICION DE LA VARIANZA
 ##################################################
@@ -242,10 +269,12 @@ tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]
 xtable(tableddfm, digits=3)
 ##########################
 
-##########################
+########################################################################
 # KernelSHAP: Practical Shapley Value Estimation via Linear Regression
-##########################
+#########################################################################
 # para F1
+library(kernelshap)
+library(viridis)
 f1=F_pseudo_inv_t[,1]
 X=as.data.frame(data_s)
 fit <- lm(f1 ~ ., data = X)
@@ -253,6 +282,29 @@ X_explain <- X
 set.seed(1)
 bg_X <-X[sample(nrow(X), 118), ]
 s <- kernelshap(fit, X_explain, bg_X = bg_X)
+abs_S <- apply(s$S, 2, abs)
+
 sum(abs(s$S[,1]))
 18.50535/118 # en promedio me deberia dar aproximdada
-# ordernar las variables
+# Compute the sum of each column
+column_sums <- colSums(abs_S)
+
+# Order the column sums in descending order
+ordered_sums <- column_sums[order(-column_sums)]
+top_15_sums <- rev(top_15_sums)
+top_15_names <- rev(top_15_names)
+matching_values <- ng$gsi[match(top_15_names, ng$fred)]
+################################################################
+# Create a horizontal bar plot
+barplot(top_15_sums, horiz = TRUE, names.arg = top_15_names,
+        main = "Top 15 variables que contribuyen al primer factor", xlab = "Suma de los valores absolutos por columna",
+        cex.names = 0.7, las = 1, col =  viridis_pal()(15))
+#################################### PLOT F1: 15 VARIABLES MAS IMPORTANTES
+# Set the margin to accommodate longer names
+par(mar = c(5, 8, 4, 2) + 0.1)
+# Create a horizontal bar plot with the matching values as names
+barplot(top_15_sums, horiz = TRUE, names.arg = matching_values,
+        main = "Top 15 variables que contribuyen al primer factor",
+        xlab = "Suma de los valores absolutos de los valores kernelshap por columna",
+        cex.names = 0.7, las = 1, col = color_palette)
+

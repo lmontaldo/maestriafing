@@ -1,6 +1,6 @@
 rm(list = ls())
 obj1=load("data/Rdata/favar_dfms_output.RData")
-F_hat=read.csv('data/ddfm/f_hat_ddfm_fact6.csv')
+F_hat=read.csv('data/FAVAR_profundo/f_hat_ddfm_fact6.csv')
 libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 #

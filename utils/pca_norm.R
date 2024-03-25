@@ -27,10 +27,9 @@ perform_pca <- function(data_s, n_components = NULL) {
   # Calculate correlation matrix
   correlation_matrix <- var(Xce)
 
-
-
   # Calculate eigenvalues of the correlation matrix
   desc <- eigen(correlation_matrix, symmetric = TRUE)
+  desc$values # coincide con (pc_all$sdev)^2 a menos de redondeos numéricos en los últimos siete valores
 
   # Print eigenvalues
   # cat("Eigenvalues:\n")

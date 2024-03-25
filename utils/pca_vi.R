@@ -1,3 +1,9 @@
+
+rm(list = ls())
+load("data/Rdata/favar_dfms_output.RData")
+libraries=source("utils/load_libraries.R")
+source("utils/accuracy_measures.R")
+
 perform_pca <- function(data_s, n_components = NULL) {
   # Convert data_s to a matrix X
   X <- data.matrix(data_s)
@@ -70,3 +76,8 @@ perform_pca <- function(data_s, n_components = NULL) {
   # Return principal components, global inertia, and loading dataframe
   return(list(principal_components = F, global_inertia = I1, loading_df = loading_df))
 }
+
+
+result <- perform_pca(data_s, n_components =7)
+principal_components <- result$principal_components
+global_inertia <- result$global_inertia

@@ -6,6 +6,7 @@ libraries=source("utils/load_libraries.R")
 ###############################
 # Nombres variables
 ################################
+library(fbi)
 data(fredmd_description)
 n_g=fredmd_description
 ng=n_g[, c("fred", "group","gsi:description")]
@@ -19,7 +20,13 @@ for (i in seq_along(values_to_change)) {
 }
 colnames(ng)[colnames(ng) == "gsi:description"] <- "gsi"
 
-
+##### save(ng, file = "data/Rdata/ng_dataframe/ng.RData")
+if (!file.exists("data/Rdata/ng_dataframe/ng.RData")) {
+  # Save the dataframe as an .RData file
+  save(ng, file = "data/Rdata/ng_dataframe/ng.RData")
+} else {
+  print("File already exists. Not saving.")
+}
 ################################################################
 #### CONTRIBUTION 15 VARIABLES MAS IMPORTANTES A CADA FACTOR
 ####################################################################
@@ -105,3 +112,18 @@ factor_6_lineal<- updated_dfs$Factor_6
 # Save the updated dataframes as an RData object
 # Save the dataframes as an RData object
 save(factor_1_lineal, factor_2_lineal, factor_3_lineal, factor_4_lineal, factor_5_lineal, factor_6_lineal, file = "data/Rdata/factor_comparison/VI_factors_lineal.RData")
+
+
+# Get the variables from each data frame
+variables_factor_1 <- factor_1_lineal$variable
+variables_factor_2 <- factor_2_lineal$variable
+variables_factor_3 <- factor_3_lineal$variable
+variables_factor_4 <- factor_4_lineal$variable
+variables_factor_5 <- factor_5_lineal$variable
+variables_factor_6 <- factor_6_lineal$variable
+
+# Find the common variables among all data frames
+common_variables <- Reduce(intersect, list(variables_factor_1, variables_factor_2, variables_factor_3, variables_factor_4, variables_factor_5, variables_factor_6))
+
+# Print or use the common variables
+print(common_variables)

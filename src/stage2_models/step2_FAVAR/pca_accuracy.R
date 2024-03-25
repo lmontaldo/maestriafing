@@ -41,7 +41,19 @@ for(n_factors in factor_values){
   loadings = reg_loadings$coefficients
   Lamda_F=loadings[1:n_factors,]
   Lambda_ffr=loadings[nrow(loadings),]
+  ##########################################
+  # Absolute values of Lambda_F
+  ##########################################
+  # Absolute values of Lambda_F
+  abs_Lambda_F <- abs(Lamda_F)
+  # Order columns in descending order based on the maximum absolute value in each column
+  ordered_columns <- order(apply(abs_Lambda_F, 2, max), decreasing = TRUE)
+  # Reorder the columns
+  Lambda_F_ordered <- abs_Lambda_F[, ordered_columns]
+  #print(Lambda_F_ordered)
+  #############################################
   cat("Predictions ahead in test timeframe \n")
+  ##############################################
   predicciones=predict(var, n.ahead = n_forecasts)
   vec_list <- list()
   for(factor_name in names(predicciones$fcst)) {
@@ -63,12 +75,15 @@ for(n_factors in factor_values){
   cat("\n Peformance metrics: \n")
   averages <- colMeans(results_df, na.rm = TRUE)
   print(averages)
-
+  #############################################################
+  ######################## SAVE DATA ##########################
+  #############################################################
   filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_", n_factors, ".RData")
   cat('Saved objects in data/Rdata/favar_estimation_results \n')
-  save(data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
-
-
+  save(abs_Lambda_F,Lambda_F_ordered, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
+  ###############################################################
+  ###############################################################
+  ################################ PLOTS ########################
   # Convert the row names of F_hat to a Date object
   dates <- as.Date(rownames(F_hat))
 
@@ -81,6 +96,7 @@ for(n_factors in factor_values){
           col = 1:ncol(F_hat), lty = 1)
 
   dev.off()
+  #######################################################################
 
 }
 
