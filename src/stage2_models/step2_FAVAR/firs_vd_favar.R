@@ -168,3 +168,106 @@ table_favar = data.frame("Variables" = variable_names, "Contribution" = round((p
 table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
 xtable(table_favar, digits=3)
 
+#############################
+###### VI
+################################
+load("data/Rdata/ng_dataframe/ng.RData")
+class(loadings)
+abs_loadings <- abs(loadings)
+# Initialize a list to store dataframes
+df_list <- list()
+# Loop through each row name in the loadings matrix
+for (row_name in rownames(loadings)) {
+  # Create a dataframe for the current row
+  df <- data.frame(variable = colnames(loadings),
+                   abs_value = abs(loadings[row_name, ]))
+
+  # Order the dataframe by abs_value in descending order
+  df <- df[order(-df$abs_value), ]
+
+  # Assign the row name as the name of the dataframe
+  names(df) <- c("variable", "abs_value")
+  row.names(df) <- NULL
+  df$abs_value=round(df$abs_value,3)
+  df_list[[row_name]] <- df
+}
+
+# Access a specific dataframe (for example, matriz_fhat1)
+f1_vi <- head(df_list[["matriz_fhat1"]],15)
+f2_vi <- head(df_list[["matriz_fhat2"]],15)
+f3_vi <- head(df_list[["matriz_fhat3"]],15)
+f4_vi <- head(df_list[["matriz_fhat4"]],15)
+f5_vi <- head(df_list[["matriz_fhat5"]],15)
+f6_vi <- head(df_list[["matriz_fhat6"]],15)
+#f7_vi <- head(df_list[["matriz_fhat7"]],15)
+# View the dataframe
+f1_vi
+f2_vi
+f3_vi
+f4_vi
+f5_vi
+f6_vi
+#f7_vi
+
+#########
+ng$fred <- gsub("S.P.div.yield", "S&P div yield", ng$fred)
+# Create gsi column in f2_vi using matched values from ng$gsi
+f1_vi$gsi <- ng$gsi[match(f1_vi$variable, ng$fred)]
+f2_vi$gsi <- ng$gsi[match(f2_vi$variable, ng$fred)]
+f3_vi$gsi <- ng$gsi[match(f3_vi$variable, ng$fred)]
+f4_vi$gsi <- ng$gsi[match(f4_vi$variable, ng$fred)]
+f5_vi$gsi <- ng$gsi[match(f5_vi$variable, ng$fred)]
+f6_vi$gsi <- ng$gsi[match(f6_vi$variable, ng$fred)]
+#f7_vi$gsi <- ng$gsi[match(f7_vi$variable, ng$fred)]
+##########
+# Function to add ng$group to each dataframe
+add_ng_group <- function(df, ng) {
+  # Match variable names between dataframe and ng$fred
+  match_indices <- match(df$variable, ng$fred)
+
+  # Create new columns for ng$group and ng$gsi
+  df$group <- ng$group[match_indices]
+  df$gsi <- ng$gsi[match_indices]
+
+  # Return the updated dataframe
+  return(df)
+}
+
+# Add ng$group and ng$gsi to each dataframe
+f1_vi_group <- add_ng_group(f1_vi, ng)
+f2_vi_group <- add_ng_group(f2_vi, ng)
+f3_vi_group <- add_ng_group(f3_vi, ng)
+f4_vi_group <- add_ng_group(f4_vi, ng)
+f5_vi_group <- add_ng_group(f5_vi, ng)
+f6_vi_group <- add_ng_group(f6_vi, ng)
+
+###############
+
+f1_vi_group$abs_value <- as.numeric(gsub(",", ".", f1_vi_group$abs_value))
+# Verify the conversion
+print(f1_vi_group$abs_value)
+
+
+
+
+
+################################################################
+# Create a horizontal bar plot
+barplot(f1_vi_group$abs_value, horiz = TRUE, names.arg = f1_vi_group$fred,
+        main = "Top 15 variables que contribuyen al primer factor", xlab = "Suma de los valores absolutos por columna",
+        cex.names = 0.7, las = 1, col =  viridis_pal()(15))
+#################################### PLOT F1: 15 VARIABLES MAS IMPORTANTES
+# Set the width of the plotting area
+options(OutDec = ",") # Change the decimal point character
+par(pin = c(8, 4))  # Adjust the width as needed
+
+# Set the margin to accommodate longer names
+par(mar = c(5, 4, 4, 2) + 0.1)
+
+# Create a horizontal bar plot with the matching values as names
+barplot(f1_vi_group$abs_value, horiz = TRUE, names.arg = f1_vi_group$gsi,
+        main = "Top 15 variables que contribuyen al primer factor (F1)",
+        xlab = "Suma de los valores absolutos de los valores kernelshap por columna",
+        cex.names = 0.7, las = 1)
+
+
