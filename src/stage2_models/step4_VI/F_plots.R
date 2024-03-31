@@ -116,8 +116,6 @@ print(round(correlation_matrix,2))
 xtable(correlation_matrix, caption='Matríz de correlación de factores escalados')
 
 ########
-
-
 f_l=as.data.frame(normalized_fact_lineales)
 f_p=as.data.frame(normalized_fact_profundos)
 
@@ -129,9 +127,10 @@ lines(f_p$f7_p, col = "blue")
 ##################### F1
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f1_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F1 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f1_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F1 lineal", xlab='', xaxt = "n", cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f7_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -140,20 +139,15 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
+
 
 ######################## F2
-
-
-plot(f_l$f2_l, type='l', col = "red")
-lines(f_p$f1_p, col = "blue")
-abs(cor(f_l$f2_l,f_p$f1_p ))
-
 dev.off()
-# Plotting the first line with red color and adding legend
-plot(f_l$f2_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F2 lineal", xaxt = "n", cex.axis = 0.8)
+
+plot(f_l$f2_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)),xlab='', ylab = "referencia F2 lineal", xaxt = "n",  cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f1_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -162,22 +156,16 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
 
 
 ######################## F3
-
-
-plot(f_l$f3_l, type='l', col = "red")
-lines(f_p$f2_p, col = "blue")
-abs(cor(f_l$f3_l,f_p$f2_p ))
-
-
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f3_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F3 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f3_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), xlab='', ylab = "referencia F3 lineal", xaxt = "n",  cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f2_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -186,23 +174,18 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1,  cex = 1.1)  # Add rotated labels
 
 
 
 
 ######################## F4
-
-
-
-plot(f_l$f4_l, type='l', col = "red")
-lines(f_p$f4_p, col = "blue")
-
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f4_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F4 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f4_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), xlab='',ylab = "referencia F4 lineal", xaxt = "n", cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f4_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -211,21 +194,18 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
 
 
 
 
 ################################ F5
-
-plot(f_l$f5_l, type='l', col = "red")
-lines(f_p$f3_p, col = "blue")
-
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f5_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F5 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f5_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), xlab='',ylab = "referencia F5 lineal", xaxt = "n", cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f3_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -234,21 +214,18 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
 
 
 
 
 ################################ F6
-
-
-plot(f_l$f6_l, type='l', col = "red")
-lines(f_p$f5_p, col = "blue")
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f6_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F6 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f6_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)),xlab='', ylab = "referencia F6 lineal", xaxt = "n", cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f5_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -257,22 +234,19 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
 
 
 
 
 
 ################################ F7
-
-
-plot(f_l$f7_l, type='l', col = "red")
-lines(f_p$f6_p, col = "blue")
 dev.off()
 # Plotting the first line with red color and adding legend
-plot(f_l$f7_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), ylab = "referencia F7 lineal", xaxt = "n", cex.axis = 0.8)
+plot(f_l$f7_l, type = 'l', col = "red", ylim = range(c(f_l$f1_l, f_p$f7_p)), xlab='',ylab = "referencia F7 lineal", xaxt = "n", cex.axis = 1.3, cex.lab = 1.2)
 lines(f_p$f6_p, col = '#00008B')
-legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1)
+legend("topright", legend = c("lineal", "profundo"), col = c("red", '#00008B'), lty = 1, cex = 1.5, xpd = TRUE, bty = "n", inset = c(0, 0))
+
 
 # Determine the number of labels to show on the x-axis
 n <- length(rownames(f_l))
@@ -281,7 +255,7 @@ label_values <- rownames(f_l)[label_indices]
 
 # Adding index as labels on x-axis
 axis(1, at = label_indices, labels = FALSE)  # Hide original labels
-text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1)  # Add rotated labels
+text(label_indices, par("usr")[3] - 0.1, labels = label_values, xpd = TRUE, srt = 45, adj = 1, cex = 1.1)  # Add rotated labels
 
 
 
