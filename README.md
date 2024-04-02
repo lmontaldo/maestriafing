@@ -4,7 +4,7 @@
 
 
 
-<img src="docs/images/tesis.drawio.png" alt="Tesis Diagram" width="500"/>
+<img src="docs/images/tesis.drawio.png" alt="Tesis Diagram" width="1000"/>
 
 
 
