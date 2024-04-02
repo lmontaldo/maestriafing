@@ -308,31 +308,31 @@ create_bar_plot(top15_f7, 7)
 # f7_p=F_pseudo_inv_t[,7]
 
 ########## borrar
-create_bar_plot <- function(top15_f, factor_index) {
-  top_15_names <- rev(toupper(top15_f$gsi))
-  matching_values <- rev(top15_f$Values)
-  matching_d <- rev(top15_f$descript)
-  matching_g <- rev(top15_f$group)
-
-  #####
-  layout(matrix(1))
-  par(mar = c(8, 14, 4, 2) + 0.9)   # Adjust the margin on the left to accommodate longer names
-  barplot(matching_values, horiz = TRUE, names.arg = top_15_names,
-          main = paste("Top 15 variables que contribuyen al factor", factor_index),
-          xlab = "pesos en valores absolutos",
-          cex.main = 1.7,
-          cex.names = 1.5,
-          las = 1,
-          cex.axis = 1.5,
-          cex.lab=1.5,
-          col = rev(viridis_pal()(15)))
-  #####
-  table_data <-data.frame(Variable = rev(top_15_names),Descripcion =  rev(matching_d))
-  x_table <- xtable(table_data, include.rownames = FALSE,
-                    caption = paste("Factor", factor_index, ": Variable, descripción"),
-                    label = paste("tab", factor_index, sep = ":fli"))
-  print(x_table)
-
-}
-
-
+# create_bar_plot <- function(top15_f, factor_index) {
+#   top_15_names <- rev(toupper(top15_f$gsi))
+#   matching_values <- rev(top15_f$Values)
+#   matching_d <- rev(top15_f$descript)
+#   matching_g <- rev(top15_f$group)
+#
+#   #####
+#   layout(matrix(1))
+#   par(mar = c(8, 14, 4, 2) + 0.9)   # Adjust the margin on the left to accommodate longer names
+#   barplot(matching_values, horiz = TRUE, names.arg = top_15_names,
+#           main = paste("Top 15 variables que contribuyen al factor", factor_index),
+#           xlab = "pesos en valores absolutos",
+#           cex.main = 1.7,
+#           cex.names = 1.5,
+#           las = 1,
+#           cex.axis = 1.5,
+#           cex.lab=1.5,
+#           col = rev(viridis_pal()(15)))
+#   #####
+#   table_data <-data.frame(Variable = rev(top_15_names),Descripcion =  rev(matching_d))
+#   x_table <- xtable(table_data, include.rownames = FALSE,
+#                     caption = paste("Factor", factor_index, ": Variable, descripción"),
+#                     label = paste("tab", factor_index, sep = ":fli"))
+#   print(x_table)
+#
+# }
+#
+#
