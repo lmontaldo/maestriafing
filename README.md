@@ -5,7 +5,7 @@ Datos del estudio
 ## docs: 
 Imagenes y otros
 ## utils: 
-archivos con funciones que se emplean en archivos de src
+Archivos con funciones que se emplean en la implementacion
 ## implementation: 
 * stage1_preprocessing
    1) step1_fred_upload_preprocess.R
