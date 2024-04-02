@@ -2,9 +2,10 @@
 # Estructura tesis
 ## En carpeta src: 
 
+<img src="doc/images/tesis.drawio.png" alt="Tesis Diagram" width="1500" height="1000"/>
 
 
-<img src="docs/images/tesis.drawio.png" alt="Tesis Diagram" width="1500" height="auto" style="height: auto; width: 1500px;">
+
 
 
 
