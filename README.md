@@ -1,12 +1,12 @@
 
 # Estructura carpetas
-## data: 
+## /data: 
 datos del estudio
-## docs: 
+## /docs: 
 imagenes y otros
-## utils: 
+## /utils: 
 archivos con funciones que se emplean en archivos de src
-## src: 
+## /src: 
 
 <img src="docs/images/tesis_estruc.jpg" alt="Tesis Diagram" width="auto" height="auto"/>
 
