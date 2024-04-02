@@ -14,7 +14,7 @@ Etapa 1: Preprocesamiento
 4) step4_split_train_test.py
 5) step5_favar_ddfm_input_data.R
    
-<img src="docs/images/prepro.jpg" alt="Tesis Diagram" width="auto" height="auto"/>
+<img src="docs/images/tesis_prep.jpg" alt="Tesis Diagram" width="auto" height="auto"/>
    
 Etapa 2: Estimacion de los modelos (se siguen los scripts de las carpetas)
 1) step1_IC_factor_number
