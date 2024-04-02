@@ -6,7 +6,7 @@ datos del estudio
 imagenes y otros
 ## /utils: 
 archivos con funciones que se emplean en archivos de src
-## /src: 
+## /implementation: 
 
 <img src="docs/images/tesis_estruc.jpg" alt="Tesis Diagram" width="auto" height="auto"/>
 
