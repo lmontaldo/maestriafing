@@ -1,7 +1,7 @@
 
 # Estructura tesis
 
-![Alt Text](images/tesis.drawio.png)
+![Alt Text](![Tesis Diagram](docs/images/tesis.drawio.png))
 
 
 
