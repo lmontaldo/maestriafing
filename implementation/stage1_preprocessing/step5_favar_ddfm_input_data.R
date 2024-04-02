@@ -97,3 +97,4 @@ write.csv(df_data_s, 'data/scaled_train_test/scaled_train.csv', row.names=FALSE)
 
 
 save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")
+
