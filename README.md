@@ -20,7 +20,7 @@ Etapa 2: Estimacion de los modelos (se siguen los scripts de las carpetas)
 1) step1_IC_factor_number
 2) step2_FAVAR_lineal
 3) step3_DDFM_FAVAR_profundo
-4) step4_VI
+4) step4_VI 
 
 
 
