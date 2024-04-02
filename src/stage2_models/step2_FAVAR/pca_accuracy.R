@@ -1,5 +1,5 @@
 rm(list = ls())
-load("data/Rdata/favar_dfms_output.RData")
+load("data/Rdata/favar_ddfm_output.RData")
 libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 source("utils/pca_norm.R")
@@ -79,23 +79,8 @@ for(n_factors in factor_values){
   ######################## SAVE DATA ##########################
   #############################################################
   filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_", n_factors, ".RData")
-  cat('Saved objects in data/Rdata/favar_estimation_results \n')
-  save(abs_Lambda_F,Lambda_F_ordered, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
-  ###############################################################
-  ###############################################################
-  ################################ PLOTS ########################
-  # Convert the row names of F_hat to a Date object
-  dates <- as.Date(rownames(F_hat))
-
-  # Plot all principal components together
-  png(file.path(path, paste0("favar_n_factor_", n_factors, ".png")), width = 1200, height = 800)
-  par(mar = c(5, 5, 4, 2) + 0.1, cex.lab = 2, cex.main = 2)
-  matplot(dates, F_hat, type = "l",
-          xlab = "Date", ylab = "Principal Components",
-          main = paste(n_factors, "factores latentes estimados en el conjunto de entrenamiento", sep = " "),
-          col = 1:ncol(F_hat), lty = 1)
-
-  dev.off()
+  #cat('Saved objects in data/Rdata/favar_estimation_results \n')
+  #save(abs_Lambda_F,Lambda_F_ordered, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
   #######################################################################
 
 }
