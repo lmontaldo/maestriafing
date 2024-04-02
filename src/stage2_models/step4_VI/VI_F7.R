@@ -10,6 +10,25 @@ data_p=load("data/Rdata/variable_importance/profundo.RData")
 data_l=load("data/Rdata/variable_importance/lineal.RData")
 source("utils/accuracy_measures.R")
 str(load("data/Rdata/variable_importance/profundo.RData"))
+load("data/Rdata/variable_importance/shapley.RData")
+###################
+## colors by goup
+###################
+distinct_colors_manual <- c("#1f77b4", "#ff7f0e", "#FFDB58", "#d62728", "#9467bd", "#808080", "#e377c2", "#00FFFF")
+# Identify unique groups
+unique_groups <- unique(fred$group)
+color_mapping <- setNames(distinct_colors_manual, unique_groups)
+fred$color <- color_mapping[fred$group]
+
+group_color_df <- data.frame(
+  group = names(color_mapping),
+  color = as.character(color_mapping),
+  stringsAsFactors = FALSE
+)
+
+# Print the dataframe
+print(group_color_df)
+
 ########################################################################
 # KernelSHAP: Practical Shapley Value Estimation via Linear Regression
 
@@ -131,6 +150,11 @@ xtable(combined_df5, include.rownames = FALSE, caption = "Factor 5: Variable, de
 xtable(combined_df6, include.rownames = FALSE, caption = "Factor 6: Variable, descripción", label="tab:fp6")
 xtable(combined_df7, include.rownames = FALSE, caption = "Factor 7: Variable, descripción", label="tab:fp7")
 
+
+
+
+
+
 #########################################################
 ##################################################################################
 ######## function plot for all the factores in FAVAR profundo
@@ -156,22 +180,29 @@ plot_top_contributing_variables <- function(F_pseudo_inv_t, data_s) {
     matching_values <- rev(toupper(fred$gsi[match(names(top_15_sums), fred$fred)]))
     matching_descrip<- rev(fred$description[match(names(top_15_sums), fred$fred)])
     matching_group<- rev(fred$group[match(names(top_15_sums), fred$fred)])
+    matching_color<- rev(fred$color[match(names(top_15_sums), fred$fred)])
     combined_df <- data.frame(Variable=rev(matching_values), Descripcion=rev(matching_descrip), Grupo=rev(matching_group))
     x_table <- xtable(combined_df, caption = "Factor : Variable, descripcion y grupo", include.rownames = FALSE)
     cat('factor', i, '\n')
     print(x_table)
     ####################################################
     layout(matrix(1))
-    par(mar = c(8, 12, 4, 2) + 0.9)  # Adjust the margin on the left to accommodate longer names
+    par(mar = c(8, 14, 4, 2) + 0.9)  # Adjust the margin on the left to accommodate longer names
     barplot(top_15_names, horiz = TRUE, names.arg = matching_values,
             main = paste("Top 15 variables que contribuyen al factor", i),
-            xlab = "Suma de los valores absolutos de los valores kernelshap",
-            cex.names = 1, las = 1, col = rev(viridis_pal()(15)))
+            xlab = "pesos en valores absolutos",
+            cex.main = 2,
+            cex.names = 1.5,
+            las = 1,
+            cex.axis = 2,
+            cex.lab=1.5,
+            col = matching_color)
+
   }
 }
 
 plot_top_contributing_variables(F_pseudo_inv_t, data_s)
-
+#col = rev(viridis_pal()(15)))
 ############################################################################
 ###### VI lineal
 #################################################################################
@@ -198,6 +229,10 @@ add_gsi_column <- function(df, fred) {
   df$gsi <- fred_gsi
   fred_des <- fred$description[match(row_names, fred$fred)]
   df$descript <- fred_des
+  fred_g <- fred$group[match(row_names, fred$fred)]
+  df$group <- fred_g
+  fred_c <- fred$color[match(row_names, fred$fred)]
+  df$color <- fred_c
   return(df)
 }
 #
@@ -210,20 +245,39 @@ top15_f5 <- add_gsi_column(dataframes[["matriz_fhat5"]], fred)
 top15_f6 <- add_gsi_column(dataframes[["matriz_fhat6"]], fred)
 top15_f7 <- add_gsi_column(dataframes[["matriz_fhat7"]], fred)
 #
+################### ESTE POR LOS COLORES DE GRUPO
+################
 create_bar_plot <- function(top15_f, factor_index) {
   top_15_names <- rev(toupper(top15_f$gsi))
   matching_values <- rev(top15_f$Values)
+  matching_d <- rev(top15_f$descript)
+  matching_g <- rev(top15_f$group)
+  matching_c<- rev(top15_f$color)
 
   #####
   layout(matrix(1))
-  par(mar = c(8, 10, 4, 2) + 0.1)  # Adjust the margin on the left to accommodate longer names
+  par(mar = c(8, 14, 4, 2) + 0.9)   # Adjust the margin on the left to accommodate longer names
+
 
   barplot(matching_values, horiz = TRUE, names.arg = top_15_names,
           main = paste("Top 15 variables que contribuyen al factor", factor_index),
           xlab = "pesos en valores absolutos",
-          cex.names = 1, las = 1, col = rev(viridis_pal()(15)))
+          cex.main = 2,
+          cex.names = 1.5,
+          las = 1,
+          cex.axis = 2,
+          cex.lab=1.5,
+          col = matching_c)  # Use color_vector for specifying bar colors
+  #####
+  table_data <- data.frame(Variable = rev(top_15_names), Descripcion =  rev(matching_d))
+  x_table <- xtable(table_data, include.rownames = FALSE,
+                    caption = paste("Factor", factor_index, ": Variable, descripción"),
+                    label = paste("tab", factor_index, sep = ":fli"))
+  print(x_table)
+
 }
 
+#################
 # Apply the function to each top15_f data frame
 create_bar_plot(top15_f1, 1)
 create_bar_plot(top15_f2, 2)
@@ -233,24 +287,52 @@ create_bar_plot(top15_f5, 5)
 create_bar_plot(top15_f6, 6)
 create_bar_plot(top15_f7, 7)
 #
+
+#########################
 # factores
-f1_l=F_hat[,1]
-f2_l=F_hat[,2]
-f3_l=F_hat[,3]
-f4_l=F_hat[,4]
-f5_l=F_hat[,5]
-f6_l=F_hat[,6]
-f7_l=F_hat[,7]
-plot(F_hat[,1], type="l")
-#
-f1_p=F_pseudo_inv_t[,1]
-f2_p=F_pseudo_inv_t[,2]
-f3_p=F_pseudo_inv_t[,3]
-f4_p=F_pseudo_inv_t[,4]
-f5_p=F_pseudo_inv_t[,5]
-f6_p=F_pseudo_inv_t[,6]
-f7_p=F_pseudo_inv_t[,7]
+# f1_l=F_hat[,1]
+# f2_l=F_hat[,2]
+# f3_l=F_hat[,3]
+# f4_l=F_hat[,4]
+# f5_l=F_hat[,5]
+# f6_l=F_hat[,6]
+# f7_l=F_hat[,7]
+# plot(F_hat[,1], type="l")
+# #
+# f1_p=F_pseudo_inv_t[,1]
+# f2_p=F_pseudo_inv_t[,2]
+# f3_p=F_pseudo_inv_t[,3]
+# f4_p=F_pseudo_inv_t[,4]
+# f5_p=F_pseudo_inv_t[,5]
+# f6_p=F_pseudo_inv_t[,6]
+# f7_p=F_pseudo_inv_t[,7]
 
+########## borrar
+create_bar_plot <- function(top15_f, factor_index) {
+  top_15_names <- rev(toupper(top15_f$gsi))
+  matching_values <- rev(top15_f$Values)
+  matching_d <- rev(top15_f$descript)
+  matching_g <- rev(top15_f$group)
 
+  #####
+  layout(matrix(1))
+  par(mar = c(8, 14, 4, 2) + 0.9)   # Adjust the margin on the left to accommodate longer names
+  barplot(matching_values, horiz = TRUE, names.arg = top_15_names,
+          main = paste("Top 15 variables que contribuyen al factor", factor_index),
+          xlab = "pesos en valores absolutos",
+          cex.main = 1.7,
+          cex.names = 1.5,
+          las = 1,
+          cex.axis = 1.5,
+          cex.lab=1.5,
+          col = rev(viridis_pal()(15)))
+  #####
+  table_data <-data.frame(Variable = rev(top_15_names),Descripcion =  rev(matching_d))
+  x_table <- xtable(table_data, include.rownames = FALSE,
+                    caption = paste("Factor", factor_index, ": Variable, descripción"),
+                    label = paste("tab", factor_index, sep = ":fli"))
+  print(x_table)
+
+}
 
 
