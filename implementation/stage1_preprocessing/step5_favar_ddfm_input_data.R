@@ -105,27 +105,61 @@ for (i in seq_along(values_to_change)) {
   ng$fred[ng$fred == values_to_change[i]] <- new_values[i]
 }
 colnames(ng)[colnames(ng) == "gsi:description"] <- "gsi"
-#####################
+#########################################################
+##################### check if columns names are equal
+#########################################################
+if (identical(names(data_s), names(actual_s))) {
+  print("The names of data_s and actual_s are equal.")
+} else {
+  print("The names of data_s and actual_s are not equal.")
+}
+#########################################################
 df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
 # Check if all names in df$data_s are in ng$fred
 missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
 missing_names
-fred=ng
-save(fred,  file = "data/Rdata/ng_dataframe/fred.RData")
-
-
-save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts,
-     ics,ic_p2_factors,  file = "data/Rdata/input_data_models/favar_ddfm_input.RData")
-
-
+################################################################################
+# cuadros ####################################################################
+################################################################################
+filtered_ng <- ng %>% filter(fred %in% names(data_s))
+slow_fast <- as.data.frame(read_delim("data/prepro/descripcion_df.csv",
+                             delim = ";", escape_double = FALSE, trim_ws = TRUE))
+#
+not_in_slow_fast <- filtered_ng$fred[!filtered_ng$fred %in% slow_fast$fred]
+#
+old_values <- c("S.P.500", "S.P..indust", "S.P.div.yield", "S.P.PE.ratio")
+new_values <- c("S&P 500", "S&P: indust", "S&P div yield", "S&P PE ratio")
+slow_fast$fred <- ifelse(slow_fast$fred %in% old_values,
+                         new_values[match(slow_fast$fred, old_values)],
+                         slow_fast$fred)
+#
+filtered_slow_fast <- slow_fast[slow_fast$fred %in% names(data_s), ]
+ordered_filtered_slow_fast <- filtered_slow_fast[order(filtered_slow_fast$group), ]
+# Split ordered_filtered_slow_fast into dataframes by group
+grouped_dataframes <- split(ordered_filtered_slow_fast, ordered_filtered_slow_fast$group)
+# Create a list to store the dataframes for the first 8 groups
+first_8_group_dataframes <- list()
+for (i in 1:8) {
+  first_8_group_dataframes[[i]] <- grouped_dataframes[[i]]
+}
+g1=first_8_group_dataframes[[1]]
+g2=first_8_group_dataframes[[2]]
+g3=first_8_group_dataframes[[3]]
+g4=first_8_group_dataframes[[4]]
+g5=first_8_group_dataframes[[5]]
+g6=first_8_group_dataframes[[6]]
+g7=first_8_group_dataframes[[7]]
+g8=first_8_group_dataframes[[8]]
 ################################################################################
 # save data ####################################################################
 ################################################################################
+save(fred,  file = "data/Rdata/ng_dataframe/fred.RData")
+save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts,
+     ics,ic_p2_factors,  file = "data/Rdata/input_data_models/favar_ddfm_input.RData")
+########################
 df_actual_s <- fortify.zoo(actual_s)
 df_data_s<- fortify.zoo(data_s)
 write.csv(df_actual_s, 'data/scaled_train_test/scaled_test.csv', row.names=FALSE)
 write.csv(df_data_s, 'data/scaled_train_test/scaled_train.csv', row.names=FALSE)
-
-
 #save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")
 
