@@ -1,8 +1,8 @@
 rm(list = ls())
 libraries=source("utils/load_libraries.R")
 library(MASS)
-load("data/Rdata/favar_dfms_output.RData")
-load("data/Rdata/ng_dataframe/ng.RData")
+load("data/Rdata/input_data_models/favar_ddfm_input.RData")
+load("data/Rdata/ng_dataframe/fred.RData")
 source("utils/accuracy_measures.R")
 F_hat <- read.csv("data/FAVAR_profundo/f_hat_DDFM_fact5.csv")
 #######################################################################

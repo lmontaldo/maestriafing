@@ -4,25 +4,26 @@ library(MASS)
 library(kernelshap)
 library(viridis)
 library(xtable)
-load("data/Rdata/favar_ddfm_output.RData")
-load("data/Rdata/ng_dataframe/ng.RData")
+load("data/Rdata/favar_ddfm_input.RData")
+load("data/Rdata/ng_dataframe/fred.RData")
 data_p=load("data/Rdata/variable_importance/profundo.RData")
 data_l=load("data/Rdata/variable_importance/lineal.RData")
 source("utils/accuracy_measures.R")
 str(load("data/Rdata/variable_importance/profundo.RData"))
-load("data/Rdata/variable_importance/shapley.RData")
+load("data/Rdata/variable_importance/shapley.RData") #"abs_S_1" "abs_S_2" "abs_S_3" "abs_S_4" "abs_S_5" "abs_S_6" "abs_S_7"
 ###################
 ## colors by goup
 ###################
 distinct_colors_manual <- c("#1f77b4", "#ff7f0e", "#FFDB58", "#d62728", "#9467bd", "#808080", "#e377c2", "#00FFFF")
 # Identify unique groups
+fred=ng
 unique_groups <- unique(fred$group)
 color_mapping <- setNames(distinct_colors_manual, unique_groups)
 fred$color <- color_mapping[fred$group]
 
 group_color_df <- data.frame(
-  group = names(color_mapping),
   color = as.character(color_mapping),
+  group = names(color_mapping),
   stringsAsFactors = FALSE
 )
 
@@ -150,7 +151,33 @@ xtable(combined_df5, include.rownames = FALSE, caption = "Factor 5: Variable, de
 xtable(combined_df6, include.rownames = FALSE, caption = "Factor 6: Variable, descripción", label="tab:fp6")
 xtable(combined_df7, include.rownames = FALSE, caption = "Factor 7: Variable, descripción", label="tab:fp7")
 
+#############
+fred=ng
+column_sums <- colSums(abs_S_1)
+ordered_sums <- column_sums[order(-column_sums)]
+top_15_sums <- ordered_sums[1:15]
+print(top_15_sums)
+top_15_names<- rev(top_15_sums)
+#matching_values <- toupper(fred$gsi[match(names(top_15_sums), fred$fred)])
+matching_values <- rev(toupper(fred$gsi[match(names(top_15_sums), fred$fred)]))
+matching_descrip<- rev(fred$description[match(names(top_15_sums), fred$fred)])
+matching_group<- rev(fred$group[match(names(top_15_sums), fred$fred)])
+matching_color<- rev(fred$color[match(names(top_15_sums), fred$fred)])
+combined_df <- data.frame(Variable=rev(matching_values), Descripcion=rev(matching_descrip), Grupo=rev(matching_group))
 
+
+x_table <- xtable(combined_df, caption = "Factor : Variable, descripcion y grupo", include.rownames = FALSE)
+####################################################
+layout(matrix(1))
+par(mar = c(8, 14, 4, 2) + 0.9)  # Adjust the margin on the left to accommodate longer names
+barplot(top_15_names, horiz = TRUE, names.arg = matching_values,
+        xlab = "pesos en valores absolutos",
+        cex.main = 2,
+        cex.names = 1.5,
+        las = 1,
+        cex.axis = 2,
+        cex.lab=1.5,
+        col = matching_color)
 
 
 

@@ -1,7 +1,7 @@
 rm(list = ls())
 libraries=source("utils/load_libraries.R")
 library(MASS)
-load("data/Rdata/favar_ddfm_output.RData")
+load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 load("data/Rdata/ng_dataframe/ng.RData")
 source("utils/accuracy_measures.R")
 F_hat <- read.csv("data/FAVAR_profundo/f_hat_DDFM_fact7.csv")
@@ -137,30 +137,6 @@ for(i in variables){
          cex.main=1.5, cex.axis=1)
     lines((Upper[,i]), lty=2, col="red")
     lines((Lower[,i]), lty=2, col="red")
-    abline(h=0)
-  }
-}
-
-########### con kernel
-options(repr.plot.width=12, repr.plot.height=8)
-par(mfrow=c(5,4), mar = c(2, 2, 2, 2))
-
-for(i in variables){
-  index <- which(variables == i)
-  if(transf_cumsum[index] == 5){
-    plot(cumsum(IRF[,i]), type ='l', lwd=2, main = variable_names[index],
-         ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]), cumsum(Upper[,i])),
-         cex.main=1, cex.axis=1)
-    lines(cumsum(Upper[,i]), lty=2, col="red")
-    lines(cumsum(Lower[,i]), lty=2, col="red")
-    abline(h=0)
-  } else {
-    smoothed_irf <- stats::filter(IRF[,i], transf_cumsum[index], sides = 2)
-    plot(cumsum(smoothed_irf), type ='l', lwd=2, main = variable_names[index],
-         ylab= "", xlab="Steps", ylim=range(cumsum(Lower[,i]), cumsum(Upper[,i])),
-         cex.main=1, cex.axis=1)
-    lines(cumsum(Upper[,i]), lty=2, col="red")
-    lines(cumsum(Lower[,i]), lty=2, col="red")
     abline(h=0)
   }
 }

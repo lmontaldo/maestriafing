@@ -1,8 +1,6 @@
 rm(list = ls())
 obj1=load("data/Rdata/favar_dfms_output.RData")
 libraries=source("utils/load_libraries.R")
-
-
 ###############################
 # Nombres variables
 ################################
@@ -20,8 +18,7 @@ for (i in seq_along(values_to_change)) {
 }
 colnames(ng)[colnames(ng) == "gsi:description"] <- "gsi"
 #####################
-
-names_data_s=names(data_s)
+names_data_s=names(data_s) # "S.P.500"         "S.P..indust"     "S&P div yield"   "S.P.PE.ratio"
 names_actual_s=names(actual_s)
 
 df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
@@ -32,16 +29,18 @@ missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
 positions_and_values <- data.frame(position = which(!(df$data_s %in% ng$fred)),
                                    value = missing_names)
 
-library(stringdist)
-target_string <- positions_and_values$value[1]
+ng$fred #"S.P.500"         "S.P..indust"     "S.P.div.yield"   "S.P.PE.ratio"
 
-# Calculate the distances between the target string and all strings in ng$gsi
-distances <- stringdist::stringdist(target_string, ng$gsi)
+# replace by
+ng$fred <- gsub("[\\\\\\.\\&\\_]", "", ng$fred)
+names(data_s) <- gsub("[\\\\\\.\\&\\_ ]", "", names(data_s))
 
-# Find the index of the minimum distance
-closest_match_index <- which.min(distances)
+# check again
+df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
+# Check if all names in df$data_s are in ng$fred
+missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
 
-# Retrieve the most similar regex from ng$gsi
-most_similar_regex <- ng$gsi[closest_match_index]
+head(ng)
 
-
+save(ng,  file = "data/Rdata/ng_dataframe/fred.RData")
+# in replacement of load("data/Rdata/ng_dataframe/ng.RData")

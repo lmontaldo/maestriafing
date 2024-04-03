@@ -1,4 +1,5 @@
-loaded_objects <-load("data/Rdata/favar_ddfm_output.RData")
+loaded_objects <-load("data/Rdata/input_data_models/favar_ddfm_input.RData")
+
 
 libraries=source("utils/load_libraries.R")
 

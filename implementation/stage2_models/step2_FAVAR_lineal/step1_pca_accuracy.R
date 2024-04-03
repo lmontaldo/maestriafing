@@ -1,8 +1,9 @@
 rm(list = ls())
-load("data/Rdata/favar_ddfm_output.RData")
+dat=load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 libraries=source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 source("utils/pca_norm.R")
+
 
 # Define factor values to iterate over
 #n_factors =7
@@ -15,6 +16,7 @@ for(n_factors in factor_values){
   cat("Results for", n_factors,"latent factors \n")
   cat("---------------------------------------------- \n")
   cat('Step 1: Extract principal componentes of all X (including Y) \n')
+  print(names(data_s))
   result <- perform_pca(data_s, n_components =n_factors)
   C<-result$principal_components
   cat('Step 2: Extract principal componentes of Slow Variables \n')
@@ -79,8 +81,8 @@ for(n_factors in factor_values){
   ######################## SAVE DATA ##########################
   #############################################################
   filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_", n_factors, ".RData")
-  #cat('Saved objects in data/Rdata/favar_estimation_results \n')
-  #save(abs_Lambda_F,Lambda_F_ordered, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
+  cat('Saved objects in data/Rdata/favar_estimation_results \n')
+  save(abs_Lambda_F,Lambda_F_ordered, loadings, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
   #######################################################################
 
 }

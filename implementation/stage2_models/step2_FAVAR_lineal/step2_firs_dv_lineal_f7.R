@@ -1,6 +1,6 @@
 rm(list = ls())
-obj1=load("data/Rdata/favar_ddfm_output.RData")
-obj2=load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
+load("data/Rdata/input_data_models/favar_ddfm_input.RData")
+load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
 libraries=source("utils/load_libraries.R")
 #
 #

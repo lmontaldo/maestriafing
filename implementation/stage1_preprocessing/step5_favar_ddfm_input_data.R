@@ -87,6 +87,37 @@ variable_names = c("Fed Funds Rate",
                    "Dividend Yield")
 transf_code <- as.numeric(as.character(ordered_descrip_tcode$tcode))
 #transf_code = c(1,5,5,1,1,5,5,5,1,1,5,5,5,1,1,5,1,1,1)
+
+
+################################################################################
+# grupos de variables y descripciones ##########################################
+################################################################################
+library(fbi)
+data(fredmd_description)
+n_g=fredmd_description
+ng=n_g[, c("fred", "group","gsi:description", "description")]
+# List of values to be changed
+values_to_change <- c("IPB51222s")
+# New values to replace the old values
+new_values <- c("IPB51222S")
+# Loop through each value to be changed and replace them with new values
+for (i in seq_along(values_to_change)) {
+  ng$fred[ng$fred == values_to_change[i]] <- new_values[i]
+}
+colnames(ng)[colnames(ng) == "gsi:description"] <- "gsi"
+#####################
+df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
+# Check if all names in df$data_s are in ng$fred
+missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
+missing_names
+fred=ng
+save(fred,  file = "data/Rdata/ng_dataframe/fred.RData")
+
+
+save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts,
+     ics,ic_p2_factors,  file = "data/Rdata/input_data_models/favar_ddfm_input.RData")
+
+
 ################################################################################
 # save data ####################################################################
 ################################################################################
@@ -96,5 +127,5 @@ write.csv(df_actual_s, 'data/scaled_train_test/scaled_test.csv', row.names=FALSE
 write.csv(df_data_s, 'data/scaled_train_test/scaled_train.csv', row.names=FALSE)
 
 
-save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")
+#save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")
 
