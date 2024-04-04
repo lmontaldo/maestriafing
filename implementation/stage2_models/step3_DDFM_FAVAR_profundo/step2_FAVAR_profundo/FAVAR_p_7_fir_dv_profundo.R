@@ -225,43 +225,4 @@ tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]
 xtable(tableddfm, digits=3)
 ##########################
 
-########################################################################
-# KernelSHAP: Practical Shapley Value Estimation via Linear Regression
-#########################################################################
-
-library(kernelshap)
-library(viridis)
-f1=F_pseudo_inv_t[,1]
-X=as.data.frame(data_s)
-
-fit <- lm(f1 ~ ., data = X)
-X_explain <- X
-set.seed(1)
-bg_X <-X[sample(nrow(X), 118), ]
-s <- kernelshap(fit, X_explain, bg_X = bg_X)
-abs_S <- apply(s$S, 2, abs)
-
-sum(abs(s$S[,1]))
-18.50535/118 # en promedio me deberia dar aproximdada
-# Compute the sum of each column
-column_sums <- colSums(abs_S)
-
-# Order the column sums in descending order
-ordered_sums <- column_sums[order(-column_sums)]
-top_15_sums <- rev(top_15_sums)
-top_15_names <- rev(top_15_names)
-matching_values <- ng$gsi[match(top_15_names, ng$fred)]
-################################################################
-# Create a horizontal bar plot
-barplot(top_15_sums, horiz = TRUE, names.arg = top_15_names,
-        main = "Top 15 variables que contribuyen al primer factor", xlab = "Suma de los valores absolutos por columna",
-        cex.names = 0.7, las = 1, col =  viridis_pal()(15))
-#################################### PLOT F1: 15 VARIABLES MAS IMPORTANTES
-# Set the margin to accommodate longer names
-par(mar = c(5, 8, 4, 2) + 0.1)
-# Create a horizontal bar plot with the matching values as names
-barplot(top_15_sums, horiz = TRUE, names.arg = matching_values,
-        main = "Top 15 variables que contribuyen al primer factor (F1)",
-        xlab = "Suma de los valores absolutos de los valores kernelshap por columna",
-        cex.names = 0.7, las = 1, col = color_palette)
 
