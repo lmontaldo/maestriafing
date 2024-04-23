@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-
-=======
- 
->>>>>>> origin/feature_paquetes
 # Ignore files with a specific extension
 *.log
 # Ignore __pycache__/
@@ -10,8 +5,9 @@ __pycache__/
 # Ignore R related extensions
 .Rproj.user
 .Rhistory
-
 #######
 my_thesis.egg-info
-
-
+########
+# Ignore files with a specific name
+#########
+respaldo_VI.R

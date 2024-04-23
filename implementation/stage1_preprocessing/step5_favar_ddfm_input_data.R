@@ -132,9 +132,9 @@ df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
 # Check if all names in df$data_s are in ng$fred
 missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
 missing_names
-############################################################
-# Cuadros para apendice 1 con la descripción de variables ##
-############################################################
+###########################################################################
+# Cuadros para apendice 1 con la descripción de variables: slow and fast ##
+###########################################################################
 filtered_ng <- ng %>% filter(fred %in% names(data_s))
 slow_fast <- as.data.frame(read_delim("data/prepro/descripcion_df.csv",
                              delim = ";", escape_double = FALSE, trim_ws = TRUE))
@@ -162,7 +162,11 @@ head(ordered_filtered_slow_fast)
 dim(ordered_filtered_slow_fast)
 #
 ordered_filtered_slow_fast <- left_join(ordered_filtered_slow_fast, ng[, c("fred", "tcode")], by = "fred")
-
+##########################
+# Creación datos fred ###
+#########################
+fred=modify_group_column(filtered_ng)
+cat("Estan todos los valores de la columna fred$fred en names(data_s)?:", all(fred$fred %in% names(data_s)), "\n")
 ##########################
 # Se guardan los datos ###
 ##########################
