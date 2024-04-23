@@ -1,6 +1,7 @@
 #
 rm(list = ls())
 libraries=source("utils/load_libraries.R")
+source("utils/grupos_variables.R")
 library(zoo)
 cat("My Working directory is: ", getwd(), "\n")
 df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
@@ -8,9 +9,9 @@ df_test <- read_csv("data/train_test/sfr_test.csv", show_col_types = FALSE)
 slow <- read_csv("data/prepro/slow_variables.csv", show_col_types = FALSE)
 #fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
 #escr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
-#####################################################################
-# xts objects #######################################################
-#####################################################################
+################################################
+# Creación de objetos xts ######################
+################################################
 df_train$index <- as.Date(df_train$index)
 xts_object_train <- xts(df_train[, -which(colnames(df_train) == "index")], order.by = df_train$index)
 data_s = scale(xts_object_train, center = TRUE, scale = TRUE)
@@ -23,13 +24,13 @@ actual_s = scale(xts_object_test, center = TRUE, scale = TRUE)
 df_test_index=df_test$index
 # Number of forecast steps
 n_forecasts = dim(actual_s)[1]
-###########################################################################
-# Optimal number of factors
-###########################################################################
+######################################################################
+# Cantidad óptima de factores #######################################
+#####################################################################
 ics = ICr(data_s)
 ic_p2_factors=ics$r.star[2]
 ###########################################################################################################################################
-# variables as in https://jbduarte.com/blog/time%20series/r/favar/2020/04/24/FAVAR-Replication.html#Step-4:-Estimate-FAVAR-and-get-IRFs
+# Tomo las variables como en in https://jbduarte.com/blog/time%20series/r/favar/2020/04/24/FAVAR-Replication.html#Step-4:-Estimate-FAVAR-and-get-IRFs
 ###########################################################################################################################################
 colnames(data_s)[93] <- "S&P div yield"
 variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
@@ -55,17 +56,26 @@ variables = c(grep("^FEDFUNDS$", colnames(data_s)),#Fed Funds Rate
 
 var=c("FEDFUNDS","INDPRO","CPIAUCSL","TB3MS", "GS5", "M1SL", "M2SL", "EXJPUSx", "CUSR0000SAC", "CUMFNS", "DPCERA3M086SBEA", "DDURRG3M086SBEA",
 "DNDGRG3M086SBEA", "UNRATE", "CE16OV", "CES0600000008", "HOUST", "AMDMNOx", "S&P div yield")
+########################################################################################
+# Empleo paquete fbi para crear tablas, listas de kpis y limpiar nombres de variables
+########################################################################################
 data("fredmd_description")
 descrip=fredmd_description
 kpis=descrip[descrip$fred %in% var, ]
 kpis[, c("fred", "description")]
 kpis_ordenado <- kpis[order(kpis$group), ]
-xtable(kpis_ordenado[, c( "gsi:description", "group")], caption="variables para análisis de impacto de PL")
-descrip_tcode=kpis[,c("tcode","fred")]
+kpis_ordenado <- modify_group_column(kpis_ordenado)
+# xtable
+print(xtable(kpis_ordenado[, c( "gsi:description", "grupos")],
+       caption="variables para análisis de impacto de PL",
+       label= "tab:vari_fir"), include.rownames=FALSE)
+# matching variables
+descrip_tcode=kpis_ordenado[,c("tcode","fred", "grupos")]
 ix <- match(var, descrip_tcode$fred)
 ordered_descrip_tcode <- descrip_tcode[ix, ]
-ordered_descrip_tcode
-
+##########################
+# KPIs ###################
+##########################
 variable_names = c("Fed Funds Rate",
                    "IP Index",
                    "CPI",
@@ -87,15 +97,19 @@ variable_names = c("Fed Funds Rate",
                    "Dividend Yield")
 transf_code <- as.numeric(as.character(ordered_descrip_tcode$tcode))
 #transf_code = c(1,5,5,1,1,5,5,5,1,1,5,5,5,1,1,5,1,1,1)
-
-
 ################################################################################
-# grupos de variables y descripciones ##########################################
+# tabla resultados: variables para el impacto de PL #############################
 ################################################################################
-library(fbi)
-data(fredmd_description)
+ordered_descrip_tcode_copy <- ordered_descrip_tcode
+# Agrego columna 'Variables'
+ordered_descrip_tcode_copy$Variables <- variable_names
+print(xtable(ordered_descrip_tcode_copy[,c("Variables", "grupos")] , caption="variables para análisis de impacto de PL",
+             label= "tab:vari_fir"), include.rownames=FALSE)
+################################################################################
+# Grupos de variables y descripciones ##########################################
+################################################################################
 n_g=fredmd_description
-ng=n_g[, c("fred", "group","gsi:description", "description")]
+ng=n_g[, c("fred", "group","gsi:description", "description", 'tcode')]
 # List of values to be changed
 values_to_change <- c("IPB51222s")
 # New values to replace the old values
@@ -105,9 +119,9 @@ for (i in seq_along(values_to_change)) {
   ng$fred[ng$fred == values_to_change[i]] <- new_values[i]
 }
 colnames(ng)[colnames(ng) == "gsi:description"] <- "gsi"
-#########################################################
-##################### check if columns names are equal
-#########################################################
+########################################################################################
+# Chequeo si columns de  data_s (train dataset) son iguales a actual_s (test dataset) ##
+########################################################################################
 if (identical(names(data_s), names(actual_s))) {
   print("The names of data_s and actual_s are equal.")
 } else {
@@ -118,9 +132,9 @@ df <- data.frame(data_s = names(data_s), stringsAsFactors = FALSE)
 # Check if all names in df$data_s are in ng$fred
 missing_names <- df$data_s[!(df$data_s %in% ng$fred)]
 missing_names
-################################################################################
-# cuadros ####################################################################
-################################################################################
+############################################################
+# Cuadros para apendice 1 con la descripción de variables ##
+############################################################
 filtered_ng <- ng %>% filter(fred %in% names(data_s))
 slow_fast <- as.data.frame(read_delim("data/prepro/descripcion_df.csv",
                              delim = ";", escape_double = FALSE, trim_ws = TRUE))
@@ -135,24 +149,23 @@ slow_fast$fred <- ifelse(slow_fast$fred %in% old_values,
 #
 filtered_slow_fast <- slow_fast[slow_fast$fred %in% names(data_s), ]
 ordered_filtered_slow_fast <- filtered_slow_fast[order(filtered_slow_fast$group), ]
-# Split ordered_filtered_slow_fast into dataframes by group
-grouped_dataframes <- split(ordered_filtered_slow_fast, ordered_filtered_slow_fast$group)
-# Create a list to store the dataframes for the first 8 groups
-first_8_group_dataframes <- list()
-for (i in 1:8) {
-  first_8_group_dataframes[[i]] <- grouped_dataframes[[i]]
-}
-g1=first_8_group_dataframes[[1]]
-g2=first_8_group_dataframes[[2]]
-g3=first_8_group_dataframes[[3]]
-g4=first_8_group_dataframes[[4]]
-g5=first_8_group_dataframes[[5]]
-g6=first_8_group_dataframes[[6]]
-g7=first_8_group_dataframes[[7]]
-g8=first_8_group_dataframes[[8]]
-################################################################################
-# save data ####################################################################
-################################################################################
+ordered_filtered_slow_fast_tcode <- modify_group_column(left_join(ordered_filtered_slow_fast, ng[, c("fred", "tcode")], by = "fred"))
+dim(ordered_filtered_slow_fast_tcode)
+names(ordered_filtered_slow_fast_tcode)
+unique(ordered_filtered_slow_fast_tcode$grupos)
+# xtable
+print(xtable(ordered_filtered_slow_fast_tcode[, c( "fred", "description",
+                                                   "grupos", "slow_1_fast_0", "tcode")],
+digits=0), include.rownames=FALSE)
+#
+head(ordered_filtered_slow_fast)
+dim(ordered_filtered_slow_fast)
+#
+ordered_filtered_slow_fast <- left_join(ordered_filtered_slow_fast, ng[, c("fred", "tcode")], by = "fred")
+
+##########################
+# Se guardan los datos ###
+##########################
 save(fred,  file = "data/Rdata/ng_dataframe/fred.RData")
 save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts,
      ics,ic_p2_factors,  file = "data/Rdata/input_data_models/favar_ddfm_input.RData")
