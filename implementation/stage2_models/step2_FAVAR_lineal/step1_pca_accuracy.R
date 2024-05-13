@@ -1,15 +1,12 @@
 rm(list = ls())
-dat=load("data/Rdata/input_data_models/favar_ddfm_input.RData")
-libraries=source("utils/load_libraries.R")
+source("utils/load_libraries.R")
 source("utils/accuracy_measures.R")
 source("utils/pca_norm.R")
-
-
+load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 # Define factor values to iterate over
 #n_factors =7
 factor_values <- c(2,3,4,5, 6, ic_p2_factors)
 # Initialize empty lists to store results
-path <- "docs/images/favar_n_factor_estimated"
 results_list <- list()
 for(n_factors in factor_values){
   cat("\n---------------------------------------------- \n")
@@ -80,9 +77,12 @@ for(n_factors in factor_values){
   #############################################################
   ######################## SAVE DATA ##########################
   #############################################################
-  filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_", n_factors, ".RData")
+  filename <- paste0("data/Rdata/favar_estimation_results/results_favar_factor_",
+                     n_factors, ".RData")
   cat('Saved objects in data/Rdata/favar_estimation_results \n')
-  save(abs_Lambda_F,Lambda_F_ordered, loadings, data_s, data_slow,F_slow, reg_loadings,data_var,n_lags, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part, Y_part, predictions_xts,   file = filename)
+  save(abs_Lambda_F,Lambda_F_ordered, loadings, data_slow,F_slow,
+       reg_loadings,data_var,n_lags,best_lag, F_hat,var,Lamda_F,Lambda_ffr,pred_F,pred_FFR,F_part,
+      Y_part, predictions_xts,   file = filename)
   #######################################################################
 
 }

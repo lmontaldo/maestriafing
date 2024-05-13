@@ -4,13 +4,9 @@ library(MASS)
 library(kernelshap)
 library(viridis)
 library(corrplot)
-load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 load("data/Rdata/ng_dataframe/fred.RData")
 data_p=load("data/Rdata/variable_importance/profundo.RData")
-data_l=load("data/Rdata/variable_importance/lineal.RData")
-source("utils/accuracy_measures.R")
-str(load("data/Rdata/variable_importance/profundo.RData"))
-
+data_l=load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
 ############################################################
 ###########################################################
 ###### scaled and normalized factors
@@ -124,7 +120,7 @@ find_and_plot_correlation <- function(df1, df2) {
   correlations <- find_correlation_matrix(df1, df2)
 
   # Plot correlation matrix with values
-  corrplot(correlations, method = 'number',  mar = c(1,1, 0,2)+2,
+  corrplot(correlations, method = 'number',
            tl.col = "black", tl.srt = 45, is.corr=FALSE, tl.cex = 1.9, cl.cex = 1.1,
            number.cex = 1.6,
            number.font = 2,

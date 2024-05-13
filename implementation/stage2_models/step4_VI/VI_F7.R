@@ -9,10 +9,8 @@ library(xtable)
 library(tibble)
 load("data/Rdata/favar_ddfm_input.RData")
 load("data/Rdata/ng_dataframe/fred.RData")
-data_p=load("data/Rdata/variable_importance/profundo.RData")
-data_l=load("data/Rdata/variable_importance/lineal.RData")
-source("utils/accuracy_measures.R")
 load("data/Rdata/variable_importance/profundo.RData")
+load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
 load("data/Rdata/variable_importance/shapley.RData") #"abs_S_1" "abs_S_2" "abs_S_3" "abs_S_4" "abs_S_5" "abs_S_6" "abs_S_7"
 ###############
 # VI profundo #
@@ -106,4 +104,4 @@ generate_horizontal_bar_plot(top15_f4)
 generate_horizontal_bar_plot(top15_f5)
 generate_horizontal_bar_plot(top15_f6)
 generate_horizontal_bar_plot(top15_f7)
-dev.off()
+

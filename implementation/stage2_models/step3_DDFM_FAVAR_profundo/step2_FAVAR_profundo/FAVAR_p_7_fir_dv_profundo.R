@@ -1,20 +1,17 @@
 rm(list = ls())
-libraries=source("utils/load_libraries.R")
+source("utils/load_libraries.R")
+source("utils/accuracy_measures.R")
 library(MASS)
 load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 load("data/Rdata/ng_dataframe/ng.RData")
-source("utils/accuracy_measures.R")
 F_hat <- read.csv("data/FAVAR_profundo/f_hat_DDFM_fact7.csv")
 #######################################################################
 ################ F_hat with time index             ####################
 #######################################################################
-
 F_hat$Index <- as.Date(F_hat$Index)
-
 # Set the 'Index' column as the index
 rownames(F_hat) <- F_hat$Index
 F_hat$Index <- NULL  # Remove the 'Index' column from the DataFrame
-
 #######################################################################
 ################ Moore-Penrose pseudoinvers        ####################
 #######################################################################
@@ -26,7 +23,7 @@ rownames(F_pseudo_inv_t)<- rownames(F_matrix)
 X=as.matrix(data_s)
 moore_penrose_loadings <- F_pseudoinverse %*% X
 dim(moore_penrose_loadings)
-save(F_pseudo_inv_t,moore_penrose_loadings, X , file = "data/Rdata/variable_importance/profundo.RData")
+#save(F_pseudo_inv_t,moore_penrose_loadings, X , file = "data/Rdata/variable_importance/profundo.RData")
 ##################################################
 ####### IMPULSE-RESPONSE FUNCTIONS
 ##################################################
@@ -221,8 +218,9 @@ for(i in 1:key_nvars){
   r2[i] = results[[variables[i]]]$r.squared
 }
 tableddfm = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]
-xtable(tableddfm, digits=3)
+#DV$tableddfm$DV=tableddfm["Contribution"]*tableddfm["R.squared"]
+table_favarp_ordered <- tableddfm[order(-tableddfm$R.squared), ]
+print(xtable(table_favarp_ordered , digits=3), include.rownames = FALSE)
 ##########################
 
 

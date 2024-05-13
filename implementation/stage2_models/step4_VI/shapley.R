@@ -7,8 +7,7 @@ library(viridis)
 library(xtable)
 load("data/Rdata/input_data_models/favar_ddfm_input.RData")
 data_p=load("data/Rdata/variable_importance/profundo.RData")
-data_l=load("data/Rdata/variable_importance/lineal.RData")
-load("data/Rdata/variable_importance/profundo.RData")
+data_l=load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
 load("data/Rdata/ng_dataframe/fred.RData")
 ########################################################################
 # KernelSHAP: Practical Shapley Value Estimation via Linear Regression
@@ -120,9 +119,6 @@ combined_df5 <- process_abs_S(abs_S_5 ,fred)
 combined_df6 <- process_abs_S(abs_S_6, fred)
 combined_df7 <- process_abs_S(abs_S_7, fred)
 ########
-
-xtable(combined_df7, include.rownames = FALSE, caption = "Factor: Variable, descripción y grupo", label="tab:fp1")
-
 xtable(combined_df1, include.rownames = FALSE, caption = "Factor 1: Variable, descripción", label="tab:fp1")
 xtable(combined_df2, include.rownames = FALSE, caption = "Factor 2: Variable, descripción", label="tab:fp2")
 xtable(combined_df3, include.rownames = FALSE, caption = "Factor 3: Variable, descripción", label="tab:fp3")

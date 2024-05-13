@@ -7,8 +7,6 @@ cat("My Working directory is: ", getwd(), "\n")
 df_train <- read_csv("data/train_test/sfr_train.csv", show_col_types = FALSE)
 df_test <- read_csv("data/train_test/sfr_test.csv", show_col_types = FALSE)
 slow <- read_csv("data/prepro/slow_variables.csv", show_col_types = FALSE)
-#fast <- read_csv("../../data/prepro/fast_columns.csv", show_col_types = FALSE)
-#escr <- read.table("../../data/prepro/descripciones.txt", header = TRUE, sep = "\t")
 ################################################
 # Creación de objetos xts ######################
 ################################################
@@ -165,8 +163,10 @@ ordered_filtered_slow_fast <- left_join(ordered_filtered_slow_fast, ng[, c("fred
 ##########################
 # Creación datos fred ###
 #########################
-fred=modify_group_column(filtered_ng)
+fred=grupos_espagnol_abreviados(filtered_ng)
 cat("Estan todos los valores de la columna fred$fred en names(data_s)?:", all(fred$fred %in% names(data_s)), "\n")
+fred <- merge(fred, group_color_df, by.x = "grupos", by.y = "group", all.x = TRUE)
+names(fred)
 ##########################
 # Se guardan los datos ###
 ##########################
@@ -178,5 +178,4 @@ df_actual_s <- fortify.zoo(actual_s)
 df_data_s<- fortify.zoo(data_s)
 write.csv(df_actual_s, 'data/scaled_train_test/scaled_test.csv', row.names=FALSE)
 write.csv(df_data_s, 'data/scaled_train_test/scaled_train.csv', row.names=FALSE)
-#save(transf_code,variables, variable_names, df_train, slow,data_s, actual_s,df_test_index,n_forecasts, ics,ic_p2_factors,  file = "data/Rdata/favar_ddfm_output.RData")
 

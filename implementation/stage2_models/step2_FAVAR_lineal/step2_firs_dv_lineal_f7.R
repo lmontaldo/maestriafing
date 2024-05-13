@@ -1,15 +1,14 @@
 rm(list = ls())
-load("data/Rdata/input_data_models/favar_ddfm_input.RData")
-load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
-libraries=source("utils/load_libraries.R")
+source("utils/load_libraries.R")
+input=load("data/Rdata/input_data_models/favar_ddfm_input.RData")
+f7=load("data/Rdata/favar_estimation_results/results_favar_factor_7.RData")
 #
+#data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
+#var_select <- VARselect(data_var, lag.max = 15, type = "both")
+#best_lag <- var_select$selection
+#n_lags=best_lag[1]
 #
-data_var <- data.frame(F_hat, "FEDFUNDS" = data_s[, "FEDFUNDS"])
-var_select <- VARselect(data_var, lag.max = 15, type = "both")
-best_lag <- var_select$selection
-n_lags=best_lag[1]
-#
-var = VAR(data_var, p =n_lags)
+#var = VAR(data_var, p =n_lags)
 irf_point = irf(var, n.ahead = 48, impulse = "FEDFUNDS", response = "FEDFUNDS", boot = FALSE)
 # Shock size of 25 basis points
 impulse_sd = 0.25/sd(df_train$FEDFUNDS)
@@ -19,7 +18,7 @@ matriz_s<- as.matrix(data_s)
 matriz_fhat<- as.matrix(F_hat)
 reg_loadings = lm(matriz_s ~ 0 + matriz_fhat + data_s[,"FEDFUNDS"])
 loadings = reg_loadings$coefficients
-save(F_hat,loadings,  file = "data/Rdata/variable_importance/lineal.RData")
+#save(F_hat,loadings,  file = "data/Rdata/variable_importance/lineal.RData")
 #head(reg_loadings$coefficients)
 #summary(reg_loadings)
 #######################################
@@ -166,6 +165,9 @@ for(i in 1:key_nvars){
   r2[i] = results[[variables[i]]]$r.squared
 }
 table_favar = data.frame("Variables" = variable_names, "Contribution" = round((psi2_ffr/var_total),3), "R-squared" = round(r2,3))
-table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
-xtable(table_favar, digits=3)
+#table_favar$DV=table_favar["Contribution"]*table_favar["R.squared"]
+table_favar_ordered <- table_favar[order(-table_favar$R.squared), ]
+print(xtable(table_favar_ordered, digits=3), include.rownames = FALSE)
+
+
 
