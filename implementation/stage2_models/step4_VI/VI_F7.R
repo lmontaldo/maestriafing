@@ -43,6 +43,7 @@ top15_f4_p <- top15_vi_profundo(abs_S_4, fred)
 top15_f5_p <- top15_vi_profundo(abs_S_5, fred)
 top15_f6_p <- top15_vi_profundo(abs_S_6, fred)
 top15_f7_p <- top15_vi_profundo(abs_S_7, fred)
+
 #################
 ## Bar plots ####
 #################
@@ -54,6 +55,18 @@ generate_horizontal_bar_plot(top15_f5_p)
 generate_horizontal_bar_plot(top15_f6_p)
 generate_horizontal_bar_plot(top15_f7_p)
 dev.off()
+
+###############
+### xtables ###
+###############
+print(xtable(top15_f1_p[,c('gsi', 'descript')],  caption = "Factor 1: Variable, descripción", label="tab:fp1"), include.rownames = FALSE)
+print(xtable(top15_f2_p[,c('gsi', 'descript')],  caption = "Factor 2: Variable, descripción", label="tab:fp2"), include.rownames = FALSE)
+print(xtable(top15_f3_p[,c('gsi', 'descript')],  caption = "Factor 3: Variable, descripción", label="tab:fp3"), include.rownames = FALSE)
+print(xtable(top15_f4_p[,c('gsi', 'descript')],  caption = "Factor 4: Variable, descripción", label="tab:fp4"), include.rownames = FALSE)
+print(xtable(top15_f5_p[,c('gsi', 'descript')],  caption = "Factor 5: Variable, descripción", label="tab:fp5"), include.rownames = FALSE)
+print(xtable(top15_f6_p[,c('gsi', 'descript')],  caption = "Factor 6: Variable, descripción", label="tab:fp6"), include.rownames = FALSE)
+print(xtable(top15_f7_p[,c('gsi', 'descript')],  caption = "Factor 7: Variable, descripción", label="tab:fp7"), include.rownames = FALSE)
+
 ###################
 ###### VI lineal #
 ###################
@@ -105,3 +118,13 @@ generate_horizontal_bar_plot(top15_f5)
 generate_horizontal_bar_plot(top15_f6)
 generate_horizontal_bar_plot(top15_f7)
 
+###############
+### xtables ###
+###############
+print(xtable(top15_f1[,c('gsi', 'descript')],  caption = "Factor 1: Variable, descripción", label="tab:fli1"), include.rownames = FALSE)
+print(xtable(top15_f2[,c('gsi', 'descript')],  caption = "Factor 2: Variable, descripción", label="tab:fli2"), include.rownames = FALSE)
+print(xtable(top15_f3[,c('gsi', 'descript')],  caption = "Factor 3: Variable, descripción", label="tab:fli3"), include.rownames = FALSE)
+print(xtable(top15_f4[,c('gsi', 'descript')],  caption = "Factor 4: Variable, descripción", label="tab:fli4"), include.rownames = FALSE)
+print(xtable(top15_f5[,c('gsi', 'descript')],  caption = "Factor 5: Variable, descripción", label="tab:fli5"), include.rownames = FALSE)
+print(xtable(top15_f6[,c('gsi', 'descript')],  caption = "Factor 6: Variable, descripción", label="tab:fli6"), include.rownames = FALSE)
+print(xtable(top15_f7[,c('gsi', 'descript')],  caption = "Factor 7: Variable, descripción", label="tab:fli7"), include.rownames = FALSE)
